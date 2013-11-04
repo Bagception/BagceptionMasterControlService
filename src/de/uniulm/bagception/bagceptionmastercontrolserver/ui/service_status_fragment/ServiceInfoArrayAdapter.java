@@ -4,10 +4,12 @@ import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import de.philipphock.android.lib.logging.LOG;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo.STATUS;
 
@@ -18,7 +20,7 @@ public class ServiceInfoArrayAdapter extends ArrayAdapter<ServiceInfo> {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 		if (view == null) {
 			LayoutInflater inflater = (LayoutInflater) getContext()
@@ -26,7 +28,7 @@ public class ServiceInfoArrayAdapter extends ArrayAdapter<ServiceInfo> {
 			view = inflater.inflate(R.layout.service_status_fragment_item, null);
 		}
 
-		ServiceInfo item = getItem(position);
+		final ServiceInfo item = getItem(position);
 		if (item != null) {
 			TextView serviceName = (TextView) view
 					.findViewById(R.id.serviceName);
@@ -65,9 +67,32 @@ public class ServiceInfoArrayAdapter extends ArrayAdapter<ServiceInfo> {
 			
 
 			
+			
+			serviceButton.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					item.startStopService();
+				}
+			});
+			
 		}
 
 		return view;
 	}
+	
+	
+	public void forceUpdate(){
+		for (int i=0;i<this.getCount();i++){
+			ServiceInfo info = this.getItem(i);
+			info.resume();
+		}
+	}
 
+	public void pause(){
+		for (int i=0;i<this.getCount();i++){
+			ServiceInfo info = this.getItem(i);
+			info.pause();
+		}
+	}
 }
