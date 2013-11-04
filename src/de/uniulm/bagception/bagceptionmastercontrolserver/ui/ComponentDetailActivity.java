@@ -1,13 +1,15 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.id;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.layout;
+import java.lang.reflect.InvocationTargetException;
+
+import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import de.philipphock.android.lib.logging.LOG;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 
 /**
  * An activity representing a single Component detail screen. This activity is
@@ -40,15 +42,42 @@ public class ComponentDetailActivity extends FragmentActivity {
 		if (savedInstanceState == null) {
 			// Create the detail fragment and add it to the activity
 			// using a fragment transaction.
-			Bundle arguments = new Bundle();
-			arguments.putString(
-					ComponentDetailFragment.ARG_ITEM_ID,
-					getIntent().getStringExtra(
-							ComponentDetailFragment.ARG_ITEM_ID));
-			ComponentDetailFragment fragment = new ComponentDetailFragment();
-			fragment.setArguments(arguments);
-			getSupportFragmentManager().beginTransaction()
-					.add(R.id.component_detail_container, fragment).commit();
+				//			Bundle arguments = new Bundle();
+				//			arguments.putString(
+				//					ComponentDetailFragment.ARG_ITEM_ID,
+				//					getIntent().getStringExtra(
+				//							ComponentDetailFragment.ARG_ITEM_ID));
+				//			ComponentDetailFragment fragment = new ComponentDetailFragment();
+				//			fragment.setArguments(arguments);
+				//			getSupportFragmentManager().beginTransaction()
+				//					.add(R.id.component_detail_container, fragment).commit();
+			
+			
+			String className= getIntent().getStringExtra(ComponentListActivity.FRAGMENT_CLASS);
+			Class<?> clazz;
+			Fragment toCreate=null;
+
+			try {
+				clazz = Class.forName(className);
+				toCreate = (Fragment) clazz.getConstructor().newInstance();
+				getFragmentManager().beginTransaction()
+				.add(R.id.component_detail_container, toCreate).commit();
+				return;
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e1) {
+				e1.printStackTrace();
+			}
+			LOG.out(this, "ERRRRORRRR");
+
 		}
 	}
 

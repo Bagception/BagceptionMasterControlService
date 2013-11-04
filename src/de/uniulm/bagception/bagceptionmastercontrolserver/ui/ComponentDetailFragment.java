@@ -6,11 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.id;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.layout;
-import de.uniulm.bagception.bagceptionmastercontrolserver.dummy.ListContent;
+import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ListContent;
 
 /**
  * A fragment representing a single Component detail screen. This fragment is

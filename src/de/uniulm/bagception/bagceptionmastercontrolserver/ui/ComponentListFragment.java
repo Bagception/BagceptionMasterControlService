@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.dummy.ListContent;
+import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ListContent;
 
 /**
  * A list fragment representing a list of Components. This fragment also
@@ -46,7 +46,7 @@ public class ComponentListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(String id);
+		public void onItemSelected(ListContent.FragmentListItem item);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ComponentListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(String id) {
+		public void onItemSelected(ListContent.FragmentListItem item) {
 		}
 	};
 
@@ -115,7 +115,7 @@ public class ComponentListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(ListContent.ITEMS.get(position).id);
+		mCallbacks.onItemSelected(ListContent.ITEMS.get(position));
 	}
 
 	@Override
