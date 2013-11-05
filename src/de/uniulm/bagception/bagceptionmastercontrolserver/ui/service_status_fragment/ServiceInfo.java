@@ -3,7 +3,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fra
 import android.app.Activity;
 import android.content.Intent;
 import android.widget.BaseAdapter;
-import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
