@@ -3,10 +3,12 @@
     package="de.uniulm.bagception.bagceptionmastercontrolserver"
     android:versionCode="1"
     android:versionName="1.0" >
-
+    
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    
     <uses-sdk
         android:minSdkVersion="18"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <application
         android:allowBackup="true"
@@ -40,7 +42,11 @@
             </intent-filter>
         </service>
         
-        
+        <receiver android:name="de.uniulm.bagception.BootLoader" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

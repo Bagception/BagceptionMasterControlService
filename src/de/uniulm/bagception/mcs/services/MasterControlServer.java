@@ -30,5 +30,10 @@ public class MasterControlServer extends MessengerService implements Runnable{
 		super.onDestroy();
 		LOGGER.C(this, "MCS stopped");
 	}
+	
+	private void bootstrap(){
+		LOGGER.C(this, "initiating bootstrap method, starting necessary services");
+		
+	}
 
 }
