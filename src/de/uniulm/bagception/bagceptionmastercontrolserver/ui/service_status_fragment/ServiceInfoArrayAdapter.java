@@ -54,7 +54,7 @@ public class ServiceInfoArrayAdapter extends ArrayAdapter<ServiceInfo> {
 				serviceButton.setText("start");
 			}else if(item.getStatus() == STATUS.NOT_INSTALLED){
 				serviceStatus.setTextColor(Color.BLUE);
-				serviceButton.setEnabled(false);
+				//serviceButton.setEnabled(false);
 				serviceButton.setText("start");
 				
 			}else if(item.getStatus() == STATUS.UNKNOWN){

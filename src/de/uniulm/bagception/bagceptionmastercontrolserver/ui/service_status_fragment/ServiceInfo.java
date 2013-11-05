@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
 import android.widget.BaseAdapter;
+import android.widget.Toast;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
@@ -108,8 +109,10 @@ public class ServiceInfo implements ServiceObservationReactor {
 		if (status==STATUS.ONLINE){
 			activity.stopService(i);
 			return;
-		}
-		if (status==STATUS.OFFLINE){
+		}else{
+			if (status == STATUS.NOT_INSTALLED){
+				Toast.makeText(activity, "The Service seems not installed, I will try it anyway", Toast.LENGTH_SHORT).show();
+			}
 			activity.startService(i);
 			
 			

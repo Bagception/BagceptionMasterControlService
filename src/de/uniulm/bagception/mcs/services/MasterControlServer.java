@@ -21,10 +21,10 @@ public class MasterControlServer extends MessengerService implements Runnable{
 
 	@Override
 	protected void onFirstInit() {
-		//mainThread = new Thread(this);
-		//mainThread.start();
-		LOGGER.C(this, "MCS started");
-		bootstrap();
+		mainThread = new Thread(this);
+		mainThread.setDaemon(true);
+		mainThread.start();
+		
 	}
 
 
@@ -82,8 +82,9 @@ public class MasterControlServer extends MessengerService implements Runnable{
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-		
+		LOGGER.C(this, "MCS started");
+		bootstrap();
+		//stopSelf();
 	}
 
 }
