@@ -27,8 +27,10 @@ public class ListContent {
 	public static Map<String, FragmentListItem> ITEM_MAP = new HashMap<String, FragmentListItem>();
 
 	static {
-		// Add 3 sample items.
+		// ###### Add Items Here ######### \\
 		addItem(new FragmentListItem("1", "Services",ServiceStatusFragment.class));
+		
+		
 	}
 
 	public static synchronized void addItem(String name, Class<? extends Fragment> clazz){
