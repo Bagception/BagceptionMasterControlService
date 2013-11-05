@@ -35,7 +35,7 @@ public class LOGGER {
 		
 		sb.append("[");
 		sb.append(getTime());
-		sb.append("]: ");
+		sb.append("]:\n");
 		sb.append(message);
 		logList.add(sb.toString());
 		

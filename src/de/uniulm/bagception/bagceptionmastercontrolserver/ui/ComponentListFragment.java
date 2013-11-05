@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ListContent;
+import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
 
 /**
  * A list fragment representing a list of Components. This fragment also
@@ -46,7 +46,7 @@ public class ComponentListFragment extends ListFragment {
 		/**
 		 * Callback for when an item has been selected.
 		 */
-		public void onItemSelected(ListContent.FragmentListItem item);
+		public void onItemSelected(ComponentFragmentsListContent.FragmentListItem item);
 	}
 
 	/**
@@ -55,7 +55,7 @@ public class ComponentListFragment extends ListFragment {
 	 */
 	private static Callbacks sDummyCallbacks = new Callbacks() {
 		@Override
-		public void onItemSelected(ListContent.FragmentListItem item) {
+		public void onItemSelected(ComponentFragmentsListContent.FragmentListItem item) {
 		}
 	};
 
@@ -70,9 +70,9 @@ public class ComponentListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setListAdapter(new ArrayAdapter<ListContent.FragmentListItem>(getActivity(),
+		setListAdapter(new ArrayAdapter<ComponentFragmentsListContent.FragmentListItem>(getActivity(),
 				android.R.layout.simple_list_item_activated_1,
-				android.R.id.text1, ListContent.ITEMS));
+				android.R.id.text1, ComponentFragmentsListContent.ITEMS));
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class ComponentListFragment extends ListFragment {
 
 		// Notify the active callbacks interface (the activity, if the
 		// fragment is attached to one) that an item has been selected.
-		mCallbacks.onItemSelected(ListContent.ITEMS.get(position));
+		mCallbacks.onItemSelected(ComponentFragmentsListContent.ITEMS.get(position));
 	}
 
 	@Override

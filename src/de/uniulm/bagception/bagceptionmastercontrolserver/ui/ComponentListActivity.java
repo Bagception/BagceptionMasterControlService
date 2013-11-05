@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ListContent;
+import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
 
 /**
  * An activity representing a list of Components. This activity has different
@@ -62,11 +62,12 @@ public class ComponentListActivity extends FragmentActivity implements
 	 * that the item with the given ID was selected.
 	 */
 	@Override
-	public void onItemSelected(ListContent.FragmentListItem item) {
-		
-		Fragment replaceWith=null;
+	public void onItemSelected(
+			ComponentFragmentsListContent.FragmentListItem item) {
+
+		Fragment replaceWith = null;
 		try {
-			 replaceWith = item.clazz.getConstructor().newInstance();
+			replaceWith = item.clazz.getConstructor().newInstance();
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {
@@ -79,38 +80,17 @@ public class ComponentListActivity extends FragmentActivity implements
 			e.printStackTrace();
 		}
 		if (mTwoPane) {
-			// In two-pane mode, show the detail view in this activity by
-			// adding or replacing the detail fragment using a
-			// fragment transaction.
-					//			Bundle arguments = new Bundle();
-					//			arguments.putString(ComponentDetailFragment.ARG_ITEM_ID, id);
-					//			ComponentDetailFragment fragment = new ComponentDetailFragment();
-					//			fragment.setArguments(arguments);
-					//			getSupportFragmentManager().beginTransaction()
-					//					.replace(R.id.component_detail_container, fragment)
-					//					.commit();
-			
-			
-//			Fragment replaceWith;
-//			
-//			
-//			
-//			
+
 			getFragmentManager().beginTransaction()
-				.replace(R.id.component_detail_container, replaceWith)
-				.commit();
-			
+					.replace(R.id.component_detail_container, replaceWith)
+					.commit();
 
 		} else {
-			// In single-pane mode, simply start the detail activity
-			// for the selected item ID.
-					//			Intent detailIntent = new Intent(this,
-					//					ComponentDetailActivity.class);
-					//			detailIntent.putExtra(ComponentDetailFragment.ARG_ITEM_ID, id);
-					//			startActivity(detailIntent);
-			
-			Intent detailIntent = new Intent(this,ComponentDetailActivity.class);
-			detailIntent.putExtra(FRAGMENT_CLASS,item.clazz.getCanonicalName());
+
+			Intent detailIntent = new Intent(this,
+					ComponentDetailActivity.class);
+			detailIntent
+					.putExtra(FRAGMENT_CLASS, item.clazz.getCanonicalName());
 			startActivity(detailIntent);
 		}
 	}

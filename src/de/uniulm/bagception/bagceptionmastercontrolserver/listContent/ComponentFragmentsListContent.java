@@ -15,7 +15,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceSt
  * <p>
  * TODO: Replace all uses of this class before publishing your app.
  */
-public class ListContent {
+public class ComponentFragmentsListContent {
 
 	/**
 	 * An array of sample (dummy) items.

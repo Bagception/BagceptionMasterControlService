@@ -11,8 +11,8 @@ import de.philipphock.android.lib.services.observation.ServiceObservationReactor
 public class ServiceInfo implements ServiceObservationReactor {
 
 	private final String serviceName;
-	private final BaseAdapter adapter;
-	private final Activity activity;
+	private BaseAdapter adapter;
+	private Activity activity;
 	private final String serviceSystemName;
 
 	private final ServiceObservationActor soActor;
@@ -33,6 +33,7 @@ public class ServiceInfo implements ServiceObservationReactor {
 
 	private STATUS status = STATUS.UNKNOWN;
 
+	
 	public ServiceInfo(Activity activity, BaseAdapter adapter,
 			String serviceName, String serviceSystemName) {
 		this.serviceName = serviceName;
@@ -41,7 +42,8 @@ public class ServiceInfo implements ServiceObservationReactor {
 		this.serviceSystemName = serviceSystemName;
 		soActor = new ServiceObservationActor(this, serviceSystemName);
 		
-		resume();
+		if (activity != null)
+			resume();
 	}
 
 	public String getName() {
@@ -52,13 +54,32 @@ public class ServiceInfo implements ServiceObservationReactor {
 		return status;
 	}
 
+	public String getServiceSystemName(){
+		return serviceSystemName;
+	}
+	
+	public void setStatus(STATUS state){
+		this.status = state;
+		dataseChanged();
+
+	}
+	
+	public void setActivity(Activity activity){
+		this.activity = activity;
+	}
+	
+	public void setAdapter(BaseAdapter adapter){
+		this.adapter = adapter;
+	}
 	
 	//callbacks for activity
 	public void resume() {
 		if (ServiceUtil.isServiceRunning(activity, serviceSystemName)) {
 			status = STATUS.ONLINE;
 		}else{
-			status = STATUS.OFFLINE;
+			if (status == STATUS.UNKNOWN){
+				status = STATUS.OFFLINE;
+			}
 		}
 		soActor.register(activity);
 		dataseChanged();
@@ -67,7 +88,8 @@ public class ServiceInfo implements ServiceObservationReactor {
 	
 	public void pause(){
 		//unregister
-		soActor.unregister(activity);
+		if (activity != null)
+			soActor.unregister(activity);
 	}
 
 	private void dataseChanged() {
