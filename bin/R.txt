@@ -7,8 +7,8 @@ int id component_detail_container 0x7f080000
 int id component_list 0x7f080001
 int id dialogText 0x7f080002
 int id okButton 0x7f080003
-int id serviceControlButton 0x7f080008
-int id serviceName 0x7f080006
+int id serviceControlButton 0x7f080006
+int id serviceName 0x7f080008
 int id serviceStatus 0x7f080007
 int id textView1 0x7f080005
 int layout activity_component_detail 0x7f030000

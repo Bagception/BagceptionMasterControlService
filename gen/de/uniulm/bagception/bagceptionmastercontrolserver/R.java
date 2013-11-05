@@ -35,8 +35,8 @@ public final class R {
         public static final int component_list=0x7f080001;
         public static final int dialogText=0x7f080002;
         public static final int okButton=0x7f080003;
-        public static final int serviceControlButton=0x7f080008;
-        public static final int serviceName=0x7f080006;
+        public static final int serviceControlButton=0x7f080006;
+        public static final int serviceName=0x7f080008;
         public static final int serviceStatus=0x7f080007;
         public static final int textView1=0x7f080005;
     }
