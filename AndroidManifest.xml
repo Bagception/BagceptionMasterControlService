@@ -31,6 +31,15 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.ComponentListActivity" />
         </activity>
+        <service 
+            android:name="de.uniulm.bagception.mcs.services.MasterControlServer" 
+            android:exported="false"
+            >
+            <intent-filter>
+                <action android:name="de.uniulm.bagception.mcs.services.MasterControlServer"></action>
+            </intent-filter>
+        </service>
+        
         
     </application>
 

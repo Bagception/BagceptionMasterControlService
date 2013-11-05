@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Fragment;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.LogFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 
 /**
@@ -29,6 +30,7 @@ public class ListContent {
 	static {
 		// ###### Add Items Here ######### \\
 		addItem(new FragmentListItem("1", "Services",ServiceStatusFragment.class));
+		addItem(new FragmentListItem("2", "Logger",LogFragment.class));
 		
 		
 	}
