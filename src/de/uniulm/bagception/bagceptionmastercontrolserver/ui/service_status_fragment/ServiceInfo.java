@@ -2,6 +2,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fra
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Handler;
 import android.widget.BaseAdapter;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
@@ -88,10 +89,24 @@ public class ServiceInfo implements ServiceObservationReactor {
 		}
 		if (status==STATUS.OFFLINE){
 			activity.startService(i);
+			
+			
+			checkIfInstalledHandler.postDelayed(new Runnable() {
+			  @Override
+			  public void run() {
+			    if (ServiceInfo.this.status==STATUS.OFFLINE){
+			    	ServiceInfo.this.status=STATUS.NOT_INSTALLED;
+			    	ServiceInfo.this.dataseChanged();
+			    }
+			  }
+			}, 100);
+			
 			return;
 		}
 	}
 
+	
+	final Handler checkIfInstalledHandler = new Handler();
 	
 	//ServiceObservationReactor
 	@Override
