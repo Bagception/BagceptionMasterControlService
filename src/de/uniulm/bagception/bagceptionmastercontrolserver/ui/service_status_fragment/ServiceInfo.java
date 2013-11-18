@@ -1,5 +1,8 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Handler;
@@ -115,23 +118,24 @@ public class ServiceInfo implements ServiceObservationReactor {
 			}
 			activity.startService(i);
 			
-			
-			checkIfInstalledHandler.postDelayed(new Runnable() {
-			  @Override
-			  public void run() {
-			    if (ServiceInfo.this.status==STATUS.OFFLINE){
-			    	ServiceInfo.this.status=STATUS.NOT_INSTALLED;
-			    	ServiceInfo.this.dataseChanged();
-			    }
-			  }
+			checkIfInstalledTimer.schedule(new TimerTask() {
+				
+				@Override
+				public void run() {
+					if (ServiceInfo.this.status==STATUS.OFFLINE){
+				    	ServiceInfo.this.status=STATUS.NOT_INSTALLED;
+				    	ServiceInfo.this.dataseChanged();
+				    }
+				}
 			}, 100);
+			
 			
 			return;
 		}
 	}
 
-	
-	final Handler checkIfInstalledHandler = new Handler();
+		
+	final Timer checkIfInstalledTimer = new Timer(); 
 	
 	//ServiceObservationReactor
 	@Override
@@ -146,4 +150,9 @@ public class ServiceInfo implements ServiceObservationReactor {
 		dataseChanged();
 		
 	}
+	
+	
+	
+	
+	
 }
