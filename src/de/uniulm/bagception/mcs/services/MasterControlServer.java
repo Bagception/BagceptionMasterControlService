@@ -10,6 +10,11 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo.STATUS;
 
+/**
+ * Handles the control flow of the container
+ * @author phil
+ *
+ */
 public class MasterControlServer extends MessengerService implements Runnable{
 
 	private Thread mainThread;
@@ -35,6 +40,9 @@ public class MasterControlServer extends MessengerService implements Runnable{
 		LOGGER.C(this, "MCS stopped");
 	}
 	
+	/**
+	 * starts all system components
+	 */
 	private void bootstrap(){
 		
 		//first start all necessary services

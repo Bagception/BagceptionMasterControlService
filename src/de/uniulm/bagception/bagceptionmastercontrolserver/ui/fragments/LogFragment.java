@@ -11,6 +11,12 @@ import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 
+/**
+ * Part of the multi-pane view<br>
+ * provides the UI for the {@link LOGGER}
+ * @author phil
+ *
+ */
 public class LogFragment extends Fragment {
 	// TODO implement
 	private TextView logView;

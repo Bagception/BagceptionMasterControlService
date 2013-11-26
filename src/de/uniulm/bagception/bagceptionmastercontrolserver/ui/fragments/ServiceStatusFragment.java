@@ -9,6 +9,12 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_frag
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfoArrayAdapter;
 import de.uniulm.bagception.services.ServiceNames;
 
+/**
+ * Part of the multi-pane view<br>
+ * provides the UI for the {@link ServiceInfo}
+ * @author phil
+ *
+ */
 public class ServiceStatusFragment extends ListFragment {
 
 	private ServiceInfoArrayAdapter adapter;

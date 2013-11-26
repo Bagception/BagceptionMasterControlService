@@ -9,6 +9,11 @@ import java.util.List;
 import android.annotation.SuppressLint;
 import de.philipphock.android.lib.logging.LOG;
 
+/**
+ * provides a logging console so see what happens in this service
+ * @author phil
+ *
+ */
 public class LOGGER {
 	private static final boolean out_to_logcat=true;
 	private static final List<String> logList  = new LinkedList<String>(); 
