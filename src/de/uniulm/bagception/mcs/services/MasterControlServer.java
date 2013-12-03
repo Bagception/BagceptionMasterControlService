@@ -16,7 +16,6 @@ import de.philipphock.android.lib.services.observation.ObservableService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.Item;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -24,6 +23,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_frag
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelper;
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelperCallback;
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.services.ServiceNames;
 
 
@@ -221,18 +221,21 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				Toast.makeText(MasterControlServer.this, "scanning finished", Toast.LENGTH_SHORT).show();
 				LOGGER.C(this, "stop rfid scan");
 			}else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND.equals(intent.getAction())){
-				
+				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
 				
 				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
 				Item i = DatabaseConnector.getItem(id);
-				if (i!=null)
+				if (i!=null){
+					//tag exists in database
 					LOGGER.C(this, "TAG found: "+i.getName());
-				Toast.makeText(MasterControlServer.this, id, Toast.LENGTH_SHORT).show();
-				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
-				Bundle b = new Bundle();
-				b.putString("tag", i.getName());
+					Bundle b = new Bundle();
+					b.putString("tag", i.getName());
+						
+					btHelper.sendMessageBundle(b);
+				}else{
+					//tag not found in db
+				}
 					
-				btHelper.sendMessageBundle(b);
 			}
 			
 		}

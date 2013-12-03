@@ -1,6 +1,7 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import de.philipphock.android.lib.logging.LOG;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class DatabaseConnector {
 	public static Item getItem(String id){
