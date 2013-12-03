@@ -23,6 +23,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_frag
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelper;
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelperCallback;
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.services.ServiceNames;
 
@@ -135,6 +136,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	@Override
 	public void onBundleMessage(Bundle b) {
 		//this comes from the client
+		//DEBUG, send it back
 		LOG.out(this, b);
 		btHelper.sendMessageBundle(b);
 	}
@@ -228,9 +230,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				if (i!=null){
 					//tag exists in database
 					LOGGER.C(this, "TAG found: "+i.getName());
-					Bundle b = new Bundle();
-					b.putString("tag", i.getName());
-						
+					
+					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
+					b.putBoolean("exists", true);
+					LOG.out(this, b);
 					btHelper.sendMessageBundle(b);
 				}else{
 					//tag not found in db
