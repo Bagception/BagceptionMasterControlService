@@ -6,6 +6,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+/**
+ * ensures that the service is started at system start
+ * @author phil
+ *
+ */
 public class BootLoader extends BroadcastReceiver{
 
 	@Override

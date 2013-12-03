@@ -5,13 +5,18 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Handler;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ServiceObservationActor;
 import de.philipphock.android.lib.services.observation.ServiceObservationReactor;
 
+/**
+ * collects data of the component-services's states and controls their lifecycle (triggers start/stop)
+ * <br> Keep in mind that stopping a service turns out to be difficult when another component is bound to it
+ * @author phil
+ *
+ */
 public class ServiceInfo implements ServiceObservationReactor {
 
 	private final String serviceName;

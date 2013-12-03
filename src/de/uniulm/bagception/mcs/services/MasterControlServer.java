@@ -24,7 +24,14 @@ import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.Mess
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
 import de.uniulm.bagception.services.ServiceNames;
 
+
 public class MasterControlServer extends ObservableService implements Runnable, MessengerHelperCallback, CaseOpenServiceBroadcastReactor{
+
+/**
+ * Handles the control flow of the container
+ * @author phil
+ *
+ */
 
 	private Thread mainThread;
 	
@@ -61,6 +68,9 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		LOGGER.C(this, "MCS stopped");
 	}
 	
+	/**
+	 * starts all system components
+	 */
 	private void bootstrap(){
 		ServiceUtil.logRunningServices(this, "###");
 		//first start all necessary services
