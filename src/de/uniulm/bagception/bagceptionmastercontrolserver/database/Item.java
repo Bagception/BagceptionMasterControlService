@@ -35,6 +35,4 @@ public class Item implements Parcelable{
 		out.writeString(description);
 		out.writeStringList(tagIDs);
 	}
-	
-
 }

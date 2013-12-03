@@ -15,6 +15,8 @@ import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ObservableService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.Item;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -219,9 +221,18 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				Toast.makeText(MasterControlServer.this, "scanning finished", Toast.LENGTH_SHORT).show();
 				LOGGER.C(this, "stop rfid scan");
 			}else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND.equals(intent.getAction())){
-				LOGGER.C(this, "TAG found");
-				//Toast.makeText(MasterControlServer.this, "tag found", Toast.LENGTH_SHORT).show();
+				
+				
+				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
+				Item i = DatabaseConnector.getItem(id);
+				if (i!=null)
+					LOGGER.C(this, "TAG found: "+i.getName());
+				Toast.makeText(MasterControlServer.this, id, Toast.LENGTH_SHORT).show();
 				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
+				Bundle b = new Bundle();
+				b.putString("tag", i.getName());
+					
+				btHelper.sendMessageBundle(b);
 			}
 			
 		}
