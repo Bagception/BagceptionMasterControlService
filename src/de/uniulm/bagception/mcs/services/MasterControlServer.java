@@ -56,6 +56,8 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		IntentFilter f = new IntentFilter(BagceptionBroadcastContants.BROADCAST_RFID_FINISHED);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
+		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING);
+		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED);
 		registerReceiver(RFIDReceiver, f);
 	}
 
@@ -67,6 +69,15 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		btHelper.unregister(this);
 		caseActor.unregister(this);
 		unregisterReceiver(RFIDReceiver);
+		
+		//stop services
+		Intent i = new Intent();
+		for(ServiceInfo serviceInfo:ServiceStatusFragment.bagceptionSystemServices){
+			i.setAction(serviceInfo.getServiceSystemName());
+			stopService(i);
+			LOGGER.C(this, "stopping service "+serviceInfo.getName());
+		}
+		
 		
 		LOGGER.C(this, "MCS stopped");
 	}
@@ -155,25 +166,25 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 
 	@Override
 	public void onCommandMessage(Bundle b) {
-		
+		//nothing to do here
 		
 	}
 
 	@Override
 	public void onError(Exception e) {
-		// TODO Auto-generated method stub
-		
+		//we assume this is not going to happen
 	}
 
 	@Override
 	public void connectedWithRemoteService() {
-		LOG.out(this, "connected");
+		//we assume this works correctly
+		
 	}
 
 	@Override
 	public void disconnectedFromRemoteService() {
-		// TODO Auto-generated method stub
-		
+		//we assume this works correctly
+
 	}
 	// MessengerHelperCallback \\
 
@@ -193,15 +204,11 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 			if(isScanning) return;
 			Intent rfidScanBC = new Intent(BagceptionBroadcastContants.BROADCAST_RFID_STARTSCAN);
 			sendBroadcast(rfidScanBC);
-			Toast.makeText(MasterControlServer.this, "start scanning", Toast.LENGTH_SHORT).show();
-			LOGGER.C(this, "start rfid scan");
 		}
 		
 		
 		
 	}
-
-
 
 	@Override
 	public void caseClosed() {
@@ -218,11 +225,17 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			
+			
 			if (BagceptionBroadcastContants.BROADCAST_RFID_FINISHED.equals(intent.getAction())){
+				//scan finished
+				
 				isScanning = false;
 				Toast.makeText(MasterControlServer.this, "scanning finished", Toast.LENGTH_SHORT).show();
 				LOGGER.C(this, "stop rfid scan");
 			}else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND.equals(intent.getAction())){
+				//tag found
+				
 				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
 				
 				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
@@ -239,7 +252,19 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 					//tag not found in db
 				}
 					
+				
+			}else if (BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING.equals(intent.getAction())){
+				// rfid start scanning
+				
+				Toast.makeText(MasterControlServer.this, "start scanning", Toast.LENGTH_SHORT).show();
+				LOGGER.C(this, "start rfid scan");
+			}else if (BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED.equals(intent.getAction())){
+				//rfid not connected
+				
+				Toast.makeText(MasterControlServer.this, "RFID scanner not connected", Toast.LENGTH_SHORT).show();
+				LOGGER.C(this, "RFID scanner not connected");
 			}
+			
 			
 		}
 	};
