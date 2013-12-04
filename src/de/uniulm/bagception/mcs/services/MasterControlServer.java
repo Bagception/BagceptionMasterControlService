@@ -25,6 +25,9 @@ import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.Mess
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.protocol.bundle.constants.Command;
+import de.uniulm.bagception.protocol.bundle.constants.Response;
+import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
 
 
@@ -161,12 +164,20 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	@Override
 	public void onStatusMessage(Bundle b) {
 		// nothing to do here
+		StatusCode status = StatusCode.getStatusCode(b);
+		switch (status){
+			case DISCONNECTED:
+				//TODO?
+				break;
+			default: break;
+		}
 		
 	}
 
 	@Override
 	public void onCommandMessage(Bundle b) {
 		//nothing to do here
+		
 		
 	}
 
