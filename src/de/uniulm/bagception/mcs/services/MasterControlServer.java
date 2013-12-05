@@ -1,5 +1,7 @@
 package de.uniulm.bagception.mcs.services;
 
+import java.util.ArrayList;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -261,6 +263,9 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 					btHelper.sendMessageBundle(b);
 				}else{
 					//tag not found in db
+					ArrayList<String> ids = new ArrayList<String>();
+					ids.add(id);
+					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("","",ids)));
 				}
 					
 				
