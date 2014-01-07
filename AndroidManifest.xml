@@ -49,7 +49,12 @@
         </receiver>
         <provider 
             android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
-            android:authorities="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider">
+            android:authorities="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:label="BagceptionProvider"
+            android:readPermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.READ"
+            android:writePermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.WRITE">
         </provider>
     </application>
 

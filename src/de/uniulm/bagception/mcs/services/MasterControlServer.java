@@ -17,7 +17,6 @@ import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ObservableService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -252,21 +251,21 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
 				
 				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
-				Item i = DatabaseConnector.getItem(id);
-				if (i!=null){
-					//tag exists in database
-					LOGGER.C(this, "TAG found: "+i.getName());
-					
-					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
-					b.putBoolean("exists", true);
-					LOG.out(this, b);
-					btHelper.sendMessageBundle(b);
-				}else{
-					//tag not found in db
-					ArrayList<String> ids = new ArrayList<String>();
-					ids.add(id);
-					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("","",ids)));
-				}
+//				Item i = DatabaseConnector.getItem(id);
+//				if (i!=null){
+//					//tag exists in database
+//					LOGGER.C(this, "TAG found: "+i.getName());
+//					
+//					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
+//					b.putBoolean("exists", true);
+//					LOG.out(this, b);
+//					btHelper.sendMessageBundle(b);
+//				}else{
+//					//tag not found in db
+//					ArrayList<String> ids = new ArrayList<String>();
+//					ids.add(id);
+//					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("","",ids)));
+//				}
 					
 				
 			}else if (BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING.equals(intent.getAction())){
