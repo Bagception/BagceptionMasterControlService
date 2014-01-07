@@ -47,6 +47,10 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <provider 
+            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
+            android:authorities="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider">
+        </provider>
     </application>
 
 </manifest>
