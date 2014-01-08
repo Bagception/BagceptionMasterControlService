@@ -62,8 +62,6 @@ public final class BagceptionContract {
 	/**
 	 * Constants for a joined view of Items and Photos. 
 	 * The _id of this joined view is the _id of the Items table
-	 * @author Michael
-	 *
 	 */
 	public static final class ItemEntities implements CommonColumns {
 		
