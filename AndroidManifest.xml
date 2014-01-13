@@ -48,8 +48,8 @@
             </intent-filter>
         </receiver>
         <provider 
-            android:name=".contentprovider.BagceptionContentProvider"
-            android:authorities="de.uniulm.bagceptiondatabase.contentprovider"
+            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
+            android:authorities="de.uniulm.bagceptiondatabase.database"
             android:exported="true"
             android:grantUriPermissions="true"
             android:label="BagceptionProvider"
