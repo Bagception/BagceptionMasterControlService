@@ -16,7 +16,6 @@ public final class BagceptionContract {
 	public static final String SELECTION_ID_BASED = BaseColumns._ID + " = ? ";
 	
 	// Constants for the Items table of the Bagception Provider
-	
 	public static final class Items implements CommonColumns {
 		
 		// The content URI for this table
@@ -36,16 +35,17 @@ public final class BagceptionContract {
 
 	}
 	
-	public static final class Photos implements BaseColumns {
+	// Constants for the Categories table of the Bagception Provider
+	public static final class Categories implements BaseColumns {
 		
 		// The content URI for this table
-		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "photos");
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "categories");
 		
 		// The MIME Type of a directory of photos 
-		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_photos";
+		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_categories";
 		
 		// The MIME Type of a single photo
-		public static final String CONTENT_PHOTO_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_photos";
+		public static final String CONTENT_CATEGORY_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_categories";
 		
 		// The data column of this photo
 		public static final String _DATA = "_data";
@@ -57,6 +57,13 @@ public final class BagceptionContract {
 		public static final String[] PROJECTION_ALL = {_ID, _DATA, ITEMS_ID};
 		
 	}
+	
+	// Constants for the Activities table of the Bagception Provider
+	public static final class Activities implements BaseColumns {
+		
+	}
+	
+	
 	
 	
 	/**

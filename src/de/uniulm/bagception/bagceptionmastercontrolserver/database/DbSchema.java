@@ -9,7 +9,7 @@ public interface DbSchema {
 	
 	// Database tables
 	String TBL_ITEMS = "items";
-	String TBL_PHOTOS = "photos";
+	String TBL_CATEGORIES = "categories";
 	
 	// Columns TBL_ITEMS
 	String COL_ID = BaseColumns._ID;
@@ -31,8 +31,8 @@ public interface DbSchema {
 			"activity		TEXT,\n" +
 			")";
 	
-	String CREATE_TBL_PHOTOS =
-			"CREATE TABLE photos (" +
+	String CREATE_TBL_CATEGORIES =
+			"CREATE TABLE categories (" +
 			"_id			INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
 			"_data			TEXT,\n" +
 			"items_id		INTEGER NOT NULL,\n" +
@@ -42,16 +42,16 @@ public interface DbSchema {
 	String CREATE_TRIGGER_DEL_ITEMS =
 			"CREATE TRIGGER delete_items DELETE ON items \n" +
 			"begin\n" +
-			"	delete from photos where items_id = old._id\n" +
+			"	delete from categories where items_id = old._id\n" +
 			"end\n";
 	
 	String DROP_TBL_ITEMS = "DROP TABLE IF EXISTS items";
-	String DROP_TBL_PHOTOS = "DROP TABLE IF EXISTS photos";
+	String DROP_TBL_CATEGORIES = "DROP TABLE IF EXISTS categories";
 	String DROP_TRIGGER_DEL_ITEMS = "DROP TRIGGER IF EXISTS delete_items";
 	
 	String DML_WHERE_ID_CLAUSE = "_id = ?";
 	
 	String DEFAULT_TBL_ITEMS_SORT_ORDER = "name ASC";
 	
-	String LEFT_OUTER_JOIN_STATEMENT = TBL_ITEMS + " LEFT OUTER JOIN " + TBL_PHOTOS + " ON(items._id = photos.items_id";
+	String LEFT_OUTER_JOIN_STATEMENT = TBL_ITEMS + " LEFT OUTER JOIN " + TBL_CATEGORIES + " ON(items._id = categories.items_id";
 }
