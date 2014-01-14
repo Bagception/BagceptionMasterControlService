@@ -278,10 +278,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 						LOGGER.C(this, "Item out: "+i.getName());
 					}
 					setStatusChanged();
-//					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
-//					b.putBoolean("exists", true);
-//					LOG.out(this, b);
-//					btHelper.sendMessageBundle(b);
+					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
+					b.putBoolean("exists", true);
+					LOG.out(this, b);
+					btHelper.sendMessageBundle(b);
 				}else{
 					//tag not found in db
 					ArrayList<String> ids = new ArrayList<String>();
