@@ -13,7 +13,7 @@ public class ItemIndexSystem {
 	
 	
 	/**
-	 * determines if the item is put in or taken out of the bag
+	 * determines if the item is put in or taken out of the bag, also puts the item in or takes it out 
 	 * @param item the scanned item
 	 * @return true if the item was not in the bag, that means we put the item in the bag
 	 * false when the item was removed from the container, that means the item was taken out

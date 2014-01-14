@@ -7,6 +7,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import de.philipphock.android.lib.logging.LOG;
 
 /**
@@ -19,6 +22,10 @@ public class LOGGER {
 	private static final List<String> logList  = new LinkedList<String>(); 
 	private static final Calendar cal = Calendar.getInstance();
 	private static final StringBuilder sb = new StringBuilder();
+	private static Context context;
+	
+	
+	
 	@SuppressLint("SimpleDateFormat")
 	private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 	
@@ -33,6 +40,10 @@ public class LOGGER {
 //	}
 	
 	public static synchronized void C(Object origin, Object message){
+		if (origin instanceof Context){
+			LOGGER.context = (Context) origin;	
+		}
+		
 		if (out_to_logcat)
 			LOG.out(origin, message);
 		
@@ -47,6 +58,10 @@ public class LOGGER {
 		if (logList.size()>LOG_LIST_MAX){
 			logList.remove(0);
 		}
+		Intent logIntent = new Intent("de.uniulm.bagception.bc.log");
+		if (context == null) return;
+		LocalBroadcastManager.getInstance(context).sendBroadcast(logIntent);
+		
 	}
 	
 	

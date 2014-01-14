@@ -3,6 +3,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
@@ -14,9 +15,9 @@ public class ActivitySystem {
 	
 	public ActivitySystem() {
 		ArrayList<Item> items = new ArrayList<Item>();
-		items.add(new Item("Jacke"));
-		items.add(new Item("Hose"));
-		items.add(new Item("TiSchört"));
+		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_HOSE));
+		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_REGENJACKE));
+		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_TRINKEN));
 		currentActivity = new Activity("dummy activity",items);
 	}
 	
