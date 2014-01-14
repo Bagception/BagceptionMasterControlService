@@ -1,7 +1,12 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
 import android.app.Fragment;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,7 +22,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER
  * @author phil
  *
  */
-public class LogFragment extends Fragment {
+public class LogFragment extends Fragment{
 	// TODO implement
 	private TextView logView;
 
@@ -54,6 +59,8 @@ public class LogFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
+		LocalBroadcastManager.getInstance(getActivity()).registerReceiver(bcr,
+			      new IntentFilter("de.uniulm.bagception.bc.log"));
 		updateLog();
 	}
 
@@ -71,5 +78,15 @@ public class LogFragment extends Fragment {
 		}
 
 	}
+	
+	private final BroadcastReceiver bcr = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			LogFragment.this.updateLog();
+			
+		}
+		
+	};
 
 }

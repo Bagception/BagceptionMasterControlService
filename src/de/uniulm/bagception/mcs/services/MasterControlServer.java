@@ -19,6 +19,8 @@ import de.philipphock.android.lib.services.observation.ObservableService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
+import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
+import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -27,11 +29,13 @@ import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.Mess
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelperCallback;
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
+import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.protocol.bundle.constants.Command;
 import de.uniulm.bagception.protocol.bundle.constants.Response;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
+
 
 
 public class MasterControlServer extends ObservableService implements Runnable, MessengerHelperCallback, CaseOpenServiceBroadcastReactor{
@@ -49,6 +53,9 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	private CaseOpenBroadcastActor caseActor;
 	private volatile boolean isScanning = false;
 
+	
+	private ItemIndexSystem itemIndexSystem;
+	private ActivitySystem activitySystem;
 
 	@Override
 	protected void onFirstInit() {
@@ -65,6 +72,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED);
 		registerReceiver(RFIDReceiver, f);
+		
+		
+		itemIndexSystem = new ItemIndexSystem();
+		activitySystem = new ActivitySystem();
 	}
 
 
@@ -259,7 +270,14 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				if (i!=null){
 					//tag exists in database
 					LOGGER.C(this, "TAG found: "+i.getName());
-					
+					if (itemIndexSystem.itemScanned(i)){
+						//item put in
+						LOGGER.C(this, "Item in: "+i.getName());
+					}else{
+						//item taken out
+						LOGGER.C(this, "Item out: "+i.getName());
+					}
+					setStatusChanged();
 					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
 					b.putBoolean("exists", true);
 					LOG.out(this, b);
@@ -288,4 +306,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		}
 	};
 
+	
+	private void setStatusChanged(){
+		ContainerStateUpdate statusUpdate =  new ContainerStateUpdate(activitySystem.getCurrentActivity(),itemIndexSystem.getCurrentItems());
+		Bundle toSend = BundleMessage.getInstance().createBundle(BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE, statusUpdate.toString());
+		btHelper.sendMessageBundle(toSend);
+	}
 }
