@@ -23,7 +23,9 @@ public class DatabaseConnector {
 			ArrayList<String> ids = new ArrayList<String>();
 			ids.add("32 40 00 01 0E 30 00 E2 00 34 12 DC 03 01 18 28 24 27 37 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 			String name = "Regenjacke";
-			items.put(name, new Item(name,"",ids));
+			Item ip =  new Item(name,"",ids);
+			
+			items.put(name, ip);
 		}
 		
 		{

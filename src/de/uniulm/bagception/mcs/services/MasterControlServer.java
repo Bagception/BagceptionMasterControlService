@@ -2,10 +2,14 @@ package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
 
+import org.json.simple.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -16,6 +20,7 @@ import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ObservableService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
@@ -29,10 +34,10 @@ import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.Mess
 import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.MessengerHelperCallback;
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import de.uniulm.bagception.protocol.bundle.constants.Command;
-import de.uniulm.bagception.protocol.bundle.constants.Response;
+import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
 
@@ -50,13 +55,14 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	//bt
 	private MessengerHelper btHelper;
+	
 	private CaseOpenBroadcastActor caseActor;
 	private volatile boolean isScanning = false;
-
+	
 	
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
-
+	
 	@Override
 	protected void onFirstInit() {
 		
@@ -66,6 +72,8 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		caseActor = new CaseOpenBroadcastActor(this);
 		caseActor.register(this);
+		
+		
 		
 		IntentFilter f = new IntentFilter(BagceptionBroadcastContants.BROADCAST_RFID_FINISHED);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
@@ -161,12 +169,30 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 
 
 	//\\ MessengerHelperCallback //
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onBundleMessage(Bundle b) {
-		//this comes from the client
+		//this comes from the btclient
 		//DEBUG, send it back
-		LOG.out(this, b);
-		btHelper.sendMessageBundle(b);
+		LOGGER.C(this, "bundleMessage recv");
+		
+		switch (BundleMessage.getInstance().getBundleMessageType(b)){
+			case IMAGE_REQUEST:
+				JSONObject o = BundleMessage.getInstance().extractObject(b);
+				String imageID = o.get("img").toString();
+				LOGGER.C(this, " img request for id "+imageID);
+				//TODO get image by id;
+				Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);				
+				String serializedImage = PictureSerializer.serialize(bmp);
+				
+				LOGGER.C(this, " deser id "+serializedImage.hashCode());
+				
+				JSONObject obj = new JSONObject();
+				obj.put("img", serializedImage);
+				btHelper.sendMessageBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
+			break;
+		}
+		
 	}
 
 	@Override
@@ -278,10 +304,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 						LOGGER.C(this, "Item out: "+i.getName());
 					}
 					setStatusChanged();
-					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
-					b.putBoolean("exists", true);
-					LOG.out(this, b);
-					btHelper.sendMessageBundle(b);
+//					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
+//					b.putBoolean("exists", true);
+//					LOG.out(this, b);
+//					btHelper.sendMessageBundle(b);
 				}else{
 					//tag not found in db
 					ArrayList<String> ids = new ArrayList<String>();
@@ -309,6 +335,11 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	private void setStatusChanged(){
 		ContainerStateUpdate statusUpdate =  new ContainerStateUpdate(activitySystem.getCurrentActivity(),itemIndexSystem.getCurrentItems());
+		for (int i = 0 ; i< statusUpdate.getItemList().size();i++){
+			Item it = statusUpdate.getItemList().get(i);
+			it.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));			
+		}
+		
 		Bundle toSend = BundleMessage.getInstance().createBundle(BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE, statusUpdate.toString());
 		btHelper.sendMessageBundle(toSend);
 	}
