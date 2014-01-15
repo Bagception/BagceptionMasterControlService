@@ -19,7 +19,9 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 	public void onCreate(SQLiteDatabase db) {
 
 		db.execSQL(DbSchema.CREATE_TBL_ITEMS);
+		db.execSQL(DbSchema.CREATE_TBL_PHOTOS);
 		db.execSQL(DbSchema.CREATE_TBL_CATEGORIES);
+		db.execSQL(DbSchema.CREATE_TBL_ACTIVITIES);
 		db.execSQL(DbSchema.CREATE_TRIGGER_DEL_ITEMS);	
 	}
 
@@ -27,7 +29,9 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
 		db.execSQL(DbSchema.DROP_TBL_ITEMS);
+		db.execSQL(DbSchema.CREATE_TBL_PHOTOS);
 		db.execSQL(DbSchema.DROP_TBL_CATEGORIES);
+		db.execSQL(DbSchema.CREATE_TBL_ACTIVITIES);
 		db.execSQL(DbSchema.DROP_TRIGGER_DEL_ITEMS);
 		onCreate(db);
 	}
