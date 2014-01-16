@@ -22,6 +22,11 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 		db.execSQL(DbSchema.CREATE_TBL_PHOTOS);
 		db.execSQL(DbSchema.CREATE_TBL_CATEGORIES);
 		db.execSQL(DbSchema.CREATE_TBL_ACTIVITIES);
+		db.execSQL(DbSchema.CREATE_TBL_ACTIVITYITEMS);
+		db.execSQL(DbSchema.CREATE_TBL_LOCATIONS);
+		db.execSQL(DbSchema.CREATE_TBL_ITEMCONTEXT);
+		db.execSQL(DbSchema.CREATE_TBL_WEATHER);
+		db.execSQL(DbSchema.CREATE_TBL_TIME);
 		db.execSQL(DbSchema.CREATE_TRIGGER_DEL_ITEMS);	
 	}
 
@@ -32,6 +37,11 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 		db.execSQL(DbSchema.CREATE_TBL_PHOTOS);
 		db.execSQL(DbSchema.DROP_TBL_CATEGORIES);
 		db.execSQL(DbSchema.CREATE_TBL_ACTIVITIES);
+		db.execSQL(DbSchema.CREATE_TBL_ACTIVITYITEMS);
+		db.execSQL(DbSchema.CREATE_TBL_LOCATIONS);
+		db.execSQL(DbSchema.CREATE_TBL_ITEMCONTEXT);
+		db.execSQL(DbSchema.CREATE_TBL_WEATHER);
+		db.execSQL(DbSchema.CREATE_TBL_TIME);
 		db.execSQL(DbSchema.DROP_TRIGGER_DEL_ITEMS);
 		onCreate(db);
 	}

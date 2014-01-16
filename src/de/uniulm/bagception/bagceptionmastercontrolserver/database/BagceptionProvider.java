@@ -27,8 +27,18 @@ public class BagceptionProvider extends ContentProvider {
 	private static final int PHOTO_ID = 6;
 	private static final int ACTIVITY_LIST = 7;
 	private static final int ACTIVITY_ID = 8;
+	private static final int ACTIVITYITEMS_LIST = 9;
+	private static final int ACTIVITYITEMS_ID = 10;
 	private static final int ENTITY_LIST = 11;
 	private static final int ENTITY_ID = 12;
+	private static final int LOCATION_LIST = 13;
+	private static final int LOCATION_ID = 14;
+	private static final int ITEMCONTEXT_LIST = 15;
+	private static final int ITEMCONTEXT_ID = 16;
+	private static final int WEATHER_LIST = 17;
+	private static final int WEATHER_ID = 18;
+	private static final int TIME_LIST = 19;
+	private static final int TIME_ID = 20;
     private static final UriMatcher URI_MATCHER;
 	
 	private BagceptionOpenHelper mHelper = null;
@@ -45,6 +55,16 @@ public class BagceptionProvider extends ContentProvider {
 		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "photos/#", PHOTO_ID);
 		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "activities", ACTIVITY_LIST);
 		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "activities/#", ACTIVITY_ID);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "activityItems", ACTIVITYITEMS_LIST);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "activityItems/#", ACTIVITYITEMS_ID);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "locations", LOCATION_LIST);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "locations/#", LOCATION_ID);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "itemContext", ITEMCONTEXT_LIST);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "itemContext/#", ITEMCONTEXT_ID);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "weather", WEATHER_LIST);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "weather/#", WEATHER_ID);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "time", TIME_LIST);
+		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "time/#", TIME_ID);
 		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "entities", ENTITY_LIST);
 		URI_MATCHER.addURI(BagceptionContract.AUTHORITY, "entities/#", ENTITY_ID);
 	}
@@ -75,6 +95,7 @@ public class BagceptionProvider extends ContentProvider {
 			}
 			delCount = db.delete(DbSchema.TBL_ITEMS, where, selectionArgs);
 			break;
+			
 		case CATEGORY_LIST:
 			delCount = db.delete(DbSchema.TBL_CATEGORIES, selection, selectionArgs);
 			break;
@@ -86,6 +107,7 @@ public class BagceptionProvider extends ContentProvider {
 			}
 			delCount = db.delete(DbSchema.TBL_CATEGORIES, where, selectionArgs);
 			break;
+			
 		case ACTIVITY_LIST:
 			delCount = db.delete(DbSchema.TBL_ACTIVITIES, selection, selectionArgs);
 			break;
@@ -97,6 +119,67 @@ public class BagceptionProvider extends ContentProvider {
 			}
 			delCount = db.delete(DbSchema.TBL_ACTIVITIES, where, selectionArgs);
 			break;
+			
+		case ACTIVITYITEMS_LIST:
+			delCount = db.delete(DbSchema.TBL_ACTIVITYITEMS, selection, selectionArgs);
+			break;
+		case ACTIVITYITEMS_ID:
+			idStr = uri.getLastPathSegment();
+			where = ActivityItems._ID + " = " + idStr;
+			if(!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			delCount = db.delete(DbSchema.TBL_ACTIVITYITEMS, where, selectionArgs);
+			break;
+			
+		case LOCATION_LIST:
+			delCount = db.delete(DbSchema.TBL_LOCATIONS, selection, selectionArgs);
+			break;
+		case LOCATION_ID:
+			idStr = uri.getLastPathSegment();
+			where = Locations._ID + " = " + idStr;
+			if(!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			delCount = db.delete(DbSchema.TBL_LOCATIONS, where, selectionArgs);
+			break;
+			
+		case ITEMCONTEXT_LIST:
+			delCount = db.delete(DbSchema.TBL_ITEMCONTEXT, selection, selectionArgs);
+			break;
+		case ITEMCONTEXT_ID:
+			idStr = uri.getLastPathSegment();
+			where = ItemContext._ID + " = " + idStr;
+			if(!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			delCount = db.delete(DbSchema.TBL_ITEMCONTEXT, where, selectionArgs);
+			break;
+			
+		case WEATHER_LIST:
+			delCount = db.delete(DbSchema.TBL_WEATHER, selection, selectionArgs);
+			break;
+		case WEATHER_ID:
+			idStr = uri.getLastPathSegment();
+			where = Weather._ID + " = " + idStr;
+			if(!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			delCount = db.delete(DbSchema.TBL_WEATHER, where, selectionArgs);
+			break;
+			
+		case TIME_LIST:
+			delCount = db.delete(DbSchema.TBL_TIME, selection, selectionArgs);
+			break;
+		case TIME_ID:
+			idStr = uri.getLastPathSegment();
+			where = Time._ID + " = " + idStr;
+			if(!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			delCount = db.delete(DbSchema.TBL_TIME, where, selectionArgs);
+			break;
+			
 		default:
 			throw new IllegalArgumentException("Unsupported URI: " + uri);
 		}
@@ -130,6 +213,31 @@ public class BagceptionProvider extends ContentProvider {
 		case ACTIVITY_LIST:
 			return Activities.CONTENT_TYPE;
 			
+		case ACTIVITYITEMS_ID:
+			return ActivityItems.CONTENT_ACTIVITYITEM_TYPE;
+		case ACTIVITYITEMS_LIST:
+			return ActivityItems.CONTENT_TYPE;
+			
+		case LOCATION_ID:
+			return Locations.CONTENT_LOCATIONS_TYPE;
+		case LOCATION_LIST:
+			return Locations.CONTENT_TYPE;
+			
+		case ITEMCONTEXT_ID:
+			return ItemContext.CONTENT_ITEMCONTEXT_TYPE;
+		case ITEMCONTEXT_LIST:
+			return ItemContext.CONTENT_TYPE;
+			
+		case WEATHER_ID:
+			return Weather.CONTENT_WEATHER_TYPE;
+		case WEATHER_LIST:
+			return Weather.CONTENT_TYPE;
+			
+		case TIME_ID:
+			return Time.CONTENT_TIME_TYPE;
+		case TIME_LIST:
+			return Time.CONTENT_TYPE;
+			
 		case ENTITY_ID:
 			return ItemEntities.CONTENT_ENTITY_TYPE;
 		case ENTITY_LIST:
@@ -162,6 +270,31 @@ public class BagceptionProvider extends ContentProvider {
 		
 		else if (URI_MATCHER.match(uri) == ACTIVITY_LIST) {
 			long id = db.insert(DbSchema.TBL_ACTIVITIES, null, values);
+			return getUriForId(id, uri);
+		}
+		
+		else if (URI_MATCHER.match(uri) == ACTIVITYITEMS_LIST) {
+			long id = db.insert(DbSchema.TBL_ACTIVITYITEMS, null, values);
+			return getUriForId(id, uri);
+		}
+		
+		else if (URI_MATCHER.match(uri) == LOCATION_LIST) {
+			long id = db.insert(DbSchema.TBL_LOCATIONS, null, values);
+			return getUriForId(id, uri);
+		}
+		
+		else if (URI_MATCHER.match(uri) == ITEMCONTEXT_LIST) {
+			long id = db.insert(DbSchema.TBL_ITEMCONTEXT, null, values);
+			return getUriForId(id, uri);
+		}
+		
+		else if (URI_MATCHER.match(uri) == WEATHER_LIST) {
+			long id = db.insert(DbSchema.TBL_WEATHER, null, values);
+			return getUriForId(id, uri);
+		}
+		
+		else if (URI_MATCHER.match(uri) == TIME_LIST) {
+			long id = db.insert(DbSchema.TBL_TIME, null, values);
 			return getUriForId(id, uri);
 		}
 		
@@ -234,18 +367,74 @@ public class BagceptionProvider extends ContentProvider {
 			builder.appendWhere(Activities._ID + " = " + uri.getLastPathSegment());
 			break;
 			
+		case ACTIVITYITEMS_LIST:
+			builder.setTables(DbSchema.TBL_ACTIVITYITEMS);
+			if (TextUtils.isEmpty(sortOrder)) {
+				sortOrder = ActivityItems.SORT_ORDER_DEFAULT;
+			}
+			break;
+		case ACTIVITYITEMS_ID:
+			builder.setTables(DbSchema.TBL_ACTIVITYITEMS);
+			builder.appendWhere(ActivityItems._ID + " = " + uri.getLastPathSegment());
+			break;
+			
+		case LOCATION_LIST:
+			builder.setTables(DbSchema.TBL_LOCATIONS);
+			if (TextUtils.isEmpty(sortOrder)) {
+				sortOrder = Locations.SORT_ORDER_DEFAULT;
+			}
+			break;
+		case LOCATION_ID:
+			builder.setTables(DbSchema.TBL_LOCATIONS);
+			builder.appendWhere(Locations._ID + " = " + uri.getLastPathSegment());
+			break;
+			
+		case ITEMCONTEXT_LIST:
+			builder.setTables(DbSchema.TBL_ITEMCONTEXT);
+			if (TextUtils.isEmpty(sortOrder)) {
+				sortOrder = ItemContext.SORT_ORDER_DEFAULT;
+			}
+			break;
+		case ITEMCONTEXT_ID:
+			builder.setTables(DbSchema.TBL_ITEMCONTEXT);
+			builder.appendWhere(ItemContext._ID + " = " + uri.getLastPathSegment());
+			break;
+			
+		case WEATHER_LIST:
+			builder.setTables(DbSchema.TBL_WEATHER);
+			if (TextUtils.isEmpty(sortOrder)) {
+				sortOrder = Weather.SORT_ORDER_DEFAULT;
+			}
+			break;
+		case WEATHER_ID:
+			builder.setTables(DbSchema.TBL_WEATHER);
+			builder.appendWhere(Weather._ID + " = " + uri.getLastPathSegment());
+			break;
+			
+		case TIME_LIST:
+			builder.setTables(DbSchema.TBL_TIME);
+			if (TextUtils.isEmpty(sortOrder)) {
+				sortOrder = Time.SORT_ORDER_DEFAULT;
+			}
+			break;
+		case TIME_ID:
+			builder.setTables(DbSchema.TBL_TIME);
+			builder.appendWhere(Time._ID + " = " + uri.getLastPathSegment());
+			break;
+         
       case ENTITY_LIST:
-         builder.setTables(DbSchema.LEFT_OUTER_JOIN_STATEMENT);
-         if (TextUtils.isEmpty(sortOrder)) {
-            sortOrder = ItemEntities.SORT_ORDER_DEFAULT;
-         }
-         useAuthorityUri = true;
-         break;
-      case ENTITY_ID:
-         builder.setTables(DbSchema.LEFT_OUTER_JOIN_STATEMENT);
-         builder.appendWhere(DbSchema.TBL_ITEMS + "." + Items._ID + " = " + uri.getLastPathSegment());
-         useAuthorityUri = true;
-         break;
+          builder.setTables(DbSchema.LEFT_OUTER_JOIN_STATEMENT);
+          if (TextUtils.isEmpty(sortOrder)) {
+             sortOrder = ItemEntities.SORT_ORDER_DEFAULT;
+          }
+          useAuthorityUri = true;
+          break;
+       case ENTITY_ID:
+          builder.setTables(DbSchema.LEFT_OUTER_JOIN_STATEMENT);
+          builder.appendWhere(DbSchema.TBL_ITEMS + "." + Items._ID + " = " + uri.getLastPathSegment());
+          useAuthorityUri = true;
+          break;  
+         
 		default:
 			throw new IllegalArgumentException("Unsupported URI: " + uri);
 		}
@@ -305,6 +494,66 @@ public class BagceptionProvider extends ContentProvider {
 				where += " AND " + selection;
 			}
 			updateCount = db.update(DbSchema.TBL_ACTIVITIES, values, where, selectionArgs);
+			break;
+			
+		case ACTIVITYITEMS_LIST:
+			updateCount = db.update(DbSchema.TBL_ACTIVITYITEMS, values, selection, selectionArgs);
+			break;
+		case ACTIVITYITEMS_ID:
+			idStr = uri.getLastPathSegment();
+			where = ActivityItems._ID + " = " + idStr;
+			if (!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			updateCount = db.update(DbSchema.TBL_ACTIVITYITEMS, values, where, selectionArgs);
+			break;
+			
+		case LOCATION_LIST:
+			updateCount = db.update(DbSchema.TBL_LOCATIONS, values, selection, selectionArgs);
+			break;
+		case LOCATION_ID:
+			idStr = uri.getLastPathSegment();
+			where = Locations._ID + " = " + idStr;
+			if (!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			updateCount = db.update(DbSchema.TBL_LOCATIONS, values, where, selectionArgs);
+			break;
+			
+		case ITEMCONTEXT_LIST:
+			updateCount = db.update(DbSchema.TBL_ITEMCONTEXT, values, selection, selectionArgs);
+			break;
+		case ITEMCONTEXT_ID:
+			idStr = uri.getLastPathSegment();
+			where = ItemContext._ID + " = " + idStr;
+			if (!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			updateCount = db.update(DbSchema.TBL_ITEMCONTEXT, values, where, selectionArgs);
+			break;
+			
+		case WEATHER_LIST:
+			updateCount = db.update(DbSchema.TBL_WEATHER, values, selection, selectionArgs);
+			break;
+		case WEATHER_ID:
+			idStr = uri.getLastPathSegment();
+			where = Weather._ID + " = " + idStr;
+			if (!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			updateCount = db.update(DbSchema.TBL_WEATHER, values, where, selectionArgs);
+			break;
+			
+		case TIME_LIST:
+			updateCount = db.update(DbSchema.TBL_TIME, values, selection, selectionArgs);
+			break;
+		case TIME_ID:
+			idStr = uri.getLastPathSegment();
+			where = Time._ID + " = " + idStr;
+			if (!TextUtils.isEmpty(selection)) {
+				where += " AND " + selection;
+			}
+			updateCount = db.update(DbSchema.TBL_TIME, values, where, selectionArgs);
 			break;
 			
 		default:

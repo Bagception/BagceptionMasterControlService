@@ -15,7 +15,10 @@ public final class BagceptionContract {
 	// A selection clause for ID based queries
 	public static final String SELECTION_ID_BASED = BaseColumns._ID + " = ? ";
 	
-	// Constants for the Items table of the Bagception Provider
+	
+	/**
+	 * Constants for the Items table of the Bagception Provider
+	 */
 	public static final class Items implements ItemColumns {
 		
 		// The content URI for this table
@@ -35,7 +38,10 @@ public final class BagceptionContract {
 
 	}
 	
-	// Constant for the Photos table of the Bagception Provider
+	
+	/**
+	 * Constant for the Photos table of the Bagception Provider
+	 */
 	public static final class Photos implements BaseColumns {
 		
 		// The content URI for this table
@@ -57,7 +63,10 @@ public final class BagceptionContract {
 		public static final String[] PROJECTION_ALL = {_ID, _DATA, ITEMS_ID};
 	}
 	
-	// Constants for the Categories table of the Bagception Provider
+	
+	/**
+	 * Constants for the Categories table of the Bagception Provider
+	 */
 	public static final class Categories implements CategoryColumns {
 		
 		// The content URI for this table
@@ -77,7 +86,10 @@ public final class BagceptionContract {
 		
 	}
 	
-	// Constants for the Activities table of the Bagception Provider
+	
+	/** 
+	 * Constants for the Activities table of the Bagception Provider
+	 */
 	public static final class Activities implements ActivitiyColumns {
 		
 		// The content URI for this table
@@ -97,6 +109,114 @@ public final class BagceptionContract {
 	}
 	
 	
+	/**
+	 * Constants for the ActivityItems table of the Bagception Provider
+	 */
+	public static final class ActivityItems implements ActivityItemsColumns {
+		
+		// The content URI for this table
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "activityItems");
+				
+		// The MIME Type of a directory of activityItems
+		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_activityItems";
+						
+		// The MIME Type of a single activityItem
+		public static final String CONTENT_ACTIVITYITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_activityItems";
+				
+		// A projection of all columns in the activityItems table
+		public static final String[] PROJECTION_ALL = {_ID, ACTIVITY, ITEM, CATEGORY};
+					
+		// The default sort order for queries containing NAME fields
+		public static final String SORT_ORDER_DEFAULT = " ASC"; 
+	}
+	
+	
+	/**
+	 * Constants for the Locations table of the Bagception Provider
+	 */
+	public static final class Locations implements LocationColumns {
+		
+		// The content URI for this table
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "locations");
+				
+		// The MIME Type of a directory of locations
+		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_locations";
+						
+		// The MIME Type of a single locations
+		public static final String CONTENT_LOCATIONS_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_locations";
+				
+		// A projection of all columns in the locations table
+		public static final String[] PROJECTION_ALL = {_ID, NAME, LON, LAT, RADIUS, MAC};
+					
+		// The default sort order for queries containing NAME fields
+		public static final String SORT_ORDER_DEFAULT = " ASC"; 
+	}
+	
+	
+	/**
+	 * Constants for the ItemContext table of the Bagception Provider
+	 */
+	public static final class ItemContext implements ItemContextColumns {
+		
+		// The content URI for this table
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "itemContext");
+				
+		// The MIME Type of a directory of ItemContext
+		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_itemContext";
+						
+		// The MIME Type of a single ItemContext
+		public static final String CONTENT_ITEMCONTEXT_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_itemContext";
+				
+		// A projection of all columns in the ItemContext table
+		public static final String[] PROJECTION_ALL = {_ID, ITEMID, WEATHERID, TIMEID};
+					
+		// The default sort order for queries containing NAME fields
+		public static final String SORT_ORDER_DEFAULT = " ASC"; 
+	}
+	
+	
+	/**
+	 * Constants for the Weather table of the Bagception Provider
+	 */
+	public static final class Weather implements WeatherColumns {
+		
+		// The content URI for this table
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "weather");
+				
+		// The MIME Type of a directory of Weather
+		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_weather";
+						
+		// The MIME Type of a single Weather
+		public static final String CONTENT_WEATHER_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_weather";
+				
+		// A projection of all columns in the Weather table
+		public static final String[] PROJECTION_ALL = {_ID, NAME, TEMPERATURE, WEATHER};
+					
+		// The default sort order for queries containing NAME fields
+		public static final String SORT_ORDER_DEFAULT = " ASC"; 
+	}
+	
+	
+	/**
+	 * Constants for the time table of the Bagception Provider
+	 */
+	public static final class Time implements TimeColumns {
+		
+		// The content URI for this table
+		public static final Uri CONTENT_URI = Uri.withAppendedPath(BagceptionContract.CONTENT_URI, "time");
+				
+		// The MIME Type of a directory of time
+		public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/bagception_time";
+						
+		// The MIME Type of a single time
+		public static final String CONTENT_TIME_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/bagception_time";
+				
+		// A projection of all columns in the time table
+		public static final String[] PROJECTION_ALL = {_ID, NAME, DATE, TIME};
+					
+		// The default sort order for queries containing NAME fields
+		public static final String SORT_ORDER_DEFAULT = " ASC"; 
+	}
 	
 	
 	/**
@@ -147,5 +267,41 @@ public final class BagceptionContract {
 		public static final String NAME = "activityname";
 		public static final String LOCATION = "location";
 	}
+	
+	public static interface ActivityItemsColumns extends BaseColumns {
+		
+		public static final String ACTIVITY = "activity";
+		public static final String ITEM = "item";
+		public static final String CATEGORY = "category";
+	}
 
+	public static interface LocationColumns extends BaseColumns {
+		
+		public static final String NAME = "name";
+		public static final String LON = "longitude";
+		public static final String LAT = "latitude";
+		public static final String RADIUS = "radius";
+		public static final String MAC = "mac";
+	}
+	
+	public static interface ItemContextColumns extends BaseColumns {
+		
+		public static final String ITEMID = "itemid";
+		public static final String WEATHERID = "weatherid";
+		public static final String TIMEID = "timeid";
+	}
+	
+	public static interface WeatherColumns extends BaseColumns {
+		
+		public static final String NAME = "name";
+		public static final String TEMPERATURE = "temperature";
+		public static final String WEATHER = "weather";
+	}
+	
+	public static interface TimeColumns extends BaseColumns {
+		
+		public static final String NAME = "name";
+		public static final String DATE = "date";
+		public static final String TIME = "time";
+	}
 }

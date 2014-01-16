@@ -12,6 +12,11 @@ public interface DbSchema {
 	String TBL_PHOTOS = "photos";
 	String TBL_CATEGORIES = "categories";
 	String TBL_ACTIVITIES = "activities";
+	String TBL_ACTIVITYITEMS = "activityitems";
+	String TBL_LOCATIONS = "locations";
+	String TBL_ITEMCONTEXT = "itemcontext";
+	String TBL_WEATHER = "weather";
+	String TBL_TIME = "time";
 	
 	// Columns TBL_ITEMS
 	String COL_ID = BaseColumns._ID;
@@ -35,6 +40,38 @@ public interface DbSchema {
 	String COL_ACTIVITYNAME = "activityname";
 	String COL_ACTIVITYLOCATION = "location";
 	
+	// Columns TBL_ACTIVITYITEMS
+	String COL_ID_ACTIVITYITEMS = "_id";
+	String COL_ACTIVITY = "activity";
+	String COL_ITEM = "item";
+	// COL_CATEGORY
+	
+	// Columns TBL_LOCATION
+	String COL_ID_LOC = "_id";
+	String COL_LOCATIONNAME = "locationname";
+	String COL_LON = "longitude";
+	String COL_LAT = "latitude";
+	String COL_RADIUS = "radius";
+	String COL_MAC = "mac";
+	
+	// Columns TBL_ITEMCONTEXT
+	String COL_ID_CONTEXT = "_id";
+	String COL_ITEMID = "item";
+	String COL_WEATHERID = "weatherid";
+	String COL_TIMEID = "timeid";
+	
+	// Columns TBL_WEATHER
+	String COL_ID_WEATHER = "_id";
+	String COL_WEATHERNAME = "name";
+	String COL_TEMPERATURE = "temperature";
+	String COL_WEATHER = "weather";
+	
+	// Columns TBL_TIME
+	String COL_ID_TIME = "_id";
+	String COL_TIMENAME = "name";
+	String COL_DATE = "date";
+	String COL_TIME = "time";
+	
 	// Strings to create tables	
 	String CREATE_TBL_ITEMS =
 			"CREATE TABLE " + TBL_ITEMS + "(" +
@@ -43,6 +80,7 @@ public interface DbSchema {
 			COL_TAGID + 		"TEXT,\n" +
 			COL_VISIBILITY +	"TEXT,\n" +
 			COL_ACTIVITY_IND + 	"TEXT,\n" +
+			COL_CATEGORY + 		"TEXT,\n" +
 			")";
 	
 	String CREATE_TBL_PHOTOS =
@@ -64,6 +102,48 @@ public interface DbSchema {
 			COL_ACTIVITYNAME + "TEXT,\n" +
 			COL_ACTIVITYLOCATION + "TEXT,\n" +
 			")";
+	
+	String CREATE_TBL_ACTIVITYITEMS =
+			"CREATE TABLE " + TBL_ACTIVITYITEMS + "(" +
+			COL_ID_ACTIVITYITEMS + "INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
+			COL_ACTIVITY + "TEXT,\n" +
+			COL_ITEM + "TEXT,\n" +
+			COL_CATEGORY + "TEXT,\n" +
+			")";
+	
+	String CREATE_TBL_LOCATIONS =
+			"CREATE TABLE " + TBL_LOCATIONS + "(" +
+			COL_ID_LOC + "INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
+			COL_LOCATIONNAME + "TEXT,\n" +
+			COL_LON + "TEXT,\n" +
+			COL_LAT + "TEXT,\n" +
+			COL_RADIUS + "TEXT,\n" +
+			COL_MAC + "TEXT,\n" +
+			")";
+	
+	String CREATE_TBL_ITEMCONTEXT =
+			"CREATE TABLE " + TBL_ITEMCONTEXT + "(" +
+			COL_ID_CONTEXT + "INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
+			COL_ITEMID + "TEXT,\n" +
+			COL_WEATHERID + "TEXT,\n" +
+			COL_TIMEID + "TEXT,\n" +
+			")";
+	
+	String CREATE_TBL_WEATHER =
+			"CREATE TABLE " + TBL_WEATHER + "(" +
+			COL_ID_WEATHER + "INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
+			COL_WEATHERNAME + "TEXT,\n" +
+			COL_TEMPERATURE + "TEXT,\n" +
+			COL_WEATHER + "TEXT,\n" +
+			")";
+	
+	String CREATE_TBL_TIME =
+			"CREATE TABLE " + TBL_TIME + "(" +
+			COL_ID_TIME + "INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
+			COL_TIMENAME + "TEXT,\n" +
+			COL_DATE + "TEXT,\n" +
+			COL_TIME + "TEXT,\n" +
+			")";
 			
 	
 	// Create trigger to achieve referential integrity
@@ -77,6 +157,10 @@ public interface DbSchema {
 	String DROP_TBL_PHOTOS = "DROP TABLE IF EXISTS " + TBL_PHOTOS;
 	String DROP_TBL_CATEGORIES = "DROP TABLE IF EXISTS " + TBL_CATEGORIES;
 	String DROP_TBL_ACTIVITIES = "DROP TABLE IF EXISTS " + TBL_ACTIVITIES;
+	String DROP_TBL_ACTIVITYITEMS = "DROP TABLE IF EXISTS " + TBL_ACTIVITYITEMS;
+	
+	// TODO
+	// Drop-Strings for Location, ItemContext, Weather and Time
 	
 	String DROP_TRIGGER_DEL_ITEMS = "DROP TRIGGER IF EXISTS delete_items";
 	
