@@ -191,6 +191,12 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				obj.put("img", serializedImage);
 				btHelper.sendMessageBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
 			break;
+			
+			case CONTAINER_STATUS_UPDATE_REQUEST:
+				setStatusChanged();
+				break;
+		default:
+			break;
 		}
 		
 	}
