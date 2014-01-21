@@ -72,6 +72,8 @@ public interface DbSchema {
 	String COL_DATE = "date";
 	String COL_TIME = "time";
 	
+	
+	
 	// Strings to create tables	
 	String CREATE_TBL_ITEMS =
 			"CREATE TABLE " + TBL_ITEMS + "(" +
@@ -80,7 +82,8 @@ public interface DbSchema {
 			COL_TAGID + 		"TEXT,\n" +
 			COL_VISIBILITY +	"TEXT,\n" +
 			COL_ACTIVITY_IND + 	"TEXT,\n" +
-			COL_CATEGORY + 		"TEXT,\n" +
+			COL_CATEGORY + 		"INTEGER,\n" +
+			" FOREIGN KEY (" + COL_CATEGORY + ") REFERENCES " + TBL_CATEGORIES + " (" + COL_ID_CATEGORY + ");" +
 			")";
 	
 	String CREATE_TBL_PHOTOS =
@@ -88,6 +91,7 @@ public interface DbSchema {
 			COL_ID_PHOTO + 	"INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
 			COL_DATA + 		"TEXT,\n" +
 			COL_ITEMS +		"INTEGER NOT NULL,\n" +
+			" FOREIGN KEY (" + COL_ITEMS + ") REFERENCES " + TBL_ITEMS + " (" + COL_ID + ");" +
 			")";
 	
 	String CREATE_TBL_CATEGORIES =
@@ -100,7 +104,8 @@ public interface DbSchema {
 			"CREATE TABLE " + TBL_ACTIVITIES + "(" +
 			COL_ID_ACTIVITY + "INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
 			COL_ACTIVITYNAME + "TEXT,\n" +
-			COL_ACTIVITYLOCATION + "TEXT,\n" +
+			COL_ACTIVITYLOCATION + "INTEGER,\n" +
+			" FOREIGN KEY (" + COL_ACTIVITYLOCATION + ") REFERENCES " + TBL_LOCATIONS + " (" + COL_ID_LOC + ");" +
 			")";
 	
 	String CREATE_TBL_ACTIVITYITEMS =

@@ -3,6 +3,16 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.OperationApplicationException;
+import android.database.Cursor;
+import android.os.RemoteException;
+import android.util.Log;
+
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.Items;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.Photos;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class DatabaseConnector {
@@ -68,3 +78,84 @@ public class DatabaseConnector {
 		return null;
 	}
 }
+
+
+
+
+/**
+	
+	private void dummyApplyBatch() {
+
+      String item = "Fussball";
+      String visibility = "public";
+      boolean hasPic = true;
+      //Context ctx = getActivity();
+      //String somePath = ctx.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+      
+      ArrayList<ContentProviderOperation> ops = 
+            new ArrayList<ContentProviderOperation>();
+      ops.add(ContentProviderOperation.newInsert(Items.CONTENT_URI)
+            .withValue(Items.NAME, item)
+            .withValue(Items.VISIBILITY, visibility)
+            .build());
+      if (hasPic) {
+         ops.add(ContentProviderOperation.newInsert(Photos.CONTENT_URI)
+               .withValue(Photos._DATA, somePath)
+               .withValueBackReference(Photos.ITEMS_ID, 0).
+               build());
+      }
+      try {
+         ContentResolver resolver = getActivity().getContentResolver();
+         resolver.applyBatch(BagceptionContract.AUTHORITY, ops);
+      } catch (OperationApplicationException e) {
+         Log.e("Error: ", "cannot apply batch: " + e.getLocalizedMessage(), e);
+      } catch (RemoteException e) {
+         Log.e("Error: ", "cannot apply batch: " + e.getLocalizedMessage(), e);
+      }
+
+      // EventBus.getDefault().post(whatever);
+
+   }
+   
+   
+   private long itemUpdate() {
+
+      String itemId = "10";
+      String selection = BagceptionContract.SELECTION_ID_BASED; // BaseColumns._ID
+                                                               // + " = ? "
+      String[] selectionArgs = {itemId};
+      ContentResolver resolver = getActivity().getContentResolver();
+      ContentValues values = new ContentValues();
+      values.put(Items.NAME, "Fussball");
+      values.put(Items.VISIBILITY, "public");
+      long updateCount = 
+            resolver.update(Items.CONTENT_URI, values, selection, selectionArgs);
+      
+      
+      return updateCount;
+   }
+
+
+   private void dummyQuery() {
+
+      String itemId = "10";
+      String selection = BagceptionContract.SELECTION_ID_BASED; // BaseColumns._ID
+                                                               // + " = ? "
+      String[] selectionArgs = {itemId};
+      ContentResolver resolver = getActivity().getContentResolver();
+      Cursor c = resolver.query(
+            Items.CONTENT_URI,          // die URI
+            Items.PROJECTION_ALL,       // optionale Angabe der gewünschten Spalten
+            selection,                  // optionale WHERE Klausel (ohne Keyword)
+            selectionArgs,              // optionale Wildcard Ersetzungen
+            Items.SORT_ORDER_DEFAULT);  // optionale ORDER BY Klausel (ohne Keyword)
+      
+      if (c != null && c.moveToFirst()) {
+         // int idx = c.getColumnIndex(Items.NAME);
+         String name = c.getString(1);
+         String tagid = c.getString(2);
+         ...
+      }
+      
+   }
+   */

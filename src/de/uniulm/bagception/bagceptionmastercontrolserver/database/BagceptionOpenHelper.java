@@ -18,6 +18,7 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 
+		db.execSQL("PRAGMA foreign_keys=ON;");
 		db.execSQL(DbSchema.CREATE_TBL_ITEMS);
 		db.execSQL(DbSchema.CREATE_TBL_PHOTOS);
 		db.execSQL(DbSchema.CREATE_TBL_CATEGORIES);
@@ -33,6 +34,7 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+		db.execSQL("PRAGMA foreign_keys=ON;");
 		db.execSQL(DbSchema.DROP_TBL_ITEMS);
 		db.execSQL(DbSchema.CREATE_TBL_PHOTOS);
 		db.execSQL(DbSchema.DROP_TBL_CATEGORIES);
