@@ -19,7 +19,7 @@ public interface DbSchema {
 	String TBL_TIME = "time";
 	
 	// Columns TBL_ITEMS
-	String COL_ID = BaseColumns._ID;
+	String COL_ID_ITEM = BaseColumns._ID;
 	String COL_ITEMNAME = "itemname";
 	String COL_TAGID = "tag_id";
 	String COL_VISIBILITY = "visibility";
@@ -77,7 +77,7 @@ public interface DbSchema {
 	// Strings to create tables	
 	String CREATE_TBL_ITEMS =
 			"CREATE TABLE " + TBL_ITEMS + "(" +
-			COL_ID +			"INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
+			COL_ID_ITEM +			"INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
 			COL_ITEMNAME + 		"TEXT,\n" +
 			COL_TAGID + 		"TEXT,\n" +
 			COL_VISIBILITY +	"TEXT,\n" +
@@ -91,7 +91,7 @@ public interface DbSchema {
 			COL_ID_PHOTO + 	"INTEGER PRIMARY KEY AUTOINCREMENT, \n" + 
 			COL_DATA + 		"TEXT,\n" +
 			COL_ITEMS +		"INTEGER NOT NULL,\n" +
-			" FOREIGN KEY (" + COL_ITEMS + ") REFERENCES " + TBL_ITEMS + " (" + COL_ID + ");" +
+			" FOREIGN KEY (" + COL_ITEMS + ") REFERENCES " + TBL_ITEMS + " (" + COL_ID_ITEM + ");" +
 			")";
 	
 	String CREATE_TBL_CATEGORIES =
@@ -114,6 +114,9 @@ public interface DbSchema {
 			COL_ACTIVITY + "TEXT,\n" +
 			COL_ITEM + "TEXT,\n" +
 			COL_CATEGORY + "TEXT,\n" +
+			" FOREIGN KEY (" + COL_ACTIVITY + ") REFERENCES " + TBL_ACTIVITIES + " (" + COL_ID_ACTIVITY + ");" +
+			" FOREIGN KEY (" + COL_ITEM + ") REFERENCES " + TBL_ITEMS + " (" + COL_ID_ITEM + ");" +
+			" FOREIGN KEY (" + COL_CATEGORY + ") REFERENCES " + TBL_LOCATIONS + " (" + COL_ID_CATEGORY + ");" +
 			")";
 	
 	String CREATE_TBL_LOCATIONS =
@@ -132,6 +135,9 @@ public interface DbSchema {
 			COL_ITEMID + "TEXT,\n" +
 			COL_WEATHERID + "TEXT,\n" +
 			COL_TIMEID + "TEXT,\n" +
+			" FOREIGN KEY (" + COL_WEATHERID + ") REFERENCES " + TBL_WEATHER + " (" + COL_ID_WEATHER + ");" +
+			" FOREIGN KEY (" + COL_ITEMID + ") REFERENCES " + TBL_ITEMS + " (" + COL_ID_ITEM + ");" +
+			" FOREIGN KEY (" + COL_TIMEID + ") REFERENCES " + TBL_TIME + " (" + COL_ID_TIME + ");" +
 			")";
 	
 	String CREATE_TBL_WEATHER =
