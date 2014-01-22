@@ -30,10 +30,12 @@ public class ItemHandler extends Activity {
 		
 		Log.w("Top: ", "Ich leg jetzt das Bundle an");
 		
+		String tagid = "123456789";
+		
 		Bundle b = new Bundle();
 		b.putString("name", "Handtuch");
 		b.putString("category", null);
-		b.putString("tagid", "123456789");
+		b.putString("tagid", tagid);
 //		
 //		Log.w("Top: ", "Jetzt kommt das Intent ran");
 //		Intent i = new Intent(this, DatabaseHandler.class);
@@ -42,8 +44,17 @@ public class ItemHandler extends Activity {
 //		
 //		Log.w("Top: ", "Ich bin in der richtigen Activity");
 //		Bundle b = getIntent().getExtras();
-		// onActionCreateItem(b);
-		onActionQueryItem("123456789");
+		onActionCreateItem(b);
+		
+		onActionQueryItem(tagid);
+		
+		b.remove("name");
+		b.putString("name", "Großes Handtuch");
+		onActionUpdateItem(b);
+		
+		onActionQueryItem(tagid);
+		
+		onActionDeleteItem(b);
 	}
 
 	@Override
@@ -55,7 +66,7 @@ public class ItemHandler extends Activity {
 	
 	public void onActionCreateItem(Bundle savedInstanceState) {
 		
-		Log.w("Top", "Ich bin in der Insert Methode");
+		//Log.w("Top", "Ich bin in der Insert Methode");
 		
 			  String name = savedInstanceState.getString("name");
 			  String category = savedInstanceState.getString("category", null);
@@ -80,7 +91,7 @@ public class ItemHandler extends Activity {
 		      Uri result = resolver.insert(Items.CONTENT_URI, values);
 		      
 		      if(result == null) {
-		    	  Log.e("Error: ", "Item kann nicht angelegt werden");
+		    	  //Log.e("Error: ", "Item kann nicht angelegt werden");
 		    	  return;
 		      }
 		      
@@ -89,7 +100,7 @@ public class ItemHandler extends Activity {
 		    	  insertPhoto(values, resolver, hasPic, itemId);
 		      }
 		      
-		      Log.w("Top: ", "Alles gefunzt!");
+		      Log.w("Top", "Item " + name + " wurde erstellt.");
 		
    }
 	   
@@ -133,6 +144,8 @@ public class ItemHandler extends Activity {
 	      
 	      long resultCount = resolver.update(updateUri, values, null, null);
 	      
+	      Log.w("Top", "Item wurde erfolgreich in " + name + " geändert");
+	      
 	      if (resultCount == 0) {
 	         Log.e("Error: ", "Couldn't update item with id " + itemId);
 	         return;
@@ -150,6 +163,7 @@ public class ItemHandler extends Activity {
 	   public void onActionDeleteItem(Bundle savedInstanceState) {
 		   
 		      long itemId = savedInstanceState.getLong(BaseColumns._ID, -1);
+		      String name = savedInstanceState.getString("name");
 		      
 		      if (itemId == -1) {
 		         throw new IllegalStateException("Cannot delete record with itemId == -1");
@@ -158,6 +172,8 @@ public class ItemHandler extends Activity {
 		      Uri delUri = ContentUris.withAppendedId(Items.CONTENT_URI, itemId);
 		      
 		      long resultCount = getContentResolver().delete(delUri, null, null);
+		      
+		      Log.w("Top", "Item " + name + " wurde erfolgreich gelöscht");
 		      
 		      if (resultCount == 0) {
 		         Log.e("Error: ", "Couldn't delete item with id " + itemId);
@@ -168,7 +184,7 @@ public class ItemHandler extends Activity {
 	   // TODO
 	   public void onActionQueryItem(String tagId) {
 
-		   Log.w("Top ", "Bin in der Query Methode");
+		   //Log.w("Top ", "Bin in der Query Methode");
 		   
 	      //String itemId = "10";
 		  //String itemId = tagId.getString("itemId", null);
@@ -179,7 +195,7 @@ public class ItemHandler extends Activity {
 		      String[] selectionArgs = {tagId};
 		      ContentResolver resolver = getContentResolver();
 		     
-		    Log.w("Top ", "Erstelle jetzt Cursor");  
+		    //Log.w("Top ", "Erstelle jetzt Cursor");  
 		      
 		      Cursor c = resolver.query(
 		            Items.CONTENT_URI,          // die URI
@@ -189,7 +205,7 @@ public class ItemHandler extends Activity {
 		            //Items.SORT_ORDER_DEFAULT);  // optionale ORDER BY Klausel (ohne Keyword)
 		            null);
 		      
-		      Log.w("Top ", "Cursor wurde erstellt");
+		      //Log.w("Top ", "Cursor wurde erstellt");
 		      
 		      if (c != null && c.moveToFirst()) {
 		         // int idx = c.getColumnIndex(Items.NAME);
