@@ -24,6 +24,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.ItemHandler;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
@@ -84,6 +85,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		itemIndexSystem = new ItemIndexSystem();
 		activitySystem = new ActivitySystem();
+		
+		
+		
+		
 	}
 
 
