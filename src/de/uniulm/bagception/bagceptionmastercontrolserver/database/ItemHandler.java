@@ -18,6 +18,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 import android.view.Menu;
 
@@ -28,7 +29,7 @@ public class ItemHandler extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_database_handler);
 		
-		Log.w("Top: ", "Ich leg jetzt das Bundle an");
+//		Log.w("Top: ", "Ich leg jetzt das Bundle an");
 		
 		String tagid = "123456789";
 		
@@ -44,17 +45,19 @@ public class ItemHandler extends Activity {
 //		
 //		Log.w("Top: ", "Ich bin in der richtigen Activity");
 //		Bundle b = getIntent().getExtras();
+		
 		onActionCreateItem(b);
+//		
+//		onActionQueryItem(tagid);
 		
-		onActionQueryItem(tagid);
-		
-		b.remove("name");
-		b.putString("name", "Großes Handtuch");
-		onActionUpdateItem(b);
-		
-		onActionQueryItem(tagid);
-		
-		onActionDeleteItem(b);
+//		b.remove("name");
+//		b.putString("name", "Großes Handtuch");
+//		onActionUpdateItem(b);
+//		
+//		onActionQueryItem(tagid);
+//		Cursor del = onActionQueryItem(null);
+//		onActionDeleteItem(del);
+//		onActionGetItems();
 	}
 
 	@Override
@@ -119,14 +122,25 @@ public class ItemHandler extends Activity {
 	}
 
 	public void onActionUpdateItem(Bundle savedInstanceState) {
+		
+		Log.w("Top", "Bin jetzt in der Updatemethode");
 
-		long itemId = savedInstanceState.getLong(BaseColumns._ID, -1);
+//		long itemId = savedInstanceState.getLong(BaseColumns._ID, -1);
+		
+		Cursor bundle = onActionQueryItem(savedInstanceState.getString("tagid"));
+		
+		long itemId = bundle.getLong(0);
+		
+		Log.w("Top", "ID: " + itemId);
 		
 	      if (itemId == -1) {
 	         throw new IllegalStateException("Cannot update record with itemId == -1");
 	      }
 	      
-	      String name = savedInstanceState.getString(Items.NAME);
+	      Log.w("Top", "Hole jetzt die Daten aus dem Bundle");
+	      
+//	      String name = savedInstanceState.getString(Items.NAME);
+	      String name = savedInstanceState.getString("name");
 	      String category = savedInstanceState.getString(Items.CATEGORY, null);
 	      String tagid = savedInstanceState.getString(Items.TAGID);
 	      String activityIndependent = savedInstanceState.getString(Items.ACTIVITY_IND, null);
@@ -159,35 +173,45 @@ public class ItemHandler extends Activity {
 	    	  insertPhoto(values, resolver, photo, itemId);
 	      }
 	   }
-
-	   public void onActionDeleteItem(Bundle savedInstanceState) {
+	
+	
+		public void onActionDeleteItem(Cursor savedInstanceState) {
 		   
-		      long itemId = savedInstanceState.getLong(BaseColumns._ID, -1);
-		      String name = savedInstanceState.getString("name");
+		   	Log.w("Top", "Löschen Methode");
+		   
+		      //long itemId = savedInstanceState.getLong(BaseColumns._ID, -1);
+		   	//long itemId = savedInstanceState.getLong("_id");
+		   	long itemId = savedInstanceState.getLong(0);
+		      
+		    Log.w("Top", "ItemId bekommen");
 		      
 		      if (itemId == -1) {
+		    	  Log.w("Top", "itemdId nicht vorhanden");
 		         throw new IllegalStateException("Cannot delete record with itemId == -1");
 		      }
 		      
 		      Uri delUri = ContentUris.withAppendedId(Items.CONTENT_URI, itemId);
 		      
-		      long resultCount = getContentResolver().delete(delUri, null, null);
+		      Log.w("Top", "Uri bekommen");
 		      
-		      Log.w("Top", "Item " + name + " wurde erfolgreich gelöscht");
+		      long resultCount = getContentResolver().delete(delUri, null, null);
 		      
 		      if (resultCount == 0) {
 		         Log.e("Error: ", "Couldn't delete item with id " + itemId);
 		         return;
 		      }
+		      
+		      Log.w("Top", "Item gelöscht");
 	   }
 	   
 	   // TODO
-	   public void onActionQueryItem(String tagId) {
+	   public Cursor onActionQueryItem(String tagId) {
 
 		   //Log.w("Top ", "Bin in der Query Methode");
 		   
 	      //String itemId = "10";
 		  //String itemId = tagId.getString("itemId", null);
+		   Cursor result = null;
 		  
 		  if (tagId != null) {
 		      String selection = BagceptionContract.SELECTION_TAGID_BASED; // BaseColumns._ID
@@ -197,7 +221,7 @@ public class ItemHandler extends Activity {
 		     
 		    //Log.w("Top ", "Erstelle jetzt Cursor");  
 		      
-		      Cursor c = resolver.query(
+		      result = resolver.query(
 		            Items.CONTENT_URI,          // die URI
 		            Items.PROJECTION_ALL,       // optionale Angabe der gewünschten Spalten
 		            selection,                  // optionale WHERE Klausel (ohne Keyword)
@@ -207,17 +231,52 @@ public class ItemHandler extends Activity {
 		      
 		      //Log.w("Top ", "Cursor wurde erstellt");
 		      
-		      if (c != null && c.moveToFirst()) {
+		      if (result != null && result.moveToFirst()) {
 		         // int idx = c.getColumnIndex(Items.NAME);
-		         String name = c.getString(1);
-		         String tagid = c.getString(2);
+		         String name = result.getString(1);
+		         String tagid = result.getString(2);
 		         
 		         Log.w("Top ", name);
 		         Log.w("Top ", tagid);
+		         
+		         return result;
 		      }		      
+		      
+		      if(result == null) {
+		    	  return null;
+		      }
 		  }
-	      
+		  
+		  return null;	    
 	   }
+	   
+		public Cursor onActionGetItems() {
+			
+			Log.w("Top", "Richtige Methode");
+			Cursor result = null;
+			ContentResolver resolver = getContentResolver();
+			
+			result = resolver.query(Items.CONTENT_URI, Items.PROJECTION_ALL, null, null, null);
+			
+			if (result != null && result.moveToFirst()) {
+				
+			Log.w("Top", "If Schleife xD");	
+				do {
+					
+					long id = result.getLong(0);
+					String name = result.getString(1);
+					String tagid = result.getString(2);
+					Log.w("Top", "ID: " + id);
+					Log.w("Top", "Name: " + name);
+					Log.w("Top", "TagId: " + tagid);
+				} while (result.moveToNext());
+
+			}
+			
+			
+			
+			return result;
+		}
 
 
 }
