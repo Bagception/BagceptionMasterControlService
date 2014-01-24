@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.ItemHandler;
 import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
 
 /**
@@ -53,6 +54,9 @@ public class ComponentListActivity extends FragmentActivity implements
 					.findFragmentById(R.id.component_list))
 					.setActivateOnItemClick(true);
 		}
+		
+		//Intent i = new Intent(this, ItemHandler.class);
+		//startActivity(i);
 
 		// TODO: If exposing deep links into your app, handle intents here.
 	}

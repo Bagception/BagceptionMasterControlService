@@ -328,9 +328,10 @@ public class BagceptionProvider extends ContentProvider {
 		switch (URI_MATCHER.match(uri)) {
 		case ITEM_LIST:
 	      builder.setTables(DbSchema.TBL_ITEMS);
-	      if (TextUtils.isEmpty(sortOrder)) {
-	         sortOrder = Items.SORT_ORDER_DEFAULT;
-	      }
+	      // TODO
+//	      if (TextUtils.isEmpty(sortOrder)) {
+//	         sortOrder = Items.SORT_ORDER_DEFAULT;
+//	      }
 			break;
 		case ITEM_ID:
 	      builder.setTables(DbSchema.TBL_ITEMS);

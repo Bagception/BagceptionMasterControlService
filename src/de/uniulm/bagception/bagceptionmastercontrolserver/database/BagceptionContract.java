@@ -15,6 +15,9 @@ public final class BagceptionContract {
 	// A selection clause for ID based queries
 	public static final String SELECTION_ID_BASED = BaseColumns._ID + " = ? ";
 	
+	// A selection clause for TagID based queries
+	public static final String SELECTION_TAGID_BASED = Items.TAGID + " = ? ";
+	
 	
 	/**
 	 * Constants for the Items table of the Bagception Provider
@@ -33,8 +36,9 @@ public final class BagceptionContract {
 		// A projection of all columns in the items table
 		public static final String[] PROJECTION_ALL = {_ID, NAME, TAGID, VISIBILITY, ACTIVITY_IND, CATEGORY};
 		
+		// TODO
 		// The default sort order for queries containing NAME fields
-		public static final String SORT_ORDER_DEFAULT = " ASC";
+		//public static final String SORT_ORDER_DEFAULT = " DESC";
 
 	}
 	

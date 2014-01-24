@@ -50,7 +50,7 @@
 
         <provider
             android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
-            android:authorities="de.uniulm.bagceptiondatabase.database"
+            android:authorities="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
             android:exported="true"
             android:grantUriPermissions="true"
             android:label="BagceptionProvider"
@@ -59,9 +59,10 @@
         </provider>
 
         <activity
-            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHandler"
+            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.ItemHandler"
             android:label="@string/title_activity_database_handler" >
         </activity>
+        
     </application>
 
 </manifest>

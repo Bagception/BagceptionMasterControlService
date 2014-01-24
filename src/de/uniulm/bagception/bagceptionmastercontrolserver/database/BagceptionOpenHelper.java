@@ -28,7 +28,7 @@ public class BagceptionOpenHelper extends SQLiteOpenHelper{
 		db.execSQL(DbSchema.CREATE_TBL_ITEMCONTEXT);
 		db.execSQL(DbSchema.CREATE_TBL_WEATHER);
 		db.execSQL(DbSchema.CREATE_TBL_TIME);
-		db.execSQL(DbSchema.CREATE_TRIGGER_DEL_ITEMS);	
+//		db.execSQL(DbSchema.CREATE_TRIGGER_DEL_ITEMS);	
 	}
 
 	@Override

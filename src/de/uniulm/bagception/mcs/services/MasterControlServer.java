@@ -51,7 +51,11 @@ public class MasterControlServer extends ObservableService implements Runnable, 
  *
  */
 
+	private static MasterControlServer debuginstance;
+	
 	private Thread mainThread;
+	
+	
 	
 	//bt
 	private MessengerHelper btHelper;
@@ -62,6 +66,12 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
+	
+	@Override
+		public void onCreate() {
+			debuginstance = this;
+			super.onCreate();
+		}
 	
 	@Override
 	protected void onFirstInit() {
@@ -84,6 +94,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		itemIndexSystem = new ItemIndexSystem();
 		activitySystem = new ActivitySystem();
+		
+		
+		
+		
 	}
 
 
@@ -318,7 +332,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 					//tag not found in db
 					ArrayList<String> ids = new ArrayList<String>();
 					ids.add(id);
-					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("","",ids)));
+					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("",ids)));
 				}
 					
 				
@@ -348,5 +362,9 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		Bundle toSend = BundleMessage.getInstance().createBundle(BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE, statusUpdate.toString());
 		btHelper.sendMessageBundle(toSend);
+	}
+	
+	public static void DEBUG(){
+		debuginstance.setStatusChanged();
 	}
 }
