@@ -1,26 +1,17 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
-import java.util.ArrayList;
-
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.layout;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.menu;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.*;
-import android.net.Uri;
-import android.os.Bundle;
-import android.os.RemoteException;
-import android.provider.BaseColumns;
 import android.app.Activity;
-import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
-import android.content.Intent;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.Items;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.Photos;
 
 public class ItemHandler extends Activity {
 

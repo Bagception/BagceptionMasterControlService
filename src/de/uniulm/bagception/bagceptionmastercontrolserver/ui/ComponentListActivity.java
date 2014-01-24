@@ -55,8 +55,8 @@ public class ComponentListActivity extends FragmentActivity implements
 					.setActivateOnItemClick(true);
 		}
 		
-		Intent i = new Intent(this, ItemHandler.class);
-		startActivity(i);
+		//Intent i = new Intent(this, ItemHandler.class);
+		//startActivity(i);
 
 		// TODO: If exposing deep links into your app, handle intents here.
 	}
