@@ -24,7 +24,6 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.ItemHandler;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
@@ -323,7 +322,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 					//tag not found in db
 					ArrayList<String> ids = new ArrayList<String>();
 					ids.add(id);
-					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("","",ids)));
+					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("",ids)));
 				}
 					
 				

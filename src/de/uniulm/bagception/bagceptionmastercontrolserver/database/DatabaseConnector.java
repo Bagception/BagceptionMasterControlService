@@ -3,16 +3,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.content.ContentProviderOperation;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.OperationApplicationException;
-import android.database.Cursor;
-import android.os.RemoteException;
-import android.util.Log;
-
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.Items;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionContract.Photos;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class DatabaseConnector {
@@ -33,7 +23,7 @@ public class DatabaseConnector {
 			ArrayList<String> ids = new ArrayList<String>();
 			ids.add("32 40 00 01 0E 30 00 E2 00 34 12 DC 03 01 18 28 24 27 37 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 			String name = "Regenjacke";
-			Item ip =  new Item(name,"",ids);
+			Item ip =  new Item(name,ids);
 			
 			items.put(name, ip);
 		}
@@ -42,21 +32,21 @@ public class DatabaseConnector {
 			ArrayList<String> ids = new ArrayList<String>();
 			ids.add("32 40 00 01 0E 30 00 E2 00 34 12 DC 03 01 18 28 24 27 40 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 			String name = "T-Shirt";
-			items.put(name, new Item(name,"",ids));
+			items.put(name, new Item(name,ids));
 		}
 
 		{
 			ArrayList<String> ids = new ArrayList<String>();
 			ids.add("32 40 00 01 0E 30 00 E2 00 34 12 DC 03 01 18 28 24 27 39 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 			String name = "Hose";
-			items.put(name, new Item(name,"",ids));
+			items.put(name, new Item(name,ids));
 		}
 		
 		{
 			ArrayList<String> ids = new ArrayList<String>();
 			ids.add("32 40 00 01 0E 30 00 E2 00 34 12 DC 03 01 18 28 24 27 38 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00");
 			String name = "Trinken";
-			items.put(name, new Item(name,"",ids));
+			items.put(name, new Item(name,ids));
 		}		
 		
 	}
