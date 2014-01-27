@@ -9,6 +9,7 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.ActivityCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandProcessor;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.ItemCommand;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
 
 public class AdministrationDatabaseAdapter extends AdministrationCommandProcessor{
@@ -19,13 +20,17 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 	
 	//demo response method, just to demonstrate the communication back
 	private void sendActivityResponse(AdministrationCommand<Activity> req){
-		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, ActivityCommand.reply(req, true, ""));
+		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, ActivityCommand.reply(req, false, ""));
+		
 	}
 	
 	@Override
 	public void onItemAdd(Item a,AdministrationCommand<Item> i) {
 		Log.d("db_admin_adapter", "onItemAdd");
+		Log.d("db_admin_adapter", "item: "+a.getName());
 		
+		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, ItemCommand.reply(i, true, ""));
+
 	}
 
 	@Override

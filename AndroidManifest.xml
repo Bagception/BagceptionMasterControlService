@@ -47,7 +47,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
+<!-- 
         <provider
             android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
             android:authorities="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider"
@@ -57,7 +57,7 @@
             android:readPermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.READ"
             android:writePermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.WRITE" >
         </provider>
-
+ -->
         <activity
             android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.ItemHandler"
             android:label="@string/title_activity_database_handler" >
