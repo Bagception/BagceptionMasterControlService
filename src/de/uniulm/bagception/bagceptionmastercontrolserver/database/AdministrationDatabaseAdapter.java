@@ -5,6 +5,7 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandProcessor;
 
 public class AdministrationDatabaseAdapter extends AdministrationCommandProcessor{
@@ -12,84 +13,84 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 	
 	
 	@Override
-	public void onItemAdd(Item a) {
+	public void onItemAdd(Item a,AdministrationCommand<Item> i) {
 		Log.d("db_admin_adapter", "onItemAdd");
 		
 	}
 
 	@Override
-	public void onItemDel(Item a) {
+	public void onItemDel(Item a,AdministrationCommand<Item> i) {
 		Log.d("db_admin_adapter", "onItemDel");		
 	}
 
 	@Override
-	public void onItemEdit(Item toEdit, Item editValues) {
+	public void onItemEdit(Item toEdit, Item editValues,AdministrationCommand<Item> i) {
 		Log.d("db_admin_adapter", "onItemEdit");		
 	}
 
 	@Override
-	public void onItemList() {
+	public void onItemList(AdministrationCommand<Item> i) {
 		Log.d("db_admin_adapter", "onItemList");		
 	}
 
 	@Override
-	public void onActivityAdd(Activity a) {
+	public void onActivityAdd(Activity a,AdministrationCommand<Activity> aa) {
 		Log.d("db_admin_adapter", "onActivityAdd");		
 	}
 
 	@Override
-	public void onActivityDel(Activity a) {
+	public void onActivityDel(Activity a,AdministrationCommand<Activity> aa) {
 		Log.d("db_admin_adapter", "onActivityDel");
 		
 	}
 
 	@Override
-	public void onActivityEdit(Activity toEdit, Activity editValues) {
+	public void onActivityEdit(Activity toEdit, Activity editValues,AdministrationCommand<Activity> a) {
 		Log.d("db_admin_adapter", "onActivityEdit");		
 	}
 
 	@Override
-	public void onActivityList() {
+	public void onActivityList(AdministrationCommand<Activity> a) {
 		Log.d("db_admin_adapter", "onActivityList");		
 	}
 
 	@Override
-	public void onLocationAdd(Location a) {
+	public void onLocationAdd(Location a,AdministrationCommand<Location> aa) {
 		Log.d("db_admin_adapter", "onLocationAdd");		
 	}
 
 	@Override
-	public void onLocationDel(Location a) {
+	public void onLocationDel(Location a,AdministrationCommand<Location> aa) {
 		Log.d("db_admin_adapter", "onLocationDel");		
 	}
 
 	@Override
-	public void onLocationEdit(Location toEdit, Location editValues) {
+	public void onLocationEdit(Location toEdit, Location editValues,AdministrationCommand<Location> a) {
 		Log.d("db_admin_adapter", "onLocationEdit");		
 	}
 
 	@Override
-	public void onLocationList() {
+	public void onLocationList(AdministrationCommand<Location> a) {
 		Log.d("db_admin_adapter", "onLocationList");		
 	}
 
 	@Override
-	public void onCategoryAdd(Category a) {
+	public void onCategoryAdd(Category a,AdministrationCommand<Category> c) {
 		Log.d("db_admin_adapter", "onCategoryAdd");		
 	}
 
 	@Override
-	public void onCategoryDel(Category a) {
+	public void onCategoryDel(Category a,AdministrationCommand<Category> c) {
 		Log.d("db_admin_adapter", "onCategoryDel");		
 	}
 
 	@Override
-	public void onCategoryEdit(Category toEdit, Category editValues) {
+	public void onCategoryEdit(Category toEdit, Category editValues,AdministrationCommand<Category> c) {
 		Log.d("db_admin_adapter", "onCategoryEdit");		
 	}
 
 	@Override
-	public void onCategoryList() {
+	public void onCategoryList(AdministrationCommand<Category> c) {
 		Log.d("db_admin_adapter", "onCategoryList");		
 	}
 
