@@ -1,16 +1,29 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
+import android.os.Bundle;
 import android.util.Log;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.ActivityCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandProcessor;
+import de.uniulm.bagception.mcs.services.MasterControlServer;
 
 public class AdministrationDatabaseAdapter extends AdministrationCommandProcessor{
-
+	private final MasterControlServer mcs;
+	public AdministrationDatabaseAdapter(MasterControlServer msc) {
+		this.mcs = msc;
+	}
 	
+	//demo response method, just to demonstrate the communication back
+	private void sendActivityResponse(AdministrationCommand<Activity> req){
+		Bundle toSend = BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND,ActivityCommand.reply(req, true, ""));
+		mcs.getMessengerHelper().sendMessageBundle(toSend);
+	}
 	
 	@Override
 	public void onItemAdd(Item a,AdministrationCommand<Item> i) {

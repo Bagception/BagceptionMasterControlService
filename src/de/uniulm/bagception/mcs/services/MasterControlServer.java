@@ -78,7 +78,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	@Override
 	protected void onFirstInit() {
-		adminDBAdapter = new AdministrationDatabaseAdapter();
+		adminDBAdapter = new AdministrationDatabaseAdapter(this);
 		mainThread = new Thread(this);
 		mainThread.setDaemon(true);
 		mainThread.start();
@@ -373,6 +373,10 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		
 		Bundle toSend = BundleMessage.getInstance().createBundle(BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE, statusUpdate.toString());
 		btHelper.sendMessageBundle(toSend);
+	}
+	
+	public MessengerHelper getMessengerHelper(){
+		return btHelper;
 	}
 	
 	public static void DEBUG(){
