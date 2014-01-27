@@ -38,6 +38,7 @@ import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.ActivityCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandReceiverCallbacks;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
@@ -375,8 +376,9 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		btHelper.sendMessageBundle(toSend);
 	}
 	
-	public MessengerHelper getMessengerHelper(){
-		return btHelper;
+	public void sendToRemote(BUNDLE_MESSAGE msg,Object toSendObj){
+		Bundle toSendBun = BundleMessage.getInstance().createBundle(msg,toSendObj);
+		btHelper.sendMessageBundle(toSendBun);
 	}
 	
 	public static void DEBUG(){

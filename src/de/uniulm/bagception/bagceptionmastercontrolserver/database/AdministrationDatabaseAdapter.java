@@ -21,8 +21,7 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 	
 	//demo response method, just to demonstrate the communication back
 	private void sendActivityResponse(AdministrationCommand<Activity> req){
-		Bundle toSend = BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND,ActivityCommand.reply(req, true, ""));
-		mcs.getMessengerHelper().sendMessageBundle(toSend);
+		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, ActivityCommand.reply(req, true, ""));
 	}
 	
 	@Override
