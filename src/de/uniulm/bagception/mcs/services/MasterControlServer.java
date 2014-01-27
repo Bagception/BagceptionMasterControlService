@@ -23,6 +23,7 @@ import de.philipphock.android.lib.services.observation.ObservableService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.AdministrationDatabaseAdapter;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
@@ -37,6 +38,8 @@ import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandReceiverCallbacks;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
@@ -54,7 +57,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	private static MasterControlServer debuginstance;
 	
 	private Thread mainThread;
-	
+	private AdministrationDatabaseAdapter adminDBAdapter;
 	
 	
 	//bt
@@ -75,7 +78,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	@Override
 	protected void onFirstInit() {
-		
+		adminDBAdapter = new AdministrationDatabaseAdapter();
 		mainThread = new Thread(this);
 		mainThread.setDaemon(true);
 		mainThread.start();
@@ -209,6 +212,14 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 			case CONTAINER_STATUS_UPDATE_REQUEST:
 				setStatusChanged();
 				break;
+				
+			case ADMINISTRATION_COMMAND:{
+				JSONObject json = BundleMessage.getInstance().extractObject(b);
+				AdministrationCommand<?> a_cmd = AdministrationCommand.fromJSONObject(json);
+				a_cmd.accept(adminDBAdapter);
+				break;
+			}
+				
 		default:
 			break;
 		}
