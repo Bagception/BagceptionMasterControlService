@@ -6,7 +6,6 @@ import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
 import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
 
 /**

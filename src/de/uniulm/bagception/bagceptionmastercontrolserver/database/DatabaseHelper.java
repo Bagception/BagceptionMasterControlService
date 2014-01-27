@@ -3,17 +3,16 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
 import android.util.Log;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
 public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterface{
 
