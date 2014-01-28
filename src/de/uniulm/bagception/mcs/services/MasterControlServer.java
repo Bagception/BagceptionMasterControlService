@@ -77,7 +77,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	@Override
 	protected void onFirstInit() {
-		adminDBAdapter = new AdministrationDatabaseAdapter(this);
+		adminDBAdapter = new AdministrationDatabaseAdapter(this,null);//TODO avoid nullpointer exception by using an implementation if the needed interface
 		mainThread = new Thread(this);
 		mainThread.setDaemon(true);
 		mainThread.start();

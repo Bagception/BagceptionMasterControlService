@@ -22,7 +22,7 @@ public interface DatabaseInterface {
 		 * @param item the item to create
 		 * @throws DatabaseException
 		 */
-		public void addItem(Item item, String tag_id) throws DatabaseException;
+		public void addItem(Item item) throws DatabaseException;
 		
 		/**
 		 * deletes an Item from the database
@@ -36,15 +36,16 @@ public interface DatabaseInterface {
 		 * changes an item
 		 * @param itemBefore the item to change
 		 * @param after the new item values
+		 * @param int the new id
 		 * @throws DatabaseException
 		 */
-		public int updateItem(Item item) throws DatabaseException;
+		public int editItem(Item toEdit, Item values) throws DatabaseException;
 		
 		
 		/**
 		 * get a specific item
 		 * @param id
-		 * @return
+		 * @return the requested Item, null if no item is present with this id
 		 * @throws DatabaseException
 		 */
 		public Item getItem(long id) throws DatabaseException;

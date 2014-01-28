@@ -206,10 +206,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	 * Create a new Item
 	 */
 	@Override
-	public void addItem(Item item, String tag_id) throws DatabaseException {
+	public void addItem(Item item) throws DatabaseException {
 
 		SQLiteDatabase db = this.getWritableDatabase();
-		
+		String tag_id = item.getIds().get(0);
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
 		values.put(CATEGORY_ID, item.getCategory().getId());
@@ -260,15 +260,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 
 	@Override
-	public int updateItem(Item item) throws DatabaseException {
+	public int editItem(Item item,Item editValues) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
 		values.put(CATEGORY_ID, item.getCategory().getId());
-		
-		return db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+		return 0;
+		//TODO 
 	}
 	
 	

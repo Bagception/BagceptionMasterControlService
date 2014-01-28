@@ -131,22 +131,22 @@ public class DatabaseTest extends Activity {
 //		} catch (DatabaseException e) {
 //			e.printStackTrace();
 //		}
-		
-		try {
-			List<de.uniulm.bagception.bundlemessageprotocol.entities.Activity> act = db.getActivities();
-			Log.w("TEST", "Anzahl Aktivitäten: " + act.size());
-			
-			de.uniulm.bagception.bundlemessageprotocol.entities.Activity a2 = new de.uniulm.bagception.bundlemessageprotocol.entities.Activity();
-			a2 = act.get(1);
-			
-//			List<Location> loc = db.getLocations();
+//		
+//		try {
+//			List<de.uniulm.bagception.bundlemessageprotocol.entities.Activity> act = db.getActivities();
+//			Log.w("TEST", "Anzahl Aktivitäten: " + act.size());
 //			
-//			Location l = loc.get(0);
-			
-			Log.w("TEST", "Aktivität " + a2.getName());// + " hat den Ort " + a2.getLocation().getName());
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
+//			de.uniulm.bagception.bundlemessageprotocol.entities.Activity a2 = new de.uniulm.bagception.bundlemessageprotocol.entities.Activity();
+//			a2 = act.get(1);
+//			
+////			List<Location> loc = db.getLocations();
+////			
+////			Location l = loc.get(0);
+//			
+//			Log.w("TEST", "Aktivität " + a2.getName());// + " hat den Ort " + a2.getLocation().getName());
+//		} catch (DatabaseException e) {
+//			e.printStackTrace();
+//		}
 		
 		
 /*****************************************************************************************************************************************************
