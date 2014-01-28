@@ -217,6 +217,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 			break;
 			
 			case CONTAINER_STATUS_UPDATE_REQUEST:
+				LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
 				setStatusChanged();
 				break;
 				
@@ -224,6 +225,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				JSONObject json = BundleMessage.getInstance().extractObject(b);
 				AdministrationCommand<?> a_cmd = AdministrationCommand.fromJSONObject(json);
 				a_cmd.accept(adminDBAdapter);
+				LOGGER.C(this, "admin command "+a_cmd.getEntity().name()+ ", "+a_cmd.getOperation().name());
 				break;
 			}
 				
