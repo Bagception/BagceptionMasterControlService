@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseTest;
 import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
 
 /**
@@ -56,6 +57,8 @@ public class ComponentListActivity extends FragmentActivity implements
 		
 		//Intent i = new Intent(this, ItemHandler.class);
 		//startActivity(i);
+		Intent i = new Intent(this, DatabaseTest.class);
+		startActivity(i);
 
 		// TODO: If exposing deep links into your app, handle intents here.
 	}
