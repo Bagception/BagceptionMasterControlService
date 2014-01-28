@@ -8,7 +8,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -156,9 +159,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			+ _DATA + " BLOB,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
+    private final Context context;
 	
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		this.context = context;
+		
 	}
 	
 	
@@ -707,6 +713,27 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			} while(c.moveToNext());
 		}
 		return locations;
+	}
+
+
+	@Override
+	public Item getItem(String tagId) throws DatabaseException {
+		// TODO implement!
+		return DatabaseConnector.getItem(tagId);
+	}
+
+
+	@Override
+	public void putImage(Bitmap bmp) throws DatabaseException {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	@Override
+	public Bitmap getImage(int hashCode) throws DatabaseException {
+		// TODO implement, this is just dummy code
+		return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 	}
 	
 }

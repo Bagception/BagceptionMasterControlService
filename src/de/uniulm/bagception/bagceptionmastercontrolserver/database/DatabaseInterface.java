@@ -2,6 +2,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import java.util.List;
 
+import android.graphics.Bitmap;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -180,6 +181,29 @@ public interface DatabaseInterface {
 		
 				
 				
+		/**
+		 * 
+		 * @param tagId the tagId for a specific Tag
+		 * @return the item for the given tagId, null of no Item is found with the given Id
+		 * @throws DatabaseException 
+		 */
+		public Item getItem(String tagId) throws DatabaseException;
 
+		/**
+		 * inserts an image into the database, the img.hashCode() method is the key
+		 * Note that this implementation has one problem: When 2 hashes are identical but the image is not, the system will fail. 
+		 * However this case will mostly not occur in real life
+		 * @param bmp the image to save
+		 * @throws DatabaseException
+		 */
+		public void putImage(Bitmap bmp) throws DatabaseException;
 		
+		/**
+		 * returns an Image for a given hashcode
+		 * @param hashCode
+		 * @return the image for the hashcode
+		 * @throws DatabaseException
+		 */
+		public Bitmap getImage(int hashCode) throws DatabaseException;
 }
+
