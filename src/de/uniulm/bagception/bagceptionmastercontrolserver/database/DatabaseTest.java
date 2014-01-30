@@ -1,18 +1,14 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import java.util.ArrayList;
-import java.util.List;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.layout;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.menu;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class DatabaseTest extends Activity {
 	
@@ -84,9 +80,9 @@ public class DatabaseTest extends Activity {
 			Log.w("TEST", "Da ging was schief");
 		}
 		
-		try {
-			db.getItems();
-		}
+//		try {
+//			db.getItems();
+//		}
 		
 //		try {
 //			List<Item> j = db.getItems();
