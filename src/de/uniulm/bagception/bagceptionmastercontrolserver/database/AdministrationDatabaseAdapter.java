@@ -2,6 +2,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import java.util.List;
 
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
@@ -72,7 +73,9 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 		//try {
 			//List<Item> items = dbi.getItems();
 			//Item[] itemsArray = items.toArray(new Item[items.size()]);
-			Item [] itemsArray = new Item[]{new Item("item1"),new Item("item2"),new Item("item3")};
+			Item item = new Item("item1");
+			item.setImage(BitmapFactory.decodeResource(mcs.getResources(), de.uniulm.bagception.bagceptionmastercontrolserver.R.drawable.ic_launcher));
+			Item [] itemsArray = new Item[]{item,new Item("item2"),new Item("item3")};
 
 			i.setPayloadObjects(itemsArray);
 			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, ItemCommand.reply(i, true, ""));
