@@ -1,5 +1,6 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String CREATE_TABLE_ITEM = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_ITEM 
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT UNIQUE NOT NULL, " 
+			+ NAME + " TEXT NOT NULL UNIQUE, " 
 			+ CATEGORY_ID + " INTEGER," 
 			+ " FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " + TABLE_CATEGORY + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
@@ -88,28 +89,28 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String CREATE_TABLE_TAGID = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_TAGID
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ TAG_ID + " TEXT UNIQUE NOT NULL, " 
-			+ ITEM_ID + " INTEGER UNIQUE NOT NULL," 
+			+ TAG_ID + " TEXT NOT NULL UNIQUE, " 
+			+ ITEM_ID + " INTEGER NOT NULL," 
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_CATEGORY = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_CATEGORY
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT NOT NULL);"; 
+			+ NAME + " TEXT NOT NULL UNIQUE);"; 
 	
 
 	private static final String CREATE_TABLE_INDEPENDENTITEM = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_INDEPENDENTITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL,"
+			+ ITEM_ID + " INTEGER NOT NULL UNIQUE,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_CONTEXTITEM = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_CONTEXTITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL,"
+			+ ITEM_ID + " INTEGER NOT NULL UNIQUE,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
@@ -127,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String CREATE_TABLE_ITEMATTRIBUTE = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_ITEMATTRIBUTE
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL, "
+			+ ITEM_ID + " INTEGER NOT NULL UNIQUE, "
 			+ TEMPERATURE + " TEXT, "
 			+ WEATHER + " TEXT, "
 			+ LIGHTNESS + " TEXT,"
@@ -137,7 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String CREATE_TABLE_ACTIVITY = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_ACTIVITY 
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT UNIQUE NOT NULL, " 
+			+ NAME + " TEXT NOT NULL UNIQUE, " 
 			+ LOCATION_ID + " INTEGER DEFAULT NULL,"
 			+ " FOREIGN KEY(" + LOCATION_ID + ") REFERENCES " + TABLE_LOCATION + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
@@ -145,7 +146,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
     private static final String CREATE_TABLE_LOCATION = 
     		"CREATE TABLE IF NOT EXISTS " + TABLE_LOCATION
     		+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT UNIQUE NOT NULL, "
+			+ NAME + " TEXT NOT NULL UNIQUE, "
 			+ LON + " REAL, "
 			+ LAT + " REAL, "
 			+ RADIUS + " REAL, "
@@ -155,7 +156,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
     private static final String CREATE_TABLE_PHOTO =
     		"CREATE TABLE IF NOT EXISTS " + TABLE_TAGID
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL, " 
+			+ ITEM_ID + " INTEGER NOT NULL UNIQUE, " 
 			+ _DATA + " BLOB,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
@@ -215,18 +216,34 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public void addItem(Item item) throws DatabaseException {
 
 		SQLiteDatabase db = this.getWritableDatabase();
-		String tag_id = item.getIds().get(0);
+		
+//		Category c = item.getCategory();
+		String cid = null;
+		
+//		if(c != null){
+//			cid = c.getName();
+//		}
+		
+		Log.w("TEST", "In der add-Methode");
+		
+//		String tag_id = null;
+		
+//		if(item.getIds().isEmpty() == false){
+//			tag_id = item.getIds().get(0);
+//		}
+		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
-		values.put(CATEGORY_ID, item.getCategory().getId());
+		//values.put(CATEGORY_ID, item.getCategory().getId());
+		values.put(CATEGORY_ID, cid);
 		
 		// Insert row to Item table
 		long item_id = db.insert(TABLE_ITEM, null, values);
 		
 		// Insert tag_id in TagId Table if tag_id not null
-		if (tag_id != null) {
-			addTagId(item_id, tag_id);
-		}
+//		if (tag_id != null) {
+//			addTagId(item_id, tag_id);
+//		}
 
 		// If "independentItem" is selected, add item to IndependentItem table
 		boolean independentItem = item.getIndependentItem();
@@ -240,7 +257,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			addContextItem(item_id);
 		}
 		
-		// If an Photo exists, add photo to Photo table
+		// If Photo exists, add photo to Photo table
 //		int image = item.getImageHash();
 //		if (image != 0) {
 //			addPhotoToItem(image, item_id);
@@ -278,6 +295,20 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		//TODO 
 	}
 	
+	public void updateItem(Item item) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put(NAME, item.getName());
+		
+		if(item.getCategory() != null){
+			values.put(CATEGORY_ID, item.getCategory().getId());
+		}
+		
+		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+	}
+	
 	
 	@Override
 	public Item getItem(long id) throws DatabaseException {
@@ -302,18 +333,72 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			itemData.moveToFirst();
 		}
 		
-		Item item = new Item();
-		item.setName(itemData.getString(itemData.getColumnIndex(NAME)));
-		
-		Category cat = new Category(categoryName.getString(categoryName.getColumnIndex(NAME)));
-		cat.setId(categoryName.getInt(categoryName.getColumnIndex(_ID)));
-		
-		item.setCategory(cat);
+		String name = itemData.getString(itemData.getColumnIndex(NAME));
+		Item item = new Item(name);
+
+//		Category cat = new Category(categoryName.getString(categoryName.getColumnIndex(NAME)));
+//		cat.setId(categoryName.getInt(categoryName.getColumnIndex(_ID)));
+//		
+//		item.setCategory(cat);
 		
 		//TODO category here!!
 		//item.setCategory(categoryName.getString(categoryName.getColumnIndex(NAME)));
 		
 		return item;
+	}
+	
+	
+	@Override
+	public Item getItemByName(String name) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		long category;
+		
+		String selectQuery = "SELECT * FROM " + TABLE_ITEM + " WHERE " + NAME + " = '" + name + "'";
+		
+		Log.e(LOG, selectQuery);
+		
+		Cursor itemData = db.rawQuery(selectQuery, null);
+		itemData.moveToFirst();
+		
+		long test1 = itemData.getInt(0);
+		String test2 = itemData.getString(1);
+		int test3 = itemData.getInt(2);
+		
+		Log.w("TEST", "Cursor erzeugt: ID " + test1 + " Name " + test2 + " CatID " + test3);
+		
+//		category = itemData.getLong(itemData.getColumnIndex(CATEGORY_ID));
+//		Log.w("TEST", "CatID " + category);
+		
+		category = 1;
+		
+		String getCategoryQuery = "SELECT " + NAME + " FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category;
+		
+		Cursor categoryName = db.rawQuery(getCategoryQuery, null);
+		categoryName.moveToFirst();
+		
+		int test4 = categoryName.getInt(0);
+		String test5 = itemData.getString(1);
+		Log.w("TEST", "CatID " + test4 + " Name " + test5);
+		
+//		Log.w("TEST", "Cursor erzeugt: ID " + test4 + " Name " + test5);
+		
+		if (itemData != null) {
+			itemData.moveToFirst();
+//			Log.w("TEST", "ID " + itemData.getInt(itemData.getColumnIndex(_ID)));
+			
+			//Category cat = new Category(categoryName.getInt(categoryName.getColumnIndex(_ID)), categoryName.getString(categoryName.getColumnIndex(NAME)));
+			Category cat = new Category(test4, test5);
+			Log.w("TEST", "Cat erzeugt");
+			
+			Item item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), name, cat, 0, false, false, null, new ArrayList<String>());
+			
+			return item;
+		} else {
+			return null;
+		}
+		
 	}
 
 
@@ -331,8 +416,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			// looping through all rows and adding them to list
 			if(c.moveToFirst()) {
 				do {
-						Item item = new Item();
-						item.setName(c.getString(c.getColumnIndex(NAME)));
+						String name = c.getString(c.getColumnIndex(NAME));
+						Item item = new Item(name);
 						items.add(item);
 				} while(c.moveToNext());
 			}
@@ -366,6 +451,28 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		db.delete(TABLE_TAGID, TAG_ID + " = " + tag_id, null);
 		
+	}
+	
+	
+	public List<String> getTagId(long itemId) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		List<String> id = new ArrayList<String>();
+		
+		String selectQuery = "SELECT " + TAG_ID + " FROM " + TABLE_TAGID + " WHERE " + ITEM_ID + " = " + itemId;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		// looping through all rows and adding them to list
+		if(c.moveToFirst()) {
+			do {
+				String tag_id = new String(c.getString(c.getColumnIndex(TAG_ID)));
+				id.add(tag_id);
+			} while(c.moveToNext());
+		}
+		
+		return id;
 	}
 	
 	
@@ -494,7 +601,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
-		int activity_id = toEdit.getId();
+		long activity_id = toEdit.getId();
 		
 		if(toEdit.getName() != after.getName()) {
 			values.put(NAME, after.getName());
@@ -596,7 +703,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
-		int cat_id = toEdit.getId();
+		long cat_id = toEdit.getId();
 		
 		if(toEdit.getName() != after.getName()){
 			
@@ -622,8 +729,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// looping through all rows and adding them to list
 		if(c.moveToFirst()) {
 			do {
-					Category category = new Category();
-					category.setName(c.getString(c.getColumnIndex(NAME)));
+//					Category category = new Category(c.getString(c.getColumnIndex(NAME)));
+					Category category = new Category(c.getInt(c.getColumnIndex(_ID)), c.getString(c.getColumnIndex(NAME)));
 					categories.add(category);
 			} while(c.moveToNext());
 		}

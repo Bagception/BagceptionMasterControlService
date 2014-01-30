@@ -51,6 +51,13 @@ public interface DatabaseInterface {
 		 */
 		public Item getItem(long id) throws DatabaseException;
 		
+		/**
+		 * 
+		 * @param name
+		 * @return the requested Item, null if no item is present with this name
+		 * @throws DatabaseException
+		 */
+		public Item getItemByName(String name) throws DatabaseException;
 		
 		/**
 		 * 
