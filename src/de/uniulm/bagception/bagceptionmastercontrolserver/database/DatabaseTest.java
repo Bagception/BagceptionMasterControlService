@@ -31,6 +31,7 @@ public class DatabaseTest extends Activity {
  ****************************************************************************************************************************************************/
 		// Create Objects
 		Category cat = new Category("Anziehsachen");
+		Category cat2 = new Category("Unizeugs");
 		
 		String hose = "Andere Hose";
 		String shirt = "Zweites T-Shirt";
@@ -39,97 +40,88 @@ public class DatabaseTest extends Activity {
 		
 		// Insert to database
 		
-		try {
-			db.addCategory(cat);
-			Log.w("TEST", "Kategorie " + hose + " hinzugefügt");
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			db.addCategory(cat2);
+//			Log.w("TEST", "Kategorie " + cat2.getName() + " hinzugefügt");
+//		} catch (DatabaseException e) {
+//			e.printStackTrace();
+//		}
 		
-		Item i = new Item("Blablabla");
-		Log.w("TEST", "Item erfolgreich erzeugt");
+//		Item i = new Item("LaLiLu");
+//		
+//		try {
+//			db.addItem(i);
+//			Log.w("TEST", "Item " + i.getName() + " hinzugefügt");
+//			
+//		} catch (DatabaseException e) {
+//			Log.w("TEST", "Das ging schief");
+//			e.printStackTrace();
+//		}
 		
+		
+		
+		
+//		Item ic = new Item("CatItem", cat);
+//		Log.w("TEST", "Item CatItem hinzugefügt");
+//		
+//		try {
+//			db.addItem(ic);
+//			Log.w("TEST", "Item " + ic.getName() + " mit der");
+//			Log.w("TEST", "Kategorie " + ic.getCategory().getName());
+//		} catch (DatabaseException e) {
+//			Log.w("TEST", "Das ging schief");
+//			e.printStackTrace();
+//		}
+		
+
 		try {
-			db.addItem(i);
-			Log.w("TEST", "Item " + i.getName() + " hinzugefügt");
+			Item u = db.getItemByName("FUCK");
 			
-		} catch (DatabaseException e) {
-			Log.w("TEST", "Das ging schief");
-			e.printStackTrace();
-		}
-		
-		
-		
-		
-		Item ic = new Item("CatItem", cat);
-		Log.w("TEST", "Item CatItem hinzugefügt");
-		
-		try {
-			db.addItem(ic);
-			Log.w("TEST", "Item " + ic.getName() + " mit der");
-			Log.w("TEST", "Kategorie " + ic.getCategory().getName());
-			Log.w("TEST", "Anzahl Items: " + db.getItems().size());
-		} catch (DatabaseException e) {
-			Log.w("TEST", "Das ging schief");
-			e.printStackTrace();
-		}
-		
-		try {
-			Item u = db.getItemByName("Blablabla");
-			u = new Item("Blablabla2");
+			Category ctmp = db.getCategory("Unizeugs");
+			Log.w("TEST", "CAT Name: " + ctmp.getName() + ", ID: " + ctmp.getId());
+			
+			u = new Item(u.getId(), u.getName(), ctmp, u.getImageHash(), false,	u.getIndependentItem(), u.getAttribute(), new ArrayList<String>());
 			db.updateItem(u);
-			
-			Log.w("TEST", "Anzahl Items nach update: " + db.getItems().size());
+			Log.w("TEST", "Item FUCK geupdatet " + u.getCategory().getId());
 		} catch (DatabaseException e) {
 			Log.w("TEST", "Da ging was schief");
 		}
 		
 		try {
-			db.getItems();
+			List<Item> items = db.getItems();
+			
+			for(int j = 0; j < items.size(); j++){
+				Item tmp = items.get(j);
+				Log.w("TEST", "Item: " + tmp.getName());
+				Log.w("TEST", "Itemcat: " + tmp.getCategory());
+			}
+			
+		} catch (DatabaseException e) {
+			e.printStackTrace();
 		}
 		
-//		try {
-//			List<Item> j = db.getItems();
-//			Item xyz = j.get(0);
-//			Item zyx = j.get(1);
-//			Log.w("TEST", "Alle Items: " + xyz.getName() + ", " + zyx.getName());
-//		} catch (DatabaseException e) {
-//			// TODO Auto-generated catch block
-//			Log.w("TEST", "Fehler beim Aufrufen des Items");
-//			e.printStackTrace();
-//		}
-//		
-//		try {
-//			db.deleteItem(i);
-//			Log.w("TEST", i.getName() + " wurde gelöscht");
-//		} catch (DatabaseException e) {
-//			e.printStackTrace();
-//		}
-//		
-//		try {
-//			List<Item> j = db.getItems();
-//			Item xyz = j.get(0);
-//			Log.w("TEST", "Alle Items: " + xyz.getName());
-//		} catch (DatabaseException e) {
-//			// TODO Auto-generated catch block
-//			Log.w("TEST", "Fehler beim Aufrufen des Items");
-//			e.printStackTrace();
-//		}
-//		
-//		try {
-//			List<Category> c = db.getCategories();
-//			int count = c.size();
-//			Log.w("TEST", "Anzahl TagId: " + count);
-//		} catch (DatabaseException e) {
-//			// TODO Auto-generated catch block
-//			Log.w("TEST", "Fehler beim Aufrufen des Items");
-//			e.printStackTrace();
-//		}
+		
+		try {
+			List<Category> c = db.getCategories();
+
+			for(int j = 0; j < c.size(); j++) {
+				Category tmp = c.get(j);
+				Log.w("TEST", "Kategorie: " + tmp.getName());
+			}
+			
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			Log.w("TEST", "Fehler beim Aufrufen des Items");
+			e.printStackTrace();
+		}
 		
 		
-		
-		
-		
+		try {
+			Item fu = db.getItemByName("FUCK");
+			Log.w("TEST", "Item: " + fu);
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
 		
 //		de.uniulm.bagception.bundlemessageprotocol.entities.Activity a = new de.uniulm.bagception.bundlemessageprotocol.entities.Activity();
 //		Location location = new Location();
