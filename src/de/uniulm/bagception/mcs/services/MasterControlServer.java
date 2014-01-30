@@ -24,7 +24,8 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.AdministrationDatabaseAdapter;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
@@ -57,7 +58,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	private Thread mainThread;
 	private AdministrationDatabaseAdapter adminDBAdapter;
-	
+	private DatabaseHelper dbHelper;
 	
 	//bt
 	private MessengerHelper btHelper;
@@ -77,7 +78,9 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	
 	@Override
 	protected void onFirstInit() {
-		adminDBAdapter = new AdministrationDatabaseAdapter(this);
+		dbHelper = new DatabaseHelper(this);
+	
+		adminDBAdapter = new AdministrationDatabaseAdapter(this,dbHelper);
 		mainThread = new Thread(this);
 		mainThread.setDaemon(true);
 		mainThread.start();
@@ -189,26 +192,32 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	@Override
 	public void onBundleMessage(Bundle b) {
 		//this comes from the btclient
-		//DEBUG, send it back
 		LOGGER.C(this, "bundleMessage recv");
 		
 		switch (BundleMessage.getInstance().getBundleMessageType(b)){
 			case IMAGE_REQUEST:
 				JSONObject o = BundleMessage.getInstance().extractObject(b);
 				String imageID = o.get("img").toString();
+				int imageIDInt=Integer.parseInt(imageID);
 				LOGGER.C(this, " img request for id "+imageID);
-				//TODO get image by id;
-				Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);				
-				String serializedImage = PictureSerializer.serialize(bmp);
+				Bitmap bmp;
+				try {
+					bmp = dbHelper.getImage(imageIDInt);
+					String serializedImage = PictureSerializer.serialize(bmp);
+					
+					LOGGER.C(this, " deser id "+serializedImage.hashCode());
+					
+					JSONObject obj = new JSONObject();
+					obj.put("img", serializedImage);
+					btHelper.sendMessageBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+				}				
 				
-				LOGGER.C(this, " deser id "+serializedImage.hashCode());
-				
-				JSONObject obj = new JSONObject();
-				obj.put("img", serializedImage);
-				btHelper.sendMessageBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
 			break;
 			
 			case CONTAINER_STATUS_UPDATE_REQUEST:
+				LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
 				setStatusChanged();
 				break;
 				
@@ -216,6 +225,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				JSONObject json = BundleMessage.getInstance().extractObject(b);
 				AdministrationCommand<?> a_cmd = AdministrationCommand.fromJSONObject(json);
 				a_cmd.accept(adminDBAdapter);
+				LOGGER.C(this, "admin command "+a_cmd.getEntity().name()+ ", "+a_cmd.getOperation().name());
 				break;
 			}
 				
@@ -322,28 +332,35 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
 				Log.d("bag", id);
 				LOGGER.C(this, "Tag scanned: "+id);
-				Item i = DatabaseConnector.getItem(id);
-				if (i!=null){
-					//tag exists in database
-					LOGGER.C(this, "TAG found: "+i.getName());
-					if (itemIndexSystem.itemScanned(i)){
-						//item put in
-						LOGGER.C(this, "Item in: "+i.getName());
+				Item i;
+				try {
+					i = dbHelper.getItem(id);
+					if (i!=null){
+						//tag exists in database
+						LOGGER.C(this, "TAG found: "+i.getName());
+						if (itemIndexSystem.itemScanned(i)){
+							//item put in
+							LOGGER.C(this, "Item in: "+i.getName());
+						}else{
+							//item taken out
+							LOGGER.C(this, "Item out: "+i.getName());
+						}
+						setStatusChanged();
+//						Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
+//						b.putBoolean("exists", true);
+//						LOG.out(this, b);
+//						btHelper.sendMessageBundle(b);
 					}else{
-						//item taken out
-						LOGGER.C(this, "Item out: "+i.getName());
+						//tag not found in db
+						ArrayList<String> ids = new ArrayList<String>();
+						ids.add(id);
+						btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("",ids)));
 					}
-					setStatusChanged();
-//					Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
-//					b.putBoolean("exists", true);
-//					LOG.out(this, b);
-//					btHelper.sendMessageBundle(b);
-				}else{
-					//tag not found in db
-					ArrayList<String> ids = new ArrayList<String>();
-					ids.add(id);
-					btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("",ids)));
-				}
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+				} 
+						
+				
 					
 				
 			}else if (BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING.equals(intent.getAction())){

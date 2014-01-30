@@ -8,7 +8,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -75,65 +78,74 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	// Table create statements
 	private static final String CREATE_TABLE_ITEM = 
-			"CREATE TABLE " + TABLE_ITEM 
+			"CREATE TABLE IF NOT EXISTS " + TABLE_ITEM 
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT NOT NULL, " 
-			+ CATEGORY_ID + " INTEGER DEFAULT -1);";
+			+ NAME + " TEXT UNIQUE NOT NULL, " 
+			+ CATEGORY_ID + " INTEGER," 
+			+ " FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " + TABLE_CATEGORY + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_TAGID = 
-			"CREATE TABLE " + TABLE_TAGID
+			"CREATE TABLE IF NOT EXISTS " + TABLE_TAGID
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ TAG_ID + " TEXT NOT NULL, " 
-			+ ITEM_ID + " INTEGER NOT NULL);";
+			+ TAG_ID + " TEXT UNIQUE NOT NULL, " 
+			+ ITEM_ID + " INTEGER UNIQUE NOT NULL," 
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_CATEGORY = 
-			"CREATE TABLE " + TABLE_CATEGORY
+			"CREATE TABLE IF NOT EXISTS " + TABLE_CATEGORY
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ NAME + " TEXT NOT NULL);"; 
 	
-	
+
 	private static final String CREATE_TABLE_INDEPENDENTITEM = 
-			"CREATE TABLE " + TABLE_INDEPENDENTITEM
+			"CREATE TABLE IF NOT EXISTS " + TABLE_INDEPENDENTITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL);"; 
+			+ ITEM_ID + " INTEGER NOT NULL,"
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_CONTEXTITEM = 
-			"CREATE TABLE " + TABLE_CONTEXTITEM
+			"CREATE TABLE IF NOT EXISTS " + TABLE_CONTEXTITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL);";
+			+ ITEM_ID + " INTEGER NOT NULL,"
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_ACTIVITYITEM = 
-			"CREATE TABLE " + TABLE_ACTIVITYITEM
+			"CREATE TABLE IF NOT EXISTS " + TABLE_ACTIVITYITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ ACTIVITY_ID + " INTEGER NOT NULL, "
 			+ ITEM_ID + " INTEGER NOT NULL, "
-			+ CATEGORY_ID + " INTEGER NOT NULL);";
+			+ CATEGORY_ID + " INTEGER NOT NULL," 
+			+ " FOREIGN KEY(" + ACTIVITY_ID + ") REFERENCES " + TABLE_ACTIVITY + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT,"
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT,"
+			+ " FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " + TABLE_CATEGORY + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
 	private static final String CREATE_TABLE_ITEMATTRIBUTE = 
-			"CREATE TABLE " + TABLE_ITEMATTRIBUTE
+			"CREATE TABLE IF NOT EXISTS " + TABLE_ITEMATTRIBUTE
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ ITEM_ID + " INTEGER NOT NULL, "
 			+ TEMPERATURE + " TEXT, "
 			+ WEATHER + " TEXT, "
-			+ LIGHTNESS + " TEXT);";
+			+ LIGHTNESS + " TEXT,"
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 
 	
 	private static final String CREATE_TABLE_ACTIVITY = 
-			"CREATE TABLE " + TABLE_ACTIVITY 
+			"CREATE TABLE IF NOT EXISTS " + TABLE_ACTIVITY 
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT NOT NULL, " 
-			+ LOCATION_ID + " INTEGER);";
+			+ NAME + " TEXT UNIQUE NOT NULL, " 
+			+ LOCATION_ID + " INTEGER DEFAULT NULL,"
+			+ " FOREIGN KEY(" + LOCATION_ID + ") REFERENCES " + TABLE_LOCATION + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
 	
     private static final String CREATE_TABLE_LOCATION = 
-    		"CREATE TABLE " + TABLE_LOCATION
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_LOCATION
     		+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ NAME + " TEXT NOT NULL, "
+			+ NAME + " TEXT UNIQUE NOT NULL, "
 			+ LON + " REAL, "
 			+ LAT + " REAL, "
 			+ RADIUS + " REAL, "
@@ -141,14 +153,18 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
     
     
     private static final String CREATE_TABLE_PHOTO =
-    		"CREATE TABLE " + TABLE_TAGID
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_TAGID
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ ITEM_ID + " INTEGER NOT NULL, " 
-			+ _DATA + " BLOB);";
+			+ _DATA + " BLOB,"
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
+    private final Context context;
 	
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		this.context = context;
+		
 	}
 	
 	
@@ -196,10 +212,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	 * Create a new Item
 	 */
 	@Override
-	public void addItem(Item item, String tag_id) throws DatabaseException {
+	public void addItem(Item item) throws DatabaseException {
 
 		SQLiteDatabase db = this.getWritableDatabase();
-		
+		String tag_id = item.getIds().get(0);
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
 		values.put(CATEGORY_ID, item.getCategory().getId());
@@ -225,10 +241,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		// If an Photo exists, add photo to Photo table
-		int image = item.getImageHash();
-		if (image != 0) {
-			addPhotoToItem(image, item_id);
-		}
+//		int image = item.getImageHash();
+//		if (image != 0) {
+//			addPhotoToItem(image, item_id);
+//		}
 		
 	}
 
@@ -239,27 +255,27 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		long item_id = item.getId();
-		
-		db.delete(TABLE_ITEM, _ID + " = " + item_id, null);
 		db.delete(TABLE_TAGID, ITEM_ID + " = " + item_id, null);
-		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
-		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
-		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
-		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
-		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
+//		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
+//		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
+//		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
+//		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
+//		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
 	}
 
 
 	@Override
-	public int updateItem(Item item) throws DatabaseException {
+	public int editItem(Item item,Item editValues) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
 		values.put(CATEGORY_ID, item.getCategory().getId());
-		
-		return db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+		return 0;
+		//TODO 
 	}
 	
 	
@@ -288,6 +304,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		Item item = new Item();
 		item.setName(itemData.getString(itemData.getColumnIndex(NAME)));
+		
+		Category cat = new Category(categoryName.getString(categoryName.getColumnIndex(NAME)));
+		cat.setId(categoryName.getInt(categoryName.getColumnIndex(_ID)));
+		
+		item.setCategory(cat);
+		
 		//TODO category here!!
 		//item.setCategory(categoryName.getString(categoryName.getColumnIndex(NAME)));
 		
@@ -311,10 +333,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				do {
 						Item item = new Item();
 						item.setName(c.getString(c.getColumnIndex(NAME)));
+						items.add(item);
 				} while(c.moveToNext());
 			}
 			
-		return null;
+		return items;
 	}
 
 	
@@ -324,7 +347,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	/**
 	 * Add tag_id to item
 	 */
-	public long addTagId(long item_id, String tag_id) throws DatabaseException {
+	public void addTagId(long item_id, String tag_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
@@ -334,7 +357,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long id = db.insert(TABLE_TAGID, null, values);
 		
-		return id;
+		//return id;
 	}
 	
 	public void deleteTagId(String tag_id) throws DatabaseException {
@@ -351,7 +374,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	/**
 	 * Add IndependentItem
 	 */
-	public long addIndependentItem(long item_id) throws DatabaseException{
+	public void addIndependentItem(long item_id) throws DatabaseException{
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
@@ -360,7 +383,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long id = db.insert(TABLE_INDEPENDENTITEM, null, values);
 		
-		return id;
+		//return id;
 	}
 	
 	public void deleteIndependentItem(long item_id) throws DatabaseException {
@@ -375,7 +398,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	/**
 	 * Add ContextItem
 	 */
-	public long addContextItem(long item_id) throws DatabaseException {
+	public void addContextItem(long item_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
@@ -384,7 +407,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long id = db.insert(TABLE_CONTEXTITEM, null, values);
 		
-		return id;
+		//return id;
 	}
 	
 	
@@ -402,7 +425,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	/**
 	 * Add Picture
 	 */
-	public long addPhotoToItem(int image, long item_id) {
+	public void addPhotoToItem(int image, long item_id) {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
@@ -412,7 +435,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long id = db.insert(TABLE_PHOTO, null, values);
 		
-		return id;
+		//return id;
 		
 	}
 	
@@ -435,92 +458,282 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		return db.update(TABLE_PHOTO, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
 	}
 	
+	
+	
 	// -------------------------------- "Activity" table methods -------------------------------- //
 
 	@Override
 	public void addActivity(Activity activity) throws DatabaseException {
-		// TODO Auto-generated method stub
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ContentValues values = new ContentValues();
+		values.put(NAME, activity.getName());
+		values.put(LOCATION_ID, activity.getLocation().getId());
+		
+		long id = db.insert(TABLE_ACTIVITY, null, values);
+		
+		//addActivityItem(id, activity.getItemsForActivity());
 	}
 
 
 	@Override
 	public void deleteActivity(Activity activity) throws DatabaseException {
-		// TODO Auto-generated method stub
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		String name = activity.getName();
+		
+		db.delete(TABLE_ACTIVITY, NAME + " = ?", new String[] {name});
 	}
 
 
 	@Override
-	public void editActivity(Activity toEdit, Activity after)
-			throws DatabaseException {
-		// TODO Auto-generated method stub
+	public void editActivity(Activity toEdit, Activity after) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ContentValues values = new ContentValues();
+		int activity_id = toEdit.getId();
+		
+		if(toEdit.getName() != after.getName()) {
+			values.put(NAME, after.getName());
+		}
+		if(toEdit.getLocation() != after.getLocation()) {
+			values.put(LOCATION_ID, after.getLocation().getId());
+		}
+		
+		long id = db.update(TABLE_ACTIVITY, values, _ID + " = " + activity_id, null);
+	}
+	
+	
+	public void updateActivtiy(Activity activity) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put(NAME, activity.getName());
+		values.put(LOCATION_ID, activity.getLocation().getId());
+		
+		long id = db.update(TABLE_ACTIVITY, values, _ID + " = ?", new String[] {String.valueOf(activity.getId())});
 	}
 
 
 	@Override
 	public List<Activity> getActivities() throws DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
+		List<Activity> activities = new ArrayList<Activity>();
+		
+		String selectQuery = "SELECT * FROM " + TABLE_ACTIVITY;
+		
+		Log.e(LOG, selectQuery);
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		// looping through all rows and adding them to list
+		if(c.moveToFirst()) {
+			do {
+					Activity activity = new Activity();
+					activity.setName(c.getString(c.getColumnIndex(NAME)));
+					activities.add(activity);
+			} while(c.moveToNext());
+		}
+		return activities;
+	}
+	
+	
+	
+	// -------------------------------- "ActivityItem" table methods -------------------------------- //
+	
+	private void addActivityItem(long activity_id, List<Item> itemsForActivity) {
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		for(int i = 0; i < itemsForActivity.size(); i++) {
+			
+			Item item = itemsForActivity.get(i);
+			ContentValues values = new ContentValues();
+			values.put(ACTIVITY_ID, activity_id);
+			values.put(ITEM_ID, item.getId());
+			values.put(CATEGORY_ID, item.getCategory().getId());
+			
+			long id = db.insert(TABLE_ACTIVITYITEM, null, values);
+		}
+		
+	}
+	
+	
+	
+	// -------------------------------- "Category" table methods -------------------------------- //
 
 	@Override
 	public void addCategory(Category category) throws DatabaseException {
-		// TODO Auto-generated method stub
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ContentValues values = new ContentValues();
+		values.put(NAME, category.getName());
+		
+		long id = db.insert(TABLE_CATEGORY, null, values);
 	}
 
 
 	@Override
 	public void deleteCategory(Category category) throws DatabaseException {
-		// TODO Auto-generated method stub
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		String name = category.getName();
+		
+		db.delete(TABLE_CATEGORY, NAME + " = " + name, null);
 	}
 
 
 	@Override
-	public void editCategory(Category toEdit, Category after)
-			throws DatabaseException {
-		// TODO Auto-generated method stub
+	public void editCategory(Category toEdit, Category after) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ContentValues values = new ContentValues();
+		int cat_id = toEdit.getId();
+		
+		if(toEdit.getName() != after.getName()){
+			
+			values.put(NAME, after.getName());
+		}
+		
+		long id = db.update(TABLE_CATEGORY, values, _ID + " = " + cat_id, null);
 	}
 
 
 	@Override
 	public List<Category> getCategories() throws DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
+
+		List<Category> categories = new ArrayList<Category>();
+		
+		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY;
+		
+		Log.e(LOG, selectQuery);
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		// looping through all rows and adding them to list
+		if(c.moveToFirst()) {
+			do {
+					Category category = new Category();
+					category.setName(c.getString(c.getColumnIndex(NAME)));
+					categories.add(category);
+			} while(c.moveToNext());
+		}
+		return categories;
 	}
 
+	
+	
+	// -------------------------------- "Location" table methods -------------------------------- //
 
 	@Override
 	public void addLocation(Location location) throws DatabaseException {
-		// TODO Auto-generated method stub
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ContentValues values = new ContentValues();
+		values.put(NAME, location.getName());
+		values.put(LON, location.getLng());
+		values.put(LAT, location.getLat());
+		values.put(RADIUS, location.getRadius());
+		values.put(MAC, location.getRadius());
+		
+		long id = db.insert(TABLE_LOCATION, null, values);
 	}
 
 
 	@Override
 	public void deleteLocation(Location location) throws DatabaseException {
-		// TODO Auto-generated method stub
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		String name = location.getName();
+		
+		db.delete(TABLE_LOCATION, NAME + " = " + name, null);
 	}
 
 
 	@Override
-	public void editLocation(Location toEdit, Location after)
-			throws DatabaseException {
-		// TODO Auto-generated method stub
+	public void editLocation(Location toEdit, Location after) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ContentValues values = new ContentValues();
+		
+		if(toEdit.getName() != after.getName()) {
+			values.put(NAME, after.getName());
+		}
+		
+		if(toEdit.getLng() != after.getLng()) {
+			values.put(LON, after.getLng());
+		}
+		
+		if(toEdit.getLat() != after.getLat()) {
+			values.put(LAT, after.getLat());
+		}
+		
+		if(toEdit.getRadius() != after.getRadius()) {
+			values.put(RADIUS, after.getRadius());
+		}
+		
+		if(toEdit.getMac() != after.getMac()) {
+			values.put(MAC, after.getMac());
+		}
+		
+		long id = db.update(TABLE_LOCATION, values, _ID + " = " + toEdit.getId(), null);
 	}
 
 
 	@Override
 	public List<Location> getLocations() throws DatabaseException {
+
+		List<Location> locations = new ArrayList<Location>();
+		
+		String selectQuery = "SELECT * FROM " + TABLE_LOCATION;
+		
+		Log.e(LOG, selectQuery);
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		// looping through all rows and adding them to list
+		if(c.moveToFirst()) {
+			do {
+					Location location = new Location();
+					location.setName(c.getString(c.getColumnIndex(NAME)));
+					locations.add(location);
+			} while(c.moveToNext());
+		}
+		return locations;
+	}
+
+
+	@Override
+	public Item getItem(String tagId) throws DatabaseException {
+		// TODO implement!
+		return DatabaseConnector.getItem(tagId);
+	}
+
+
+	@Override
+	public void putImage(Bitmap bmp) throws DatabaseException {
 		// TODO Auto-generated method stub
-		return null;
+		
+	}
+
+
+	@Override
+	public Bitmap getImage(int hashCode) throws DatabaseException {
+		// TODO implement, this is just dummy code
+		return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 	}
 	
 }

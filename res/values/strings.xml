@@ -10,5 +10,6 @@
     <string name="title_component_detail">Service details</string>
     <string name="title_activity_database_handler">DatabaseHandler</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_database_test">DatabaseTest</string>
 
 </resources>
