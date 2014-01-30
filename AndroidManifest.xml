@@ -58,10 +58,6 @@
             android:writePermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.WRITE" >
         </provider>
  -->
-        <activity
-            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.ItemHandler"
-            android:label="@string/title_activity_database_handler" >
-        </activity>
         
     </application>
 
