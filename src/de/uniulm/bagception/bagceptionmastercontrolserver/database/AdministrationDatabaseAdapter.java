@@ -72,7 +72,7 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 		//try {
 			//List<Item> items = dbi.getItems();
 			//Item[] itemsArray = items.toArray(new Item[items.size()]);
-			Item [] itemsArray = new Item[]{new Item("item1",null),new Item("item2",null),new Item("item3",null)};
+			Item [] itemsArray = new Item[]{new Item("item1"),new Item("item2"),new Item("item3")};
 
 			i.setPayloadObjects(itemsArray);
 			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, ItemCommand.reply(i, true, ""));
