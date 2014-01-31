@@ -217,15 +217,20 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 
 	@Override
 	public void onCategoryList(AdministrationCommand<Category> c) {
-		Log.d("db_admin_adapter", "onCategoryList");	
-		try {
-			List<Category> categories = dbi.getCategories();
-			Category[] itemsArray = categories.toArray(new Category[categories.size()]);
-			c.setPayloadObjects(itemsArray);
-			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, true, ""));
-		} catch (DatabaseException e) {
-			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, false, "unable to list categories"));
-		}
+		Log.d("db_admin_adapter", "onCategoryList");
+		Category category = new Category(1, "Cat 1");
+		Category [] categoryArray = new Category[]{category,new Category(1, "c1"),new Category(2, "c2")};
+
+		c.setPayloadObjects(categoryArray);
+		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, true, ""));
+//		try {
+//			List<Category> categories = dbi.getCategories();
+//			Category[] itemsArray = categories.toArray(new Category[categories.size()]);
+//			c.setPayloadObjects(itemsArray);
+//			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, true, ""));
+//		} catch (DatabaseException e) {
+//			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, false, "unable to list categories"));
+//		}
 	}
 
 	

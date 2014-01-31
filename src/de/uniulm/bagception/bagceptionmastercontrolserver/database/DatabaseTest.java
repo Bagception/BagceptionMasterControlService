@@ -137,7 +137,8 @@ public class DatabaseTest extends Activity {
 			Category ctmp = db.getCategory("Unizeugs");
 			Log.w("TEST", "CAT Name: " + ctmp.getName() + ", ID: " + ctmp.getId());
 			
-			u = new Item(u.getId(), u.getName(), ctmp, u.getImageHash(), false,	u.getIndependentItem(), u.getAttribute(), new ArrayList<String>());
+//			u = new Item(u.getId(), u.getName(), ctmp, u.getImageHash(), false,	u.getIndependentItem(), u.getAttribute(), new ArrayList<String>());
+			u = new Item(u.getName());
 			db.updateItem(u);
 			Log.w("TEST", "Item FUCK geupdatet " + u.getCategory().getId());
 		} catch (DatabaseException e) {
