@@ -166,14 +166,20 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 	@Override
 	public void onLocationList(AdministrationCommand<Location> a) {
 		Log.d("db_admin_adapter", "onLocationList");
-		try {
-			List<Location> locations = dbi.getLocations();
-			Location[] itemsArray = locations.toArray(new Location[locations.size()]);
-			a.setPayloadObjects(itemsArray);
-			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, LocationCommand.reply(a, true, ""));
-		} catch (DatabaseException e) {
-			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, LocationCommand.reply(a, false, "unable to list locations"));
-		}
+//		try {
+//			List<Location> locations = dbi.getLocations();
+//			Location[] itemsArray = locations.toArray(new Location[locations.size()]);
+//			a.setPayloadObjects(itemsArray);
+//			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, LocationCommand.reply(a, true, ""));
+//		} catch (DatabaseException e) {
+//			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, LocationCommand.reply(a, false, "unable to list locations"));
+//		}
+		Location location = new Location(2L, "item1", 2F, 2F, 3, "bla");
+		//location.setImage(BitmapFactory.decodeResource(mcs.getResources(), de.uniulm.bagception.bagceptionmastercontrolserver.R.drawable.ic_launcher));
+		Location [] locationsArray = new Location[]{location,new Location(2L, "item2", 2F, 2F, 3, "laa"),new Location(3L,"item3", 2F, 3F, 4, "la"), new Location(3L,"item3", 2F, 3F, 4, "la")};
+
+		a.setPayloadObjects(locationsArray);
+		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, LocationCommand.reply(a, true, ""));
 	}
 
 	@Override
@@ -211,15 +217,20 @@ public class AdministrationDatabaseAdapter extends AdministrationCommandProcesso
 
 	@Override
 	public void onCategoryList(AdministrationCommand<Category> c) {
-		Log.d("db_admin_adapter", "onCategoryList");	
-		try {
-			List<Category> categories = dbi.getCategories();
-			Category[] itemsArray = categories.toArray(new Category[categories.size()]);
-			c.setPayloadObjects(itemsArray);
-			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, true, ""));
-		} catch (DatabaseException e) {
-			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, false, "unable to list categories"));
-		}
+		Log.d("db_admin_adapter", "onCategoryList");
+		Category category = new Category(1, "Cat 1");
+		Category [] categoryArray = new Category[]{category,new Category(1, "c1"),new Category(2, "c2")};
+
+		c.setPayloadObjects(categoryArray);
+		mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, true, ""));
+//		try {
+//			List<Category> categories = dbi.getCategories();
+//			Category[] itemsArray = categories.toArray(new Category[categories.size()]);
+//			c.setPayloadObjects(itemsArray);
+//			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, true, ""));
+//		} catch (DatabaseException e) {
+//			mcs.sendToRemote(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND, CategoryCommand.reply(c, false, "unable to list categories"));
+//		}
 	}
 
 	

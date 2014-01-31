@@ -107,8 +107,7 @@ public class DatabaseTest extends Activity {
 			List<Long> ids = db.getIndependentItems();
 			Log.w("TEST", "IndependentItems: " + ids);
 			
-			List<Long> cids = db.getContextItems();
-			Log.w("TEST", "ContextItems: " + cids);
+			List<Item> items = db.getItems();
 			
 			long iID = tSuperItem.getId();
 			Log.w("TEST", "Item ID: " + iID);
