@@ -298,15 +298,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public void updateItem(Item item) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
+		long id = item.getId();
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
+		values.put(CATEGORY_ID, item.getCategory().getId());
 		
-		if(item.getCategory() != null){
-			values.put(CATEGORY_ID, item.getCategory().getId());
-		}
-		
-		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+		Log.w("TEST", "UPDATE CONTENTRESOLVER: " + values);
+		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
 	}
 	
 	
@@ -318,7 +317,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		int category;
 		
 		String selectQuery = "SELECT * FROM " + TABLE_ITEM + " WHERE " + _ID + " = " + id;
-		
 		
 		Log.e(LOG, selectQuery);
 		
@@ -335,14 +333,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		String name = itemData.getString(itemData.getColumnIndex(NAME));
 		Item item = new Item(name);
-
-//		Category cat = new Category(categoryName.getString(categoryName.getColumnIndex(NAME)));
-//		cat.setId(categoryName.getInt(categoryName.getColumnIndex(_ID)));
-//		
-//		item.setCategory(cat);
-		
-		//TODO category here!!
-		//item.setCategory(categoryName.getString(categoryName.getColumnIndex(NAME)));
 		
 		return item;
 	}
@@ -368,29 +358,22 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		Log.w("TEST", "Cursor erzeugt: ID " + test1 + " Name " + test2 + " CatID " + test3);
 		
-//		category = itemData.getLong(itemData.getColumnIndex(CATEGORY_ID));
-//		Log.w("TEST", "CatID " + category);
+		//category = 1;
 		
-		category = 1;
-		
-		String getCategoryQuery = "SELECT " + NAME + " FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category;
+		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + test3;
 		
 		Cursor categoryName = db.rawQuery(getCategoryQuery, null);
 		categoryName.moveToFirst();
 		
 		int test4 = categoryName.getInt(0);
-		String test5 = itemData.getString(1);
+		String test5 = categoryName.getString(1);
 		Log.w("TEST", "CatID " + test4 + " Name " + test5);
 		
-//		Log.w("TEST", "Cursor erzeugt: ID " + test4 + " Name " + test5);
 		
 		if (itemData != null) {
 			itemData.moveToFirst();
-//			Log.w("TEST", "ID " + itemData.getInt(itemData.getColumnIndex(_ID)));
-			
-			//Category cat = new Category(categoryName.getInt(categoryName.getColumnIndex(_ID)), categoryName.getString(categoryName.getColumnIndex(NAME)));
 			Category cat = new Category(test4, test5);
-			Log.w("TEST", "Cat erzeugt");
+			Log.w("TEST", "Cat: " + cat);
 			
 			Item item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), name, cat, 0, false, false, null, new ArrayList<String>());
 			
@@ -417,7 +400,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			if(c.moveToFirst()) {
 				do {
 						String name = c.getString(c.getColumnIndex(NAME));
-						Item item = new Item(name);
+						
+						int cat = c.getInt(c.getColumnIndex(_ID));
+						Category category = getCategory(cat);
+						
+						Item item = new Item(name, category);
 						items.add(item);
 				} while(c.moveToNext());
 			}
@@ -693,7 +680,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		String name = category.getName();
 		
-		db.delete(TABLE_CATEGORY, NAME + " = " + name, null);
+		db.delete(TABLE_CATEGORY, NAME + " = '" + name + "'", null);
 	}
 
 
@@ -712,8 +699,57 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long id = db.update(TABLE_CATEGORY, values, _ID + " = " + cat_id, null);
 	}
+	
+	
+	public void updateCategory(Category category) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		long id = category.getId();
+		
+		ContentValues values = new ContentValues();
+		values.put(NAME, category.getName());
+		
+		db.update(TABLE_CATEGORY, values, _ID + " = " + id, null);
+		
+	}
 
 
+	public Category getCategory(String name) throws DatabaseException {
+		
+		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + NAME + " = '" + name + "'";
+		
+		Log.e(LOG, selectQuery);
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+		Category category = null;
+		
+		if(c.moveToFirst()){
+				category = new Category(c.getInt(c.getColumnIndex(_ID)), c.getString(c.getColumnIndex(NAME)));
+		}
+		
+		return category;
+	}
+	
+	
+	public Category getCategory(long id) throws DatabaseException {
+		
+		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + id;
+		
+		Log.e(LOG, selectQuery);
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+		Category category = null;
+		
+		if(c.moveToFirst()){
+				category = new Category(c.getInt(c.getColumnIndex(_ID)), c.getString(c.getColumnIndex(NAME)));
+		}
+		
+		return category;
+	}
+
+	
 	@Override
 	public List<Category> getCategories() throws DatabaseException {
 
