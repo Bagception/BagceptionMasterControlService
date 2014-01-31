@@ -3,16 +3,13 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.layout;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R.menu;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
-import android.os.Bundle;
 import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class DatabaseTest extends Activity {
 	
@@ -39,7 +36,67 @@ public class DatabaseTest extends Activity {
 		tagIds.add("123456789");
 		
 		// Insert to database
+
+		try {
+			db.addCategory(cat);
+			Log.w("TEST", "Kategorie " + hose + " hinzugefügt");
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
 		
+		Item i = new Item("Blablabla");
+		Log.w("TEST", "Item erfolgreich erzeugt");
+		
+		try {
+			db.addItem(i);
+			Log.w("TEST", "Item " + i.getName() + " hinzugefügt");
+			
+		} catch (DatabaseException e) {
+			Log.w("TEST", "Das ging schief");
+			e.printStackTrace();
+		}
+		
+		
+		
+		
+		Item ic = new Item("CatItem", cat);
+		Log.w("TEST", "Item CatItem hinzugefügt");
+		
+		try {
+			db.addItem(ic);
+			Log.w("TEST", "Item " + ic.getName() + " mit der");
+			Log.w("TEST", "Kategorie " + ic.getCategory().getName());
+			Log.w("TEST", "Anzahl Items: " + db.getItems().size());
+		} catch (DatabaseException e) {
+			Log.w("TEST", "Das ging schief");
+			e.printStackTrace();
+		}
+		
+		try {
+			Item u = db.getItemByName("Blablabla");
+			u = new Item("Blablabla2");
+			db.updateItem(u);
+			
+			Log.w("TEST", "Anzahl Items nach update: " + db.getItems().size());
+		} catch (DatabaseException e) {
+			Log.w("TEST", "Da ging was schief");
+		}
+		
+//		try {
+//			db.getItems();
+//		}
+		
+//		try {
+//			List<Item> j = db.getItems();
+//			Item xyz = j.get(0);
+//			Item zyx = j.get(1);
+//			Log.w("TEST", "Alle Items: " + xyz.getName() + ", " + zyx.getName());
+//		} catch (DatabaseException e) {
+//			// TODO Auto-generated catch block
+//			Log.w("TEST", "Fehler beim Aufrufen des Items");
+//			e.printStackTrace();
+//		}
+//		
 //		try {
 //			db.addCategory(cat2);
 //			Log.w("TEST", "Kategorie " + cat2.getName() + " hinzugefügt");
