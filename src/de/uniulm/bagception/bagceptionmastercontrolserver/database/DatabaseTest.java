@@ -10,6 +10,7 @@ import android.view.Menu;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.ItemAttribute;
 
 public class DatabaseTest extends Activity {
 	
@@ -35,198 +36,88 @@ public class DatabaseTest extends Activity {
 		ArrayList<String> tagIds = new ArrayList<String>();
 		tagIds.add("123456789");
 		
-		// Insert to database
-
+		
+		// Vollständiges Item
+		String iName = "SuperItem";
+		// Category cat2
+		// ImageHash = 0
+		boolean isActivityIndependent = true;
+		boolean isIndependentItem = true;
+		ItemAttribute iAttributes = new ItemAttribute("25", "Sonne", "Day");
+		String[] iTagIDs = new String[] {"123456789"};
+		Category iCategory = null;
 		try {
-			db.addCategory(cat);
-			Log.w("TEST", "Kategorie " + hose + " hinzugefügt");
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
-		
-		Item i = new Item("Blablabla");
-		Log.w("TEST", "Item erfolgreich erzeugt");
-		
-		try {
-			db.addItem(i);
-			Log.w("TEST", "Item " + i.getName() + " hinzugefügt");
-			
-		} catch (DatabaseException e) {
-			Log.w("TEST", "Das ging schief");
-			e.printStackTrace();
-		}
-		
-		
-		
-		
-		Item ic = new Item("CatItem", cat);
-		Log.w("TEST", "Item CatItem hinzugefügt");
-		
-		try {
-			db.addItem(ic);
-			Log.w("TEST", "Item " + ic.getName() + " mit der");
-			Log.w("TEST", "Kategorie " + ic.getCategory().getName());
-			Log.w("TEST", "Anzahl Items: " + db.getItems().size());
-		} catch (DatabaseException e) {
-			Log.w("TEST", "Das ging schief");
-			e.printStackTrace();
-		}
-		
-		try {
-			Item u = db.getItemByName("Blablabla");
-			u = new Item("Blablabla2");
-			db.updateItem(u);
-			
-			Log.w("TEST", "Anzahl Items nach update: " + db.getItems().size());
-		} catch (DatabaseException e) {
-			Log.w("TEST", "Da ging was schief");
-		}
-		
-//		try {
-//			db.getItems();
-//		}
-		
-//		try {
-//			List<Item> j = db.getItems();
-//			Item xyz = j.get(0);
-//			Item zyx = j.get(1);
-//			Log.w("TEST", "Alle Items: " + xyz.getName() + ", " + zyx.getName());
-//		} catch (DatabaseException e) {
-//			// TODO Auto-generated catch block
-//			Log.w("TEST", "Fehler beim Aufrufen des Items");
-//			e.printStackTrace();
-//		}
-//		
-//		try {
-//			db.addCategory(cat2);
-//			Log.w("TEST", "Kategorie " + cat2.getName() + " hinzugefügt");
-//		} catch (DatabaseException e) {
-//			e.printStackTrace();
-//		}
-		
-//		Item i = new Item("LaLiLu");
-//		
-//		try {
-//			db.addItem(i);
-//			Log.w("TEST", "Item " + i.getName() + " hinzugefügt");
-//			
-//		} catch (DatabaseException e) {
-//			Log.w("TEST", "Das ging schief");
-//			e.printStackTrace();
-//		}
-		
-		
-		
-		
-//		Item ic = new Item("CatItem", cat);
-//		Log.w("TEST", "Item CatItem hinzugefügt");
-//		
-//		try {
-//			db.addItem(ic);
-//			Log.w("TEST", "Item " + ic.getName() + " mit der");
-//			Log.w("TEST", "Kategorie " + ic.getCategory().getName());
-//		} catch (DatabaseException e) {
-//			Log.w("TEST", "Das ging schief");
-//			e.printStackTrace();
-//		}
-		
-
-		try {
-			Item u = db.getItemByName("FUCK");
-			
-			Category ctmp = db.getCategory("Unizeugs");
-			Log.w("TEST", "CAT Name: " + ctmp.getName() + ", ID: " + ctmp.getId());
-			
-			u = new Item(u.getId(), u.getName(), ctmp, u.getImageHash(), false,	u.getIndependentItem(), u.getAttribute(), new ArrayList<String>());
-			db.updateItem(u);
-			Log.w("TEST", "Item FUCK geupdatet " + u.getCategory().getId());
-		} catch (DatabaseException e) {
-			Log.w("TEST", "Da ging was schief");
-		}
-		
-		try {
-			List<Item> items = db.getItems();
-			
-			for(int j = 0; j < items.size(); j++){
-				Item tmp = items.get(j);
-				Log.w("TEST", "Item: " + tmp.getName());
-				Log.w("TEST", "Itemcat: " + tmp.getCategory());
-			}
-			
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
-		
-		
-		try {
-			List<Category> c = db.getCategories();
-
-			for(int j = 0; j < c.size(); j++) {
-				Category tmp = c.get(j);
-				Log.w("TEST", "Kategorie: " + tmp.getName());
-			}
-			
-		} catch (DatabaseException e) {
+			iCategory = db.getCategory("Unizeugs");
+		} catch (DatabaseException e1) {
 			// TODO Auto-generated catch block
-			Log.w("TEST", "Fehler beim Aufrufen des Items");
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
+		
+		Item superItem = new Item(-1, iName, iCategory, 0, isActivityIndependent, isIndependentItem, iAttributes, iTagIDs);
+		Log.w("TEST", "SuperItem: " + superItem);
+		
+//		try {
+//			List<Category> tm = db.getCategories();
+//			
+//			for(int t = 0; t < tm.size(); t++) {
+//				Category ca = tm.get(t);
+//				Log.w("TEST", "Kategorie: " + ca);
+//			}
+//		} catch (DatabaseException e) {
+//			e.printStackTrace();
+//		}
 		
 		
 		try {
-			Item fu = db.getItemByName("FUCK");
-			Log.w("TEST", "Item: " + fu);
+			List<Item> il = db.getItems();
+			
+			for(int i = 0; i < il.size(); i++){
+				Item itmp = il.get(i);
+				Log.w("TEST", "Item: " + itmp.getName());
+			}
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
 		
-//		de.uniulm.bagception.bundlemessageprotocol.entities.Activity a = new de.uniulm.bagception.bundlemessageprotocol.entities.Activity();
-//		Location location = new Location();
-//		location.setName("Scheißhaus");
-//		location.setLat((float) 1.23456);
-//		location.setLon((float) 9.87654);
-//		
+		// Insert to database
 //		try {
-//			db.addLocation(location);
-//			Log.w("TEST", "Localtion " + location.getName() + " hinzugefügt");
+//			db.addItem(superItem);
+//			Log.w("TEST", "Einfügen SuperItem erfolgreich");
 //		} catch (DatabaseException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//		
-//		a.setName("Scheißen");
-//		a.setLocation(location);
-//		
+		
+		
+		// Delete SuperItem
 //		try {
-//			db.addActivity(a);
-//			Log.w("TEST", "Aktivität " + a.getName() + " hinzugefügt");
-//		} catch (DatabaseException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-//		try {
-//			db.deleteActivity(a);
-//			Log.w("TEST", "Aktivität " + a.getName() + " wurde gelöscht");
+//			db.deleteItem(superItem);
+//			Log.w("TEST", "Löschen erfolgreich");
 //		} catch (DatabaseException e) {
 //			e.printStackTrace();
 //		}
-//		
-//		try {
-//			List<de.uniulm.bagception.bundlemessageprotocol.entities.Activity> act = db.getActivities();
-//			Log.w("TEST", "Anzahl Aktivitäten: " + act.size());
-//			
-//			de.uniulm.bagception.bundlemessageprotocol.entities.Activity a2 = new de.uniulm.bagception.bundlemessageprotocol.entities.Activity();
-//			a2 = act.get(1);
-//			
-////			List<Location> loc = db.getLocations();
-////			
-////			Location l = loc.get(0);
-//			
-//			Log.w("TEST", "Aktivität " + a2.getName());// + " hat den Ort " + a2.getLocation().getName());
-//		} catch (DatabaseException e) {
-//			e.printStackTrace();
-//		}
+		
+
+		// Get SuperItem
+		try {
+			Item tSuperItem = db.getItemByName(iName);
+			Log.w("TEST", "Name: " + tSuperItem.getName());
+			Log.w("TEST", "Kategorie: " + tSuperItem.getCategory());
+			
+			List<Long> ids = db.getIndependentItems();
+			Log.w("TEST", "IndependentItems: " + ids);
+			
+			List<Long> cids = db.getContextItems();
+			Log.w("TEST", "ContextItems: " + cids);
+			
+			long iID = tSuperItem.getId();
+			Log.w("TEST", "Item ID: " + iID);
+			
+			List<String> tagids = db.getTagId(iID);
+			Log.w("TEST", "TagID: " + tagids);
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
 		
 		
 /*****************************************************************************************************************************************************

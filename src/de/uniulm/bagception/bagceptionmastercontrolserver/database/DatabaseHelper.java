@@ -104,14 +104,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			"CREATE TABLE IF NOT EXISTS " + TABLE_INDEPENDENTITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ ITEM_ID + " INTEGER NOT NULL UNIQUE,"
-			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE);";
 	
 	
 	private static final String CREATE_TABLE_CONTEXTITEM = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_CONTEXTITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ ITEM_ID + " INTEGER NOT NULL UNIQUE,"
-			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE);";
 	
 	
 	private static final String CREATE_TABLE_ACTIVITYITEM = 
@@ -217,16 +217,19 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
-//		Category c = item.getCategory();
-		String cid = null;
+		Category c = item.getCategory();
+		long cid = 0;
 		
-//		if(c != null){
-//			cid = c.getName();
-//		}
+		if(c != null){
+			cid = c.getId();
+		}
 		
-		Log.w("TEST", "In der add-Methode");
+		Log.w("TEST", "getIds(): " + item.getIds());
 		
 //		String tag_id = null;
+//		if(item.getIds() != null){
+//			
+//		}
 		
 //		if(item.getIds().isEmpty() == false){
 //			tag_id = item.getIds().get(0);
@@ -273,11 +276,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long item_id = item.getId();
 		db.delete(TABLE_TAGID, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
 	}
 
@@ -355,27 +358,44 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		long test1 = itemData.getInt(0);
 		String test2 = itemData.getString(1);
 		int test3 = itemData.getInt(2);
+		String tagID = itemData.getString(itemData.getColumnIndex(TAG_ID));
 		
-		Log.w("TEST", "Cursor erzeugt: ID " + test1 + " Name " + test2 + " CatID " + test3);
+		Log.w("TEST", "Cursor erzeugt: ID " + test1 + " Name " + test2 + " CatID " + test3 + " TagID " + tagID);
 		
 		//category = 1;
 		
 		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + test3;
 		
 		Cursor categoryName = db.rawQuery(getCategoryQuery, null);
-		categoryName.moveToFirst();
 		
-		int test4 = categoryName.getInt(0);
-		String test5 = categoryName.getString(1);
-		Log.w("TEST", "CatID " + test4 + " Name " + test5);
+		int test4;
+		String test5;
+		Category cat = null;
 		
+		if(categoryName != null){
+			categoryName.moveToFirst();
+			
+			test4 = categoryName.getInt(0);
+			test5 = categoryName.getString(1);
+			Log.w("TEST", "CatID " + test4 + " Name " + test5);
+			
+			cat = new Category(test4, test5);
+			Log.w("TEST", "Cat: " + cat);
+		} 
 		
 		if (itemData != null) {
 			itemData.moveToFirst();
-			Category cat = new Category(test4, test5);
-			Log.w("TEST", "Cat: " + cat);
 			
-			Item item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), name, cat, 0, false, false, null, new ArrayList<String>());
+			Item item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), 
+								name, 
+								cat, 
+								0, 
+								false, 
+								false, 
+								null, 
+								tagID);
+			
+			Log.w("TEST", "Neues Item: " + item);
 			
 			return item;
 		} else {
@@ -400,9 +420,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			if(c.moveToFirst()) {
 				do {
 						String name = c.getString(c.getColumnIndex(NAME));
+						int item_id = c.getInt(c.getColumnIndex(_ID));
+						int cat = c.getInt(c.getColumnIndex(CATEGORY_ID));
 						
-						int cat = c.getInt(c.getColumnIndex(_ID));
+						Log.w("TEST", "GET ALL ITEMS: NAME: " + name + ", KATEGORIEID: " + cat);
+						
 						Category category = getCategory(cat);
+						
+						Log.w("TEST", "Kategorie: " + category);
 						
 						Item item = new Item(name, category);
 						items.add(item);
@@ -450,6 +475,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String selectQuery = "SELECT " + TAG_ID + " FROM " + TABLE_TAGID + " WHERE " + ITEM_ID + " = " + itemId;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
+		Log.w("TEST", "TAGID-Cursor: " + c);
 		
 		// looping through all rows and adding them to list
 		if(c.moveToFirst()) {
@@ -487,6 +513,46 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
 	}
 	
+	public boolean getIndependentItem(long id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		boolean item = false;
+		
+		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_INDEPENDENTITEM + " WHERE " + ITEM_ID + " = " + id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(c == null){
+			return item;
+		} else {
+			item = true;
+			return item;
+		}
+		
+	}
+	
+	public List<Long> getIndependentItems() throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+//		long[] items = new long[]{};
+		List<Long> items = new ArrayList<Long>();
+		
+		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_INDEPENDENTITEM;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(c == null) {
+			return items;
+		} else {
+			if(c.moveToFirst()) {
+				do {
+					items.add(c.getLong(c.getColumnIndex(ITEM_ID)));
+				} while(c.moveToNext());
+			}
+			return items;
+		}
+	}
+	
 	// -------------------------------- "ContextItem" table methods -------------------------------- //
 	
 	/**
@@ -512,6 +578,45 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
 	}
 	
+	
+	public boolean getContextItem(long id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		boolean item = false;
+		
+		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_CONTEXTITEM + " WHERE " + ITEM_ID + " = " + id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(c == null){
+			return item;
+		} else {
+			item = true;
+			return item;
+		}
+		
+	}
+	
+	public List<Long> getContextItems() throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		List<Long> items = new ArrayList<Long>();
+		
+		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_CONTEXTITEM;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(c == null) {
+			return items;
+		} else {
+			if(c.moveToFirst()) {
+				do {
+					items.add(c.getLong(c.getColumnIndex(ITEM_ID)));
+				} while(c.moveToNext());
+			}
+			return items;
+		}
+	}
 	
 	
 	// -------------------------------- "Photo" table methods -------------------------------- //
