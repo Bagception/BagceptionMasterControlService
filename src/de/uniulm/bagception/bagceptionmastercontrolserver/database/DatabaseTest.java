@@ -31,10 +31,21 @@ public class DatabaseTest extends Activity {
 		Category cat = new Category("Anziehsachen");
 		Category cat2 = new Category("Unizeugs");
 		
-		String hose = "Andere Hose";
-		String shirt = "Zweites T-Shirt";
-		ArrayList<String> tagIds = new ArrayList<String>();
-		tagIds.add("123456789");
+		
+		
+//		try {
+//			db.addCategory(cat);
+//			db.addCategory(cat2);
+//		} catch (DatabaseException e){
+//			e.printStackTrace();
+//		}
+		
+		
+		
+//		String hose = "Andere Hose";
+//		String shirt = "Zweites T-Shirt";
+//		ArrayList<String> tagIds = new ArrayList<String>();
+//		tagIds.add("123456789");
 		
 		
 		// Vollständiges Item
@@ -54,7 +65,7 @@ public class DatabaseTest extends Activity {
 		}
 		
 		Item superItem = new Item(-1, iName, iCategory, 0, isActivityIndependent, isIndependentItem, iAttributes, iTagIDs);
-		Log.w("TEST", "SuperItem: " + superItem);
+		//Log.w("TEST", "SuperItem: " + superItem);
 		
 		
 //		try {
@@ -71,6 +82,7 @@ public class DatabaseTest extends Activity {
 		
 //		try {
 //			List<Item> il = db.getItems();
+//			Log.w("TEST", "Item: " + il);
 //			
 //			for(int i = 0; i < il.size(); i++){
 //				Item itmp = il.get(i);
@@ -81,13 +93,13 @@ public class DatabaseTest extends Activity {
 //		}
 		
 		// Insert to database
-		try {
-			db.addItem(superItem);
-			Log.w("TEST", "Einfügen SuperItem erfolgreich");
-		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			db.addItem(superItem);
+//			Log.w("TEST", "Einfügen SuperItem erfolgreich");
+//		} catch (DatabaseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 		
 		
 		// Delete SuperItem
@@ -108,13 +120,19 @@ public class DatabaseTest extends Activity {
 			List<Long> ids = db.getIndependentItems();
 			Log.w("TEST", "IndependentItems: " + ids);
 			
-			List<Item> items = db.getItems();
+			List<Long> cids = db.getContextItems();
+			Log.w("TEST", "ContextItems: " + cids);
+			
+//			List<Item> items = db.getItems();
 			
 			long iID = tSuperItem.getId();
 			Log.w("TEST", "Item ID: " + iID);
 			
 			List<String> tagids = db.getTagId(iID);
 			Log.w("TEST", "TagID: " + tagids);
+			
+			ItemAttribute att = db.getItemAttributes(iID);
+			Log.w("TEST", "Attribute: " + att);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}

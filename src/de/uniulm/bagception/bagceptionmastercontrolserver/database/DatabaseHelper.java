@@ -247,10 +247,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(NAME, item.getName());
 		//values.put(CATEGORY_ID, item.getCategory().getId());
 		values.put(CATEGORY_ID, cid);
-		values.put(TAG_ID, tag_id);
+		//values.put(TAG_ID, tag_id);
 		
 		// Insert row to Item table
 		long item_id = db.insert(TABLE_ITEM, null, values);
+		
+		// Insert "TagID" in the correct table
+		if(tag_id != null){
+			addTagId(item_id, tag_id);
+		}
 
 		// If "independentItem" is selected, add item to IndependentItem table
 		boolean independentItem = item.getIndependentItem();
@@ -267,6 +272,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// If attributes != null
 		ItemAttribute iA = item.getAttribute();
 		if(iA != null) {
+			Log.w("TEST", "Attribute einfügen!");
 			addItemAttribute(item);
 		}
 		
@@ -631,17 +637,19 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
-	// -------------------------------- "Photo" table methods -------------------------------- //
+	// -------------------------------- "ItemAttribute" table methods -------------------------------- //
 	
 	public void addItemAttribute(Item item) throws DatabaseException {
+		
+		Log.w("TEST", "In der addAttribute Methode");
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ItemAttribute iA = item.getAttribute();
 		Log.w("TEST", "Attribute: " + iA);
 		
-		long id = item.getId();
-		Log.w("TEST", "Item ID: " + id);
+		long item_id = item.getId();
+		Log.w("TEST", "Item ID: " + item_id);
 		
 		String temp = iA.getTemperature();
 		String weather = iA.getWeather();
@@ -651,6 +659,98 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(TEMPERATURE, temp);
 		values.put(WEATHER, weather);
 		values.put(LIGHTNESS, light);
+		
+		long id = db.insert(TABLE_ITEMATTRIBUTE, null, values);
+	}
+	
+	
+	public void deleteItemAttributes(long item_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
+	}
+	
+	
+	public ItemAttribute getItemAttributes(long id) throws DatabaseException {
+		
+		Log.w("TEST", "getItemAttributes");
+		SQLiteDatabase db = this.getReadableDatabase();
+		ItemAttribute attributes = null;
+		
+		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ITEMATTRIBUTE + " WHERE " + ITEM_ID + " = " + id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(c == null){
+			Log.w("TEST", "Cursor is null");
+			return attributes;
+		} else {
+			c.moveToFirst();
+			
+			Log.w("TEST", "Cursor: " + c.getCount());
+			
+			String temperature = null;
+			String weather = null;
+			String lightness = null;
+			
+			if(c.getString(c.getColumnIndex(TEMPERATURE)) != null){
+				temperature = c.getString(c.getColumnIndex(TEMPERATURE));
+				Log.w("TEST", "Temp: " + temperature);
+			}
+			
+			if(c.getString(c.getColumnIndex(WEATHER)) != null){
+				weather = c.getString(c.getColumnIndex(WEATHER));
+				Log.w("TEST", "Weather: " + weather);
+			}
+			
+			if(c.getString(c.getColumnIndex(LIGHTNESS)) != null){
+				lightness = c.getString(c.getColumnIndex(LIGHTNESS));
+				Log.w("TEST", "Light: " + lightness);
+			}
+			
+			attributes = new ItemAttribute(temperature, weather, lightness);
+			
+			return attributes;
+		}
+		
+	}
+	
+	
+	public void updateItemAttributes(ItemAttribute attributes) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		long id = attributes.getId();
+		long item_id = -1;
+		String temperature = null;
+		String weather = null;
+		String lightness = null;
+		
+		if(attributes.getItemId() != -1){
+			item_id = attributes.getItemId();
+		}
+		
+		if(attributes.getTemperature() != null){
+			temperature = attributes.getTemperature();
+		}
+		
+		if(attributes.getWeather() != null){
+			weather = attributes.getWeather();
+		}
+		
+		if(attributes.getLightness() != null){
+			lightness = attributes.getLightness();
+		}
+		
+		
+		ContentValues values = new ContentValues();
+		values.put(TEMPERATURE, temperature);
+		values.put(WEATHER, weather);
+		values.put(LIGHTNESS, lightness);
+		
+		Log.w("TEST", "UPDATE CONTENTRESOLVER: " + values);
+		db.update(TABLE_ITEMATTRIBUTE, values, _ID + " = " + id, null);
 	}
 	
 	
