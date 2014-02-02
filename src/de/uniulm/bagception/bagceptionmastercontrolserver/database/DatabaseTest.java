@@ -56,6 +56,7 @@ public class DatabaseTest extends Activity {
 		Item superItem = new Item(-1, iName, iCategory, 0, isActivityIndependent, isIndependentItem, iAttributes, iTagIDs);
 		Log.w("TEST", "SuperItem: " + superItem);
 		
+		
 //		try {
 //			List<Category> tm = db.getCategories();
 //			
@@ -68,25 +69,25 @@ public class DatabaseTest extends Activity {
 //		}
 		
 		
-		try {
-			List<Item> il = db.getItems();
-			
-			for(int i = 0; i < il.size(); i++){
-				Item itmp = il.get(i);
-				Log.w("TEST", "Item: " + itmp.getName());
-			}
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
-		
-		// Insert to database
 //		try {
-//			db.addItem(superItem);
-//			Log.w("TEST", "Einfügen SuperItem erfolgreich");
+//			List<Item> il = db.getItems();
+//			
+//			for(int i = 0; i < il.size(); i++){
+//				Item itmp = il.get(i);
+//				Log.w("TEST", "Item: " + itmp.getName());
+//			}
 //		} catch (DatabaseException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
+		
+		// Insert to database
+		try {
+			db.addItem(superItem);
+			Log.w("TEST", "Einfügen SuperItem erfolgreich");
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 		// Delete SuperItem

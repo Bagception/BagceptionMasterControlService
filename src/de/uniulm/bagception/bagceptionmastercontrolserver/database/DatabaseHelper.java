@@ -16,6 +16,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.ItemAttribute;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
 public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterface{
@@ -226,10 +227,17 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		Log.w("TEST", "getIds(): " + item.getIds());
 		
-//		String tag_id = null;
-//		if(item.getIds() != null){
-//			
-//		}
+		List<String> tag_ids = item.getIds();
+		String tag_id = null;
+		if(tag_ids != null){
+			Log.w("TEST", "NEW ITEM - TagIDs: " + item.getIds());
+			
+			int size = tag_ids.size();
+			
+			if(size > 0){ 
+				tag_id = tag_ids.get(0);
+			}
+		}
 		
 //		if(item.getIds().isEmpty() == false){
 //			tag_id = item.getIds().get(0);
@@ -239,14 +247,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(NAME, item.getName());
 		//values.put(CATEGORY_ID, item.getCategory().getId());
 		values.put(CATEGORY_ID, cid);
+		values.put(TAG_ID, tag_id);
 		
 		// Insert row to Item table
 		long item_id = db.insert(TABLE_ITEM, null, values);
-		
-		// Insert tag_id in TagId Table if tag_id not null
-//		if (tag_id != null) {
-//			addTagId(item_id, tag_id);
-//		}
 
 		// If "independentItem" is selected, add item to IndependentItem table
 		boolean independentItem = item.getIndependentItem();
@@ -258,6 +262,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		boolean contextItem = item.getContextItem();
 		if (contextItem == true) {
 			addContextItem(item_id);
+		}
+		
+		// If attributes != null
+		ItemAttribute iA = item.getAttribute();
+		if(iA != null) {
+			addItemAttribute(item);
 		}
 		
 		// If Photo exists, add photo to Photo table
@@ -278,7 +288,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_TAGID, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
-		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
+//		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
@@ -353,14 +363,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Log.e(LOG, selectQuery);
 		
 		Cursor itemData = db.rawQuery(selectQuery, null);
+		Log.w("TEST", "Cursorspalten: " + itemData.getColumnCount());
+		Log.w("TEST", "Cursorzeilen: " + itemData.getCount());
 		itemData.moveToFirst();
 		
 		long test1 = itemData.getInt(0);
 		String test2 = itemData.getString(1);
 		int test3 = itemData.getInt(2);
-		String tagID = itemData.getString(itemData.getColumnIndex(TAG_ID));
+		//String tagID = itemData.getString(itemData.getColumnIndex(TAG_ID));
 		
-		Log.w("TEST", "Cursor erzeugt: ID " + test1 + " Name " + test2 + " CatID " + test3 + " TagID " + tagID);
+		Log.w("TEST", "Cursor erzeugt: ID " + test1 + " Name " + test2 + " CatID " + test3);
 		
 		//category = 1;
 		
@@ -393,7 +405,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 								false, 
 								false, 
 								null, 
-								tagID);
+								new ArrayList<String>());
 			
 			Log.w("TEST", "Neues Item: " + item);
 			
@@ -621,10 +633,33 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	// -------------------------------- "Photo" table methods -------------------------------- //
 	
+	public void addItemAttribute(Item item) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ItemAttribute iA = item.getAttribute();
+		Log.w("TEST", "Attribute: " + iA);
+		
+		long id = item.getId();
+		Log.w("TEST", "Item ID: " + id);
+		
+		String temp = iA.getTemperature();
+		String weather = iA.getWeather();
+		String light = iA.getLightness();
+		
+		ContentValues values = new ContentValues();
+		values.put(TEMPERATURE, temp);
+		values.put(WEATHER, weather);
+		values.put(LIGHTNESS, light);
+	}
+	
+	
+	// -------------------------------- "Photo" table methods -------------------------------- //
+	
 	/**
 	 * Add Picture
 	 */
-	public void addPhotoToItem(int image, long item_id) {
+	public void addPhotoToItem(int image, long item_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		

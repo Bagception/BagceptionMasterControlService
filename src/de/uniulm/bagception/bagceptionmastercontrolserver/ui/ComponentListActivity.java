@@ -57,8 +57,8 @@ public class ComponentListActivity extends FragmentActivity implements
 		
 		//Intent i = new Intent(this, ItemHandler.class);
 		//startActivity(i);
-//		Intent i = new Intent(this, DatabaseTest.class);
-//		startActivity(i);
+		Intent i = new Intent(this, DatabaseTest.class);
+		startActivity(i);
 
 		// TODO: If exposing deep links into your app, handle intents here.
 	}
