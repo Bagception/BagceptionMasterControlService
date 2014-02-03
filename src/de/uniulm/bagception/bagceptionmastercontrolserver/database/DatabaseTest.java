@@ -139,12 +139,29 @@ public class DatabaseTest extends android.app.Activity {
 //			e.printStackTrace();
 //		}
 		
-		Location loc = new Location("Uni", (float) 0, (float) 0, 0);
-		Log.w("TEST", "Loc: " + loc);
+		Location loc = new Location("Uni", (float) 25, (float) 35, 5, "1A");
+		//Log.w("TEST", "Loc: " + loc);
 		
+		
+		Activity a = new Activity("Uni");
+
 		try {
-			db.addLocation(loc);
-			Log.w("TEST", "Location hinzugefügt");
+//			db.addActivity(a);
+//			Log.w("TEST", "Erfolgreich");
+			
+			Activity a2 = db.getActivity("Uni");
+//			Log.w("TEST", "ACtivity: " + a2);
+//			Log.w("TEST", "Location: " + db.getLocation("Uni"));
+			
+			
+//			a2 = new Activity(a2.getId(), a2.getName(), null, db.getLocation("Uni"));
+//			db.updateActivtiy(a2);
+//			
+//			Log.w("TEST", "ACtivity: " + db.getActivity("Uni"));
+			
+			db.deleteActivity(a2);
+			
+			Log.w("TEST", "Activities: " + db.getActivities());
 		} catch (DatabaseException e){
 			e.printStackTrace();
 		}
