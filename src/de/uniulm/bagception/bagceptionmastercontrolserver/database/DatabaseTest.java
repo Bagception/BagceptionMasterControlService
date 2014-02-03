@@ -3,16 +3,17 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ItemAttribute;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
-public class DatabaseTest extends Activity {
+public class DatabaseTest extends android.app.Activity {
 	
 	DatabaseHelper db;
 
@@ -110,30 +111,41 @@ public class DatabaseTest extends Activity {
 //			e.printStackTrace();
 //		}
 		
-
+		
 		// Get SuperItem
+//		try {
+//			Item tSuperItem = db.getItemByName(iName);
+//			Log.w("TEST", "Name: " + tSuperItem.getName());
+//			Log.w("TEST", "Kategorie: " + tSuperItem.getCategory());
+//			
+//			long iID = tSuperItem.getId();
+//			Log.w("TEST", "Item ID: " + iID);
+//			
+//			boolean ids = db.getIndependentItem(iID);
+//			Log.w("TEST", "IndependentItem: " + ids);
+//			
+//			boolean cids = db.getContextItem(iID);
+//			Log.w("TEST", "ContextItem: " + cids);
+//			
+//			List<String> tagids = db.getTagId(iID);
+//			Log.w("TEST", "TagID: " + tagids);
+//			
+//			ItemAttribute att = db.getItemAttribute(iID);
+//			Log.w("TEST", "Attribute: " + att.getItemId() + att.getTemperature() + att.getWeather() + att.getLightness());
+//			
+////			Log.w("TEST", "Anzahl Attr.: " + db.getItemAttributes().size());
+//			
+//		} catch (DatabaseException e) {
+//			e.printStackTrace();
+//		}
+		
+		Location loc = new Location("Uni", (float) 0, (float) 0, 0);
+		Log.w("TEST", "Loc: " + loc);
+		
 		try {
-			Item tSuperItem = db.getItemByName(iName);
-			Log.w("TEST", "Name: " + tSuperItem.getName());
-			Log.w("TEST", "Kategorie: " + tSuperItem.getCategory());
-			
-			List<Long> ids = db.getIndependentItems();
-			Log.w("TEST", "IndependentItems: " + ids);
-			
-			List<Long> cids = db.getContextItems();
-			Log.w("TEST", "ContextItems: " + cids);
-			
-//			List<Item> items = db.getItems();
-			
-			long iID = tSuperItem.getId();
-			Log.w("TEST", "Item ID: " + iID);
-			
-			List<String> tagids = db.getTagId(iID);
-			Log.w("TEST", "TagID: " + tagids);
-			
-			ItemAttribute att = db.getItemAttributes(iID);
-			Log.w("TEST", "Attribute: " + att);
-		} catch (DatabaseException e) {
+			db.addLocation(loc);
+			Log.w("TEST", "Location hinzugefügt");
+		} catch (DatabaseException e){
 			e.printStackTrace();
 		}
 		
