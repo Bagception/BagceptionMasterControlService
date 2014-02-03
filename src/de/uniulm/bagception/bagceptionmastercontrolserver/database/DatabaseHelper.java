@@ -120,7 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
 			+ ACTIVITY_ID + " INTEGER NOT NULL, "
 			+ ITEM_ID + " INTEGER NOT NULL, "
-			+ CATEGORY_ID + " INTEGER NOT NULL," 
+			+ CATEGORY_ID + " INTEGER," 
 			+ " FOREIGN KEY(" + ACTIVITY_ID + ") REFERENCES " + TABLE_ACTIVITY + "(" + _ID + ") ON UPDATE CASCADE,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT,"
 			+ " FOREIGN KEY(" + CATEGORY_ID + ") REFERENCES " + TABLE_CATEGORY + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
@@ -133,7 +133,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			+ TEMPERATURE + " TEXT DEFAULT NULL, "
 			+ WEATHER + " TEXT DEFAULT NULL, "
 			+ LIGHTNESS + " TEXT DEFAULT NULL,"
-			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE);";
 
 	
 	private static final String CREATE_TABLE_ACTIVITY = 
@@ -869,15 +869,23 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	// -------------------------------- "Activity" table methods -------------------------------- //
 
 	
-	//TODO
 	@Override
 	public void addActivity(Activity activity) throws DatabaseException {
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
+		long loc_id = -1;
+		
+		Log.w("TEST", "FUCK ID: " + activity.getLocation());
+		if(activity.getLocation() != null){
+			loc_id = activity.getLocation().getId();
+		}
+		
+		Log.w("TEST", "FUCK NAME: " + activity.getName());
+		Log.w("TEST", "FUCK ID: " + loc_id);
 		ContentValues values = new ContentValues();
 		values.put(NAME, activity.getName());
-		values.put(LOCATION_ID, activity.getLocation().getId());
+		values.put(LOCATION_ID, loc_id);
 			
 		db.insert(TABLE_ACTIVITY, null, values);
 		
@@ -950,7 +958,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		Location location = null;
 		
-		if(locid != 0){
+		if(locid != -1){
 			location = getLocation(locid);
 		}
 		
@@ -972,7 +980,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor c = db.rawQuery(selectQuery, null);
 		
 		// looping through all rows and adding them to list
-		if(c.moveToFirst()) {
+		if(c.moveToFirst() && c != null) {
 			do {
 					long id = c.getLong(c.getColumnIndex(_ID));
 					String name = c.getString(c.getColumnIndex(NAME));
@@ -980,7 +988,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					Log.w("TEST", "" + id + name + loc_id);
 					
 					Location location = null;
-					if(loc_id != 0){
+					if(loc_id != -1){
 						location = getLocation(loc_id);
 					}
 						
@@ -995,22 +1003,74 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	// -------------------------------- "ActivityItem" table methods -------------------------------- //
 	
-	private void addActivityItem(long activity_id, List<Item> itemsForActivity) {
-
+	public void addActivityItem(long activity_id, Item item) {
+		
 		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put(ACTIVITY_ID, activity_id);
+		values.put(ITEM_ID, item.getId());
+		values.put(CATEGORY_ID, item.getCategory().getId());
+			
+		db.insert(TABLE_ACTIVITYITEM, null, values);
+
+	}
+	//TODO
+	
+	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
+
+//		SQLiteDatabase db = this.getWritableDatabase();
 		
 		for(int i = 0; i < itemsForActivity.size(); i++) {
 			
 			Item item = itemsForActivity.get(i);
-			ContentValues values = new ContentValues();
-			values.put(ACTIVITY_ID, activity_id);
-			values.put(ITEM_ID, item.getId());
-			values.put(CATEGORY_ID, item.getCategory().getId());
 			
-			db.insert(TABLE_ACTIVITYITEM, null, values);
+			addActivityItem(activity_id, item);
 		}
 		
 	}
+	
+	
+	public void deleteActivityItem(long item_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = ?", new String[] {String.valueOf(item_id)});
+	}
+	
+	
+	public void deleteActivityCategory(long category_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		db.delete(TABLE_ACTIVITYITEM, CATEGORY_ID + " = ?", new String[] {String.valueOf(category_id)});
+	}
+	
+	
+	public List<Long> getActivityItems(long activity_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		List<Long> items = new ArrayList<Long>();
+		
+		String selectQuery = "SELECT * FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + activity_id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if (c != null){
+			c.moveToFirst();
+			
+			while(c.isAfterLast() == false){
+				items.add(c.getLong(c.getColumnIndex(ITEM_ID)));
+				items.add(c.getLong(c.getColumnIndex(CATEGORY_ID)));
+				c.moveToNext();
+			}
+			
+			return items;
+		} else {		
+			return items;
+		}
+	}
+		
 	
 	
 	

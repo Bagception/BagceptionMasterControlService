@@ -140,28 +140,60 @@ public class DatabaseTest extends android.app.Activity {
 //		}
 		
 		Location loc = new Location("Uni", (float) 25, (float) 35, 5, "1A");
-		//Log.w("TEST", "Loc: " + loc);
+//		Log.w("TEST", "Loc: " + loc);
 		
 		
 		Activity a = new Activity("Uni");
 
-		try {
+//		try {
 //			db.addActivity(a);
 //			Log.w("TEST", "Erfolgreich");
-			
-			Activity a2 = db.getActivity("Uni");
+//			
+//			Activity a2 = db.getActivity("Uni");
 //			Log.w("TEST", "ACtivity: " + a2);
 //			Log.w("TEST", "Location: " + db.getLocation("Uni"));
-			
-			
+//			
+//			
 //			a2 = new Activity(a2.getId(), a2.getName(), null, db.getLocation("Uni"));
 //			db.updateActivtiy(a2);
 //			
 //			Log.w("TEST", "ACtivity: " + db.getActivity("Uni"));
+//			
+//			db.deleteActivity(a2);
+//			
+//			Log.w("TEST", "Activities: " + db.getActivities());
+//		} catch (DatabaseException e){
+//			e.printStackTrace();
+//		}
+		
+		
+//		List<Item> itemList = new ArrayList<Item>();
+//		try {
+//			itemList.add(db.getItemByName(iName));
+//			long ac_id = db.getActivity("Uni").getId();
+//			
+//			Log.w("TEST", "Item: " + itemList);
+//			Log.w("TEST", "ActivityID: " + ac_id);
+//			
+//			db.addActivityItem(ac_id, itemList);
+//			Log.w("TEST", "ActivityItems: " + db.getActivityItems(db.getActivity("Uni").getId()));
+//			
+//		} catch (DatabaseException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		try {
+			long ac = db.getActivity("Uni").getId();
+			Log.w("TEST", "AcID: " + ac);
 			
-			db.deleteActivity(a2);
+//			long i = db.getItemByName(iName).getId();
+//			db.deleteActivityItem(i);
 			
-			Log.w("TEST", "Activities: " + db.getActivities());
+			long cid = db.getCategory("Unizeugs").getId();
+			db.deleteActivityCategory(cid);
+			
+			Log.w("TEST", "AcItems: " + db.getActivityItems(ac));
 		} catch (DatabaseException e){
 			e.printStackTrace();
 		}
