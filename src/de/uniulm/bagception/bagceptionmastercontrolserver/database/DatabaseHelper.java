@@ -1,5 +1,6 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -263,10 +264,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		// If Photo exists, add photo to Photo table
-//		int image = item.getImageHash();
-//		if (image != 0) {
-//			addPhotoToItem(image, item_id);
-//		}
+		int image = item.getImageHash();
+		Bitmap bmp = item.getImage();
+		
+		if(bmp != null){
+			putImage(item_id, bmp);
+		}
 		
 	}
 
@@ -280,7 +283,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_TAGID, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
@@ -858,7 +861,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	 * Add Picture
 	 */
 	public void addPhotoToItem(int image, long item_id) throws DatabaseException {
-		
+		//TODO
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
@@ -1044,8 +1047,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
 
-//		SQLiteDatabase db = this.getWritableDatabase();
-		
 		for(int i = 0; i < itemsForActivity.size(); i++) {
 			
 			Item item = itemsForActivity.get(i);
@@ -1382,16 +1383,50 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 
 	@Override
-	public void putImage(Bitmap bmp) throws DatabaseException {
-		// TODO Auto-generated method stub
+	public void putImage(long item_id, Bitmap bmp) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bmp.compress(Bitmap.CompressFormat.PNG, 100, bos);
+		
+		byte[] bArray = bos.toByteArray();
+		
+		ContentValues values = new ContentValues();
+		values.put(ITEM_ID, item_id);
+		values.put(_DATA, bArray);
+		
+		db.insert(TABLE_PHOTO, null, values);
+	}
+
+
+	@Override
+	public Bitmap getImage(long item_id, int hashCode) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		String selectQuery = "SELECT " + _DATA + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		byte[] bimg = new byte[1];
+		Bitmap bmp;
+		
+		if(c != null){
+			c.moveToFirst();
+			bimg = c.getBlob(0);
+		}
+		
+		bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
+	
+		return bmp;
+		//return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 	}
 
 
 	@Override
 	public Bitmap getImage(int hashCode) throws DatabaseException {
-		// TODO implement, this is just dummy code
-		return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }

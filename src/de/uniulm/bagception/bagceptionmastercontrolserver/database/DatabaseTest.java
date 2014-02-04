@@ -42,13 +42,6 @@ public class DatabaseTest extends android.app.Activity {
 //		}
 		
 		
-		
-//		String hose = "Andere Hose";
-//		String shirt = "Zweites T-Shirt";
-//		ArrayList<String> tagIds = new ArrayList<String>();
-//		tagIds.add("123456789");
-		
-		
 		// Vollständiges Item
 		String iName = "SuperItem_2";
 		// Category cat2
@@ -68,15 +61,16 @@ public class DatabaseTest extends android.app.Activity {
 //		Item superItem = new Item(-1, iName, iCategory, 0, isActivityIndependent, isIndependentItem, iAttributes, iTagIDs);
 //		Log.w("TEST", "SuperItem: " + superItem);
 		
-		try {
+//		try {
 //			db.addItem(superItem);
-			
+//			
 //			Log.w("TEST", "Items: " + db.getItems());
-			Log.w("TEST", "Item: " + db.getItemId("123456789"));
-			Log.w("TEST", "Item: " + db.getItem(db.getItemId("987654321")));
-		} catch (DatabaseException e){
-			e.printStackTrace();
-		}
+//			Log.w("TEST", "Item: " + db.getItemId("123456789"));
+//			Log.w("TEST", "Item: " + db.getItem(db.getItemId("987654321")));
+//			
+//		} catch (DatabaseException e){
+//			e.printStackTrace();
+//		}
 		
 		
 /*****************************************************************************************************************************************************
