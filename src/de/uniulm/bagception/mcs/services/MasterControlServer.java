@@ -334,7 +334,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				LOGGER.C(this, "Tag scanned: "+id);
 				Item i;
 				try {
-					i = dbHelper.getItem(id);
+					i = dbHelper.getItemByName(id);
 					if (i!=null){
 						//tag exists in database
 						LOGGER.C(this, "TAG found: "+i.getName());

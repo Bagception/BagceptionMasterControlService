@@ -50,13 +50,13 @@ public class DatabaseTest extends android.app.Activity {
 		
 		
 		// Vollständiges Item
-		String iName = "SuperItem";
+		String iName = "SuperItem_2";
 		// Category cat2
 		// ImageHash = 0
 		boolean isActivityIndependent = true;
 		boolean isIndependentItem = true;
 		ItemAttribute iAttributes = new ItemAttribute("25", "Sonne", "Day");
-		String[] iTagIDs = new String[] {"123456789"};
+		String[] iTagIDs = new String[] {"123456789", "987654321"};
 		Category iCategory = null;
 		try {
 			iCategory = db.getCategory("Unizeugs");
@@ -65,16 +65,15 @@ public class DatabaseTest extends android.app.Activity {
 			e1.printStackTrace();
 		}
 		
-		Item superItem = new Item(-1, iName, iCategory, 0, isActivityIndependent, isIndependentItem, iAttributes, iTagIDs);
-		//Log.w("TEST", "SuperItem: " + superItem);
-		
+//		Item superItem = new Item(-1, iName, iCategory, 0, isActivityIndependent, isIndependentItem, iAttributes, iTagIDs);
+//		Log.w("TEST", "SuperItem: " + superItem);
 		
 		try {
+//			db.addItem(superItem);
+			
 //			Log.w("TEST", "Items: " + db.getItems());
-//			long id = db.getItemByName(iName).getId();
-			long id = db.getItemId("123456789");
-			Log.w("TEST", "item_id: " + id);
-			Log.w("TEST", "TagID: " + db.getItem(id));
+			Log.w("TEST", "Item: " + db.getItemId("123456789"));
+			Log.w("TEST", "Item: " + db.getItem(db.getItemId("987654321")));
 		} catch (DatabaseException e){
 			e.printStackTrace();
 		}

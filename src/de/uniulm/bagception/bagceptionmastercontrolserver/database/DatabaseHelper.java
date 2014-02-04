@@ -1,6 +1,5 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -228,18 +227,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Log.w("TEST", "getIds(): " + item.getIds());
 		
 		List<String> tag_ids = item.getIds();
-		String tag_id = null;
-		
-		
-//		if(item.getIds().isEmpty() == false){
-//			tag_id = item.getIds().get(0);
-//		}
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
-		//values.put(CATEGORY_ID, item.getCategory().getId());
 		values.put(CATEGORY_ID, cid);
-		//values.put(TAG_ID, tag_id);
+
 		
 		// Insert row to Item table
 		long item_id = db.insert(TABLE_ITEM, null, values);
@@ -247,16 +239,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		// Insert "TagID" in the correct table		
 		if(tag_ids != null){
-			tag_id = tag_ids.get(0);
-			addTagId(item_id, tag_id);
+			addTagIds(item_id, tag_ids);
 		}
-		
-//		if(tag_ids.size() < 2){
-//			for(int j = 0; j < tag_ids.size(); j++){
-//				tag_id = tag_ids.get(j);
-//				addTagId(item_id, tag_id);
-//			}
-//		}
 		
 		// If "independentItem" is selected, add item to IndependentItem table
 		boolean independentItem = item.getIndependentItem();
@@ -313,7 +297,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(CATEGORY_ID, item.getCategory().getId());
 		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
 		return 0;
-		//TODO 
 	}
 	
 	public void updateItem(Item item) throws DatabaseException {
@@ -330,6 +313,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
+	@SuppressWarnings("unused")
 	@Override
 	public Item getItem(long id) throws DatabaseException {
 		
@@ -342,8 +326,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor itemData = db.rawQuery(selectQuery, null);
 		itemData.moveToFirst();
 		
-		long item_id = itemData.getInt(0);
-		String item_name = itemData.getString(1);
 		int category_id = itemData.getInt(2);
 
 		
@@ -369,7 +351,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		boolean isIndependent = getIndependentItem(id);
 		boolean isContextItem = getContextItem(id);
 		ItemAttribute attributes = getItemAttribute(id);
-			
+		List<String> tids = getTagId(id);
+		String[] tagids = new String[tids.size()];
+		
+		if(tids.size() > 0){
+			for(int j = 0; j < tids.size(); j++){
+				
+				tagids[j] = tids.get(j);
+			}
+		}
 
 		Item item = null;
 		
@@ -383,7 +373,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 								isContextItem, 
 								isIndependent, 
 								attributes, 
-								new ArrayList<String>());
+								tagids);
 			
 			Log.w("TEST", "Neues Item: " + item);
 			
@@ -429,6 +419,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 			cat = new Category(catID, catName);
 		} 
+		
+		
 				
 		Item item = null;
 		
@@ -507,6 +499,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
+	public void addTagIds(long item_id, List<String> tag_ids) throws DatabaseException {
+		
+		for(int j = 0; j < tag_ids.size(); j++){
+			
+			String tag_id = tag_ids.get(j);
+			addTagId(item_id, tag_id);
+		}
+	}
+	
+	
 	public void deleteTagId(String tag_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -516,6 +518,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public Long getItemId(String tag_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -1038,7 +1041,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.insert(TABLE_ACTIVITYITEM, null, values);
 
 	}
-	//TODO
 	
 	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
 
@@ -1376,13 +1378,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			} while(c.moveToNext());
 		}
 		return locations;
-	}
-
-
-	@Override
-	public Item getItem(String tagId) throws DatabaseException {
-		// TODO implement!
-		return DatabaseConnector.getItem(tagId);
 	}
 
 

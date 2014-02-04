@@ -194,7 +194,7 @@ public interface DatabaseInterface {
 		 * @return the item for the given tagId, null of no Item is found with the given Id
 		 * @throws DatabaseException 
 		 */
-		public Item getItem(String tagId) throws DatabaseException;
+		public Long getItemId(String tagId) throws DatabaseException;
 
 		/**
 		 * inserts an image into the database, the img.hashCode() method is the key
