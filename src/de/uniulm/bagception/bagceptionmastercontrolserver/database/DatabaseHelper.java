@@ -335,17 +335,21 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 		
-		int category;
-		
 		String selectQuery = "SELECT * FROM " + TABLE_ITEM + " WHERE " + _ID + " = " + id;
 		
 		Log.e(LOG, selectQuery);
 		
 		Cursor itemData = db.rawQuery(selectQuery, null);
+		itemData.moveToFirst();
 		
-		category = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
-		String getCategoryQuery = "SELECT " + NAME + " FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category;
+		long item_id = itemData.getInt(0);
+		String item_name = itemData.getString(1);
+		int category_id = itemData.getInt(2);
+
 		
+		// Get category
+		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category_id;
+	
 		Cursor categoryName = db.rawQuery(getCategoryQuery, null);
 		
 		int catID;
@@ -357,40 +361,40 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 			catID = categoryName.getInt(0);
 			catName = categoryName.getString(1);
-			Log.w("TEST", "CatID " + catID + " Name " + catName);
 			
 			cat = new Category(catID, catName);
-			Log.w("TEST", "Cat: " + cat);
 		} 
 		
-		String name = null;
 		
-		if (itemData.getString(itemData.getColumnIndex(NAME)) != null){
-			name = itemData.getString(itemData.getColumnIndex(NAME));
-		}
+		boolean isIndependent = getIndependentItem(id);
+		boolean isContextItem = getContextItem(id);
+		ItemAttribute attributes = getItemAttribute(id);
+			
+
+		Item item = null;
 		
 		if (itemData != null) {
 			itemData.moveToFirst();
 			
-			Item item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), 
-								name, 
+			item = new Item(	id, 
+								itemData.getString(itemData.getColumnIndex(NAME)), 
 								cat, 
 								0, 
-								false, 
-								false, 
-								null, 
+								isContextItem, 
+								isIndependent, 
+								attributes, 
 								new ArrayList<String>());
 			
 			Log.w("TEST", "Neues Item: " + item);
 			
 			return item;
 		} else {
-			return null;
+			return item;
 		}
-		
 	}
 	
 	
+	@SuppressWarnings("unused")
 	@Override
 	public Item getItemByName(String name) throws DatabaseException {
 		
@@ -426,12 +430,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			cat = new Category(catID, catName);
 		} 
 				
-		
+		Item item = null;
 		
 		if (itemData != null) {
 			itemData.moveToFirst();
 			
-			Item item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), 
+			item = new Item(itemData.getInt(itemData.getColumnIndex(_ID)), 
 								name, 
 								cat, 
 								0, 
@@ -444,7 +448,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 			return item;
 		} else {
-			return null;
+			return item;
 		}
 		
 	}
@@ -511,6 +515,25 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 	}
 	
+	
+	public Long getItemId(String tag_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		long item_id = -1;
+		
+		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_TAGID + " WHERE " + TAG_ID + " = '" + tag_id + "'";
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		c.moveToFirst();
+		
+		if(c != null){
+			item_id = c.getLong(c.getColumnIndex(ITEM_ID));
+			return item_id;
+		} else{
+			return item_id;
+		}
+	}
 	
 	public List<String> getTagId(long itemId) throws DatabaseException {
 		
