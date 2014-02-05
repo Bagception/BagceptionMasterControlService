@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.ItemAttribute;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
 public interface DatabaseInterface {
@@ -44,6 +45,14 @@ public interface DatabaseInterface {
 		
 		
 		/**
+		 * Update item
+		 * @param item
+		 * @throws DatabaseException
+		 */
+		public void updateItem(Item item) throws DatabaseException;
+		
+		
+		/**
 		 * get a specific item
 		 * @param id
 		 * @return the requested Item, null if no item is present with this id
@@ -65,6 +74,149 @@ public interface DatabaseInterface {
 		 * @throws DatabaseException
 		 */
 		public List<Item> getItems() throws DatabaseException;
+		
+		
+		/**
+		 * Add one Tag_ID to the table
+		 * @param item_id
+		 * @param tag_id
+		 * @throws DatabaseException
+		 */
+		public void addTagId(long item_id, String tag_id) throws DatabaseException;
+		
+		
+		/**
+		 * Add Tag_IDs to the table
+		 * @param item_id
+		 * @param tag_ids
+		 * @throws DatabaseException
+		 */
+		public void addTagIds(long item_id, List<String> tag_ids) throws DatabaseException;
+		
+		
+		/**
+		 * Delete a Tag_ID
+		 * @param tag_id
+		 * @throws DatabaseException
+		 */
+		public void deleteTagId(String tag_id) throws DatabaseException;
+		
+		
+		/**
+		 * Get a list with all TagIDs from a specific item
+		 * @param itemId
+		 * @return List<String> tagId
+		 * @throws DatabaseException
+		 */
+		public List<String> getTagId(long itemId) throws DatabaseException;
+		
+		
+		/**
+		 * Add independent item
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void addIndependentItem(long item_id) throws DatabaseException;
+		
+		
+		/**
+		 * Delete independent item
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void deleteIndependentItem(long item_id) throws DatabaseException;
+		
+		
+		/**
+		 * Check if item is independent 
+		 * @param id
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public boolean getIndependentItem(long id) throws DatabaseException;
+		
+		
+		/**
+		 * List with all independent items
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public List<Long> getIndependentItems() throws DatabaseException;
+		
+		
+		/**
+		 * Add context related item
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void addContextItem(long item_id) throws DatabaseException;
+		
+		
+		/**
+		 * Delete a ContextItem
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void deleteContextItem(long item_id) throws DatabaseException;
+		
+		
+		/**
+		 * Proof if a item is context dependent
+		 * @param id
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public boolean getContextItem(long id) throws DatabaseException;
+		
+		
+		/**
+		 * List with all ContextItems
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public List<Long> getContextItems() throws DatabaseException;
+		
+		
+		/**
+		 * Add attributes 
+		 * @param item_id
+		 * @param item
+		 * @throws DatabaseException
+		 */
+		public void addItemAttribute(long item_id, Item item) throws DatabaseException;
+		
+		
+		/**
+		 * Delete attributes
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void deleteItemAttributes(long item_id) throws DatabaseException;
+		
+		
+		/**
+		 * Get the attributes from a specific item
+		 * @param id
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public ItemAttribute getItemAttribute(long id) throws DatabaseException;
+		
+		
+		/**
+		 * Get a list of all attributes
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public List<ItemAttribute> getItemAttributes() throws DatabaseException;
+		
+		
+		/**
+		 * Update attributes
+		 * @param attributes
+		 * @throws DatabaseException
+		 */
+		public void updateItemAttributes(ItemAttribute attributes) throws DatabaseException;
 		
 		
 		/*
@@ -96,6 +248,22 @@ public interface DatabaseInterface {
 		 */
 		public void editActivity(Activity toEdit, Activity after) throws DatabaseException;
 		
+		
+		/**
+		 * Update activity
+		 * @param activity
+		 * @throws DatabaseException
+		 */
+		public void updateActivtiy(Activity activity) throws DatabaseException;	
+		
+		
+		/**
+		 * Get a specific Activity
+		 * @param name
+		 * @return Activity
+		 * @throws DatabaseException
+		 */
+		public Activity getActivity(String name) throws DatabaseException;
 	
 		
 		/**
@@ -105,6 +273,46 @@ public interface DatabaseInterface {
 		 */
 		public List<Activity> getActivities() throws DatabaseException;
 		
+		
+		/**
+		 * Add an item to an activity
+		 * @param activity_id
+		 * @param item
+		 */
+		public void addActivityItem(long activity_id, Item item);
+		
+		
+		/**
+		 * Add a list of items to an activity
+		 * @param activity_id
+		 * @param itemsForActivity
+		 */
+		public void addActivityItem(long activity_id, List<Item> itemsForActivity);
+		
+		
+		/**
+		 * Delete an item from an activity
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void deleteActivityItem(long item_id) throws DatabaseException;
+		
+		
+		/**
+		 * Delete a category from an activity
+		 * @param category_id
+		 * @throws DatabaseException
+		 */
+		public void deleteActivityCategory(long category_id) throws DatabaseException;
+		
+		
+		/**
+		 * Get a list with all items from an activity
+		 * @param activity_id
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public List<Long> getActivityItems(long activity_id) throws DatabaseException;
 		
 		
 		/*
@@ -135,7 +343,32 @@ public interface DatabaseInterface {
 		 */
 		public void editCategory(Category toEdit, Category after) throws DatabaseException;
 		
+		
+		/**
+		 * Update an Category
+		 * @param category
+		 * @throws DatabaseException
+		 */
+		public void updateCategory(Category category) throws DatabaseException;
+		
 	
+		/**
+		 * Get category 
+		 * @param name
+		 * @return Category
+		 * @throws DatabaseException
+		 */
+		public Category getCategory(String name) throws DatabaseException;
+		
+		
+		/**
+		 * Get category
+		 * @param id
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public Category getCategory(long id) throws DatabaseException;
+		
 		
 		/**
 		 * 
@@ -176,7 +409,31 @@ public interface DatabaseInterface {
 		 */
 		public void editLocation(Location toEdit, Location after) throws DatabaseException;
 		
+		
+		/**
+		 * Update location
+		 * @param location
+		 * @throws DatabaseException
+		 */
+		public void updateLocation(Location location) throws DatabaseException;		
 	
+		
+		/**
+		 * Get location
+		 * @param name
+		 * @return location
+		 * @throws DatabaseException
+		 */
+		public Location getLocation(String name) throws DatabaseException;
+		
+		
+		/**
+		 * Get location
+		 * @param loc_id
+		 * @return location
+		 * @throws DatabaseException
+		 */
+		public Location getLocation(long loc_id) throws DatabaseException;
 		
 		/**
 		 * 
@@ -203,7 +460,7 @@ public interface DatabaseInterface {
 		 * @param bmp the image to save
 		 * @throws DatabaseException
 		 */
-		public void putImage(Bitmap bmp) throws DatabaseException;
+		public void putImage(long item_id, Bitmap bmp) throws DatabaseException;
 		
 		/**
 		 * returns an Image for a given hashcode
@@ -211,6 +468,32 @@ public interface DatabaseInterface {
 		 * @return the image for the hashcode
 		 * @throws DatabaseException
 		 */
+		public Bitmap getImage(long item_id, int hashCode) throws DatabaseException;
+		
+		
+		/**
+		 * Get image without an item_id
+		 * @param hashCode
+		 * @return
+		 * @throws DatabaseException
+		 */
 		public Bitmap getImage(int hashCode) throws DatabaseException;
+		
+		
+		/**
+		 * Update photo
+		 * @param item
+		 * @return
+		 * @throws DatabaseException
+		 */
+		public int updatePhoto(Item item) throws DatabaseException;
+		
+		
+		/**
+		 * Delete photo
+		 * @param item_id
+		 * @throws DatabaseException
+		 */
+		public void deletePhoto(long item_id) throws DatabaseException;
 }
 

@@ -1,5 +1,6 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,7 +12,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -160,8 +160,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			+ _DATA + " BLOB,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
 	
-    private final Context context;
-	
+    
+    @SuppressWarnings("unused")
+	private final Context context;
+    
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
@@ -245,12 +247,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// If "independentItem" is selected, add item to IndependentItem table
 		boolean independentItem = item.getIndependentItem();
 		if (independentItem == true) {
+			Log.w("TEST", "Ich füge jetzt ein IndependentItem hinzu: " + independentItem);
 			addIndependentItem(item_id);
 		}
 		
 		// If "contextItem" is selected, add item to ContextItem table
 		boolean contextItem = item.getContextItem();
 		if (contextItem == true) {
+			Log.w("TEST", "Ich füge jetzt ein ContextItem hinzu: " + contextItem);
 			addContextItem(item_id);
 		}
 		
@@ -264,9 +268,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		// If Photo exists, add photo to Photo table
 //		int image = item.getImageHash();
-//		if (image != 0) {
-//			addPhotoToItem(image, item_id);
-//		}
+		Bitmap bmp = item.getImage();
+		
+		if(bmp != null){
+			putImage(item_id, bmp);
+		}
 		
 	}
 
@@ -280,7 +286,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_TAGID, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
-//		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
+		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
@@ -302,13 +308,66 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public void updateItem(Item item) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
+		
 		long id = item.getId();
+		List<String> tag_ids = item.getIds();
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
 		values.put(CATEGORY_ID, item.getCategory().getId());
 		
-		Log.w("TEST", "UPDATE CONTENTRESOLVER: " + values);
+		
+		// Insert "TagID" in the correct table		
+		if(tag_ids != null){
+			addTagIds(id, tag_ids);
+		}
+				
+		// If "independentItem" is selected, add item to IndependentItem table
+		boolean independentItem = item.getIndependentItem();
+		if (independentItem == true) {
+			addIndependentItem(id);
+		} else {
+			List<Long> ids = getIndependentItems();
+			
+			for(int j = 0; j < ids.size(); j++){
+				if(ids.get(j) == id){
+					deleteIndependentItem(id);
+				}
+			}
+		}
+				
+		// If "contextItem" is selected, add item to ContextItem table
+		boolean contextItem = item.getContextItem();
+		if (contextItem == true) {
+			addContextItem(id);
+		} else {
+			List<Long> ids = getContextItems();
+			
+			for(int j = 0; j < ids.size(); j++){
+				if(ids.get(j) == id){
+					deleteContextItem(id);
+				}
+			}
+		}
+				
+		// If attributes != null
+		ItemAttribute iA = item.getAttribute();
+		Log.w("TEST", "Attr.: " + iA);
+		if(iA != null) {
+			Log.w("TEST", "Attribute einfügen!");
+			addItemAttribute(id, item);
+		}
+				
+		// If Photo exists, add photo to Photo table
+//		int image = item.getImageHash();
+		Bitmap bmp = item.getImage();
+			
+		if(bmp != null){
+			putImage(id, bmp);
+		}
+				
+		
+//		Log.w("TEST", "UPDATE CONTENTRESOLVER: " + values);
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
 	}
 	
@@ -375,7 +434,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 								attributes, 
 								tagids);
 			
-			Log.w("TEST", "Neues Item: " + item);
+//			Log.w("TEST", "Neues Item: " + item);
 			
 			return item;
 		} else {
@@ -590,11 +649,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getReadableDatabase();
 		boolean item = false;
 		
-		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_INDEPENDENTITEM + " WHERE " + ITEM_ID + " = " + id;
+		String selectQuery = "SELECT * FROM " + TABLE_INDEPENDENTITEM + " WHERE " + ITEM_ID + " = " + id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
 		
-		if(c == null){
+		if(!(c.moveToFirst()) || c.getCount() == 0){
+			item = false;
 			return item;
 		} else {
 			item = true;
@@ -613,7 +673,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		Cursor c = db.rawQuery(selectQuery, null);
 		
-		if(c == null) {
+		if(!(c.moveToFirst()) || c.getCount() == 0) {
 			return items;
 		} else {
 			if(c.moveToFirst()) {
@@ -659,8 +719,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_CONTEXTITEM + " WHERE " + ITEM_ID + " = " + id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
+		Log.w("TEST", "Cursor ContextItem: " + c.getCount());
 		
-		if(c == null){
+		if(!(c.moveToFirst()) || c.getCount() == 0){
+			item = false;
 			return item;
 		} else {
 			item = true;
@@ -678,7 +740,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		Cursor c = db.rawQuery(selectQuery, null);
 		
-		if(c == null) {
+		if(!(c.moveToFirst()) || c.getCount() == 0) {
 			return items;
 		} else {
 			if(c.moveToFirst()) {
@@ -858,7 +920,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	 * Add Picture
 	 */
 	public void addPhotoToItem(int image, long item_id) throws DatabaseException {
-		
+		//TODO
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
@@ -902,13 +964,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		long loc_id = -1;
 		
-		Log.w("TEST", "FUCK ID: " + activity.getLocation());
 		if(activity.getLocation() != null){
 			loc_id = activity.getLocation().getId();
 		}
 		
-		Log.w("TEST", "FUCK NAME: " + activity.getName());
-		Log.w("TEST", "FUCK ID: " + loc_id);
 		ContentValues values = new ContentValues();
 		values.put(NAME, activity.getName());
 		values.put(LOCATION_ID, loc_id);
@@ -957,7 +1016,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(NAME, activity.getName());
 		values.put(LOCATION_ID, activity.getLocation().getId());
 		
-		Log.w("TEST", "LOCID: " + activity.getLocation().getId());
+//		Log.w("TEST", "LOCID: " + activity.getLocation().getId());
 		
 		long aID = activity.getId();
 		Log.w("TEST", "" + aID);
@@ -1044,8 +1103,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
 
-//		SQLiteDatabase db = this.getWritableDatabase();
-		
 		for(int i = 0; i < itemsForActivity.size(); i++) {
 			
 			Item item = itemsForActivity.get(i);
@@ -1382,16 +1439,50 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 
 	@Override
-	public void putImage(Bitmap bmp) throws DatabaseException {
-		// TODO Auto-generated method stub
+	public void putImage(long item_id, Bitmap bmp) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
 		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bmp.compress(Bitmap.CompressFormat.PNG, 100, bos);
+		
+		byte[] bArray = bos.toByteArray();
+		
+		ContentValues values = new ContentValues();
+		values.put(ITEM_ID, item_id);
+		values.put(_DATA, bArray);
+		
+		db.insert(TABLE_PHOTO, null, values);
+	}
+
+
+	@Override
+	public Bitmap getImage(long item_id, int hashCode) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		String selectQuery = "SELECT " + _DATA + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		byte[] bimg = new byte[1];
+		Bitmap bmp;
+		
+		if(c != null){
+			c.moveToFirst();
+			bimg = c.getBlob(0);
+		}
+		
+		bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
+	
+		return bmp;
+		//return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
 	}
 
 
 	@Override
 	public Bitmap getImage(int hashCode) throws DatabaseException {
-		// TODO implement, this is just dummy code
-		return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
