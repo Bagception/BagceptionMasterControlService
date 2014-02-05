@@ -3,6 +3,8 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -62,6 +64,26 @@ public class DatabaseTest extends android.app.Activity {
 //		Log.w("TEST", "SuperItem: " + superItem);
 		
 		
+		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+		
+		long tagid;
+		try {
+			tagid = db.getItemId("123456789");
+			Log.w("TEST", "TagID: " + tagid);
+			
+			long id = db.getItem(tagid).getId();
+			Log.w("TEST", "ItemID: " + id);
+			
+			db.putImage(id, bmp);
+			
+			Bitmap b = db.getImage(id);
+			Log.w("TEST", "Bitmap: ");
+			
+			
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		
 
