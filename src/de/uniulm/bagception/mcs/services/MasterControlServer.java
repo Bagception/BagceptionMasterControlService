@@ -41,8 +41,10 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
+import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
+import de.uniulm.bagception.services.attributes.OurLocation;
 
 
 
@@ -399,4 +401,5 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	public static void DEBUG(){
 		debuginstance.setStatusChanged();
 	}
+
 }
