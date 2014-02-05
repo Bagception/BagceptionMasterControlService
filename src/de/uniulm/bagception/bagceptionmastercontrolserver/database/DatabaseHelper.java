@@ -1457,13 +1457,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 
 	@Override
-	public Bitmap getImage(long item_id, int hashCode) throws DatabaseException {
+	public Bitmap getImage(long item_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getReadableDatabase();
-		
+
+		Log.w("TEST", "Erstelle Cursor");
 		String selectQuery = "SELECT " + _DATA + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
+		Log.w("TEST", "Photo-Cursor: " + c);
+		
 		byte[] bimg = new byte[1];
 		Bitmap bmp;
 		

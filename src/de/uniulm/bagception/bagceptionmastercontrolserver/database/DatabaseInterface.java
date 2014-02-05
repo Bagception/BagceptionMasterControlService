@@ -468,7 +468,7 @@ public interface DatabaseInterface {
 		 * @return the image for the hashcode
 		 * @throws DatabaseException
 		 */
-		public Bitmap getImage(long item_id, int hashCode) throws DatabaseException;
+		public Bitmap getImage(long item_id) throws DatabaseException;
 		
 		
 		/**
