@@ -2,6 +2,10 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.service.location;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.services.attributes.OurLocation;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -10,7 +14,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
@@ -23,15 +26,18 @@ import android.util.Log;
 public class LocationService extends Service{
 	
 	private ResultReceiver resultReceiver;
+	private DatabaseHelper dbHelper;
 	
 	private LocationManager locationManager;
 	private LocationListener locationListener;
 	private BluetoothAdapter bluetoothAdapter;
 	private BroadcastReceiver mReceiver;
 	private boolean isBTRegistered = false;
+	private boolean firstTime = false;
+	private List<Location> knownLocations = null; 
 	
 	
-	private ArrayList<Location> storedLocations;
+	private ArrayList<android.location.Location> storedLocations;
 	private float LOCATION_ACCURACY_THRESHOLD = 100f; // accuracy in meters
 
 	@Override
@@ -42,13 +48,15 @@ public class LocationService extends Service{
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		storedLocations = new ArrayList<Location>();
+		dbHelper = new DatabaseHelper(getBaseContext());
+		
+		storedLocations = new ArrayList<android.location.Location>();
 		bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 		
 		
 		locationListener = new LocationListener() {
-			public void onLocationChanged(Location location) {
+			public void onLocationChanged(android.location.Location location) {
 				log("new location arrived");
 				sendBestPositionFromLocations(location);
 			}
@@ -128,60 +136,77 @@ public class LocationService extends Service{
 	 */
 	public void searchForWifiAccessPoints(){
 		log("searchForWifiAPs");
-		WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		
-		IntentFilter i = new IntentFilter();
-	    i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+		try {
+			// get all known locations from db
+			knownLocations = dbHelper.getLocations();
+			
+			WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+			IntentFilter i = new IntentFilter();
+		    i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 
-	    registerReceiver(new BroadcastReceiver(){
-	            @Override
-	            public void onReceive(Context context, Intent intent) {
-	                WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-	                mWifiManager.getScanResults();
-	                List<ScanResult> scanResults = mWifiManager.getScanResults();
-	                for(ScanResult sr : scanResults){
-	                	// TODO: 
-	                	// 1. check if mac(bssid) is in db
-	                	// 2. get location (lat,lng)
-	                	// 3. call sendBestPositionFromLocations()
-	                	log("Name: " + sr.SSID + " MAC: " + sr.BSSID);
-	                	Location loc = new Location("WIFI");
-	                	loc.setLatitude(99);
-	                	loc.setLongitude(99);
-	                	loc.setAccuracy(1);
-	                	sendBestPositionFromLocations(loc);
-	                }
-	            }
-	        }
-	    ,i);
-	    mainWifi.startScan();
+		    registerReceiver(new BroadcastReceiver(){
+		            @Override
+		            public void onReceive(Context context, Intent intent) {
+		                WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		                mWifiManager.getScanResults();
+		                List<ScanResult> scanResults = mWifiManager.getScanResults();
+		                for(ScanResult sr : scanResults){
+		                	Location loc = isMACKnown(sr.BSSID, knownLocations);
+		                	if(loc != null){
+		                		android.location.Location location = new android.location.Location("WIFI");
+		                		location.setAccuracy(1);
+		                		location.setLatitude(loc.getLat());
+		                		location.setLongitude(loc.getLng());
+		                		sendBestPositionFromLocations(location);
+		                	}
+		                }
+		            }
+		        }
+		    ,i);
+		    mainWifi.startScan();
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 	
-	public void searchForBluetoothDevices(){
+	public void searchForBluetoothDevices() {
 		log("searchForBTDevices");
-		// Create a BroadcastReceiver for ACTION_FOUND
-		mReceiver = new BroadcastReceiver() {
-		    public void onReceive(Context context, Intent intent) {
-		        String action = intent.getAction();
-		        // When discovery finds a device
-		        if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-		            // Get the BluetoothDevice object from the Intent
-		            BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                	// TODO: 
-                	// 1. check if mac(device.getAddress()) is in db
-                	// 2. get location (lat,lng)
-		           Location loc = new Location("BLUETOOTH");
-		           loc.setAccuracy(1);
-		           loc.setLatitude(99);
-		           loc.setLongitude(99);
-		           sendBestPositionFromLocations(loc);
-		        }
-		    }
-		};
-		// Register the BroadcastReceiver
-		IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-		registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
-		isBTRegistered = true;
+		// get all known locations from db
+		try {
+			knownLocations = dbHelper.getLocations();
+			// Create a BroadcastReceiver for ACTION_FOUND
+			mReceiver = new BroadcastReceiver() {
+				
+				public void onReceive(Context context, Intent intent) {
+					String action = intent.getAction();
+					// When discovery finds a device
+					if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+						// Get the BluetoothDevice object from the Intent
+						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+						
+						Location loc = isMACKnown(device.getAddress(), knownLocations);
+						if(loc != null){
+	                		android.location.Location location = new android.location.Location("BLUETOOTH");
+	                		location.setAccuracy(1);
+	                		location.setLatitude(loc.getLat());
+	                		location.setLongitude(loc.getLng());
+	                		sendBestPositionFromLocations(location);
+	                	}
+					}
+				}
+			};
+			// Register the BroadcastReceiver
+			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+			registerReceiver(mReceiver, filter); // Don't forget to unregister
+													// during onDestroy
+			isBTRegistered = true;
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
 
@@ -191,10 +216,10 @@ public class LocationService extends Service{
 	 * <br>Service will wait for a new location from LocationManager if accuracy > LOCATION_ACCURACY_THRESHOLD.
 	 * @param location current location
 	 */
-	private void sendBestPositionFromLocations(Location location) {
+	private void sendBestPositionFromLocations(android.location.Location location) {
 		storedLocations.add(location);
-		Location bestLocation = storedLocations.get(0);
-		for(Location l : storedLocations){
+		android.location.Location bestLocation = storedLocations.get(0);
+		for(android.location.Location l : storedLocations){
 			// search for the location with the best accuracy
 			if(l.getAccuracy() >= bestLocation.getAccuracy()){
 				bestLocation = l;
@@ -212,15 +237,17 @@ public class LocationService extends Service{
 			log("prv: " + provider + " acc: " + accuracy + " lat: " + latitude + " lng: " + longitude);
 			
 			// sending answer
-			Bundle b = new Bundle();
-			b.putString(OurLocation.RESPONSE_TYPE, OurLocation.LOCATION);
-			b.putFloat(OurLocation.ACCURACY, accuracy);
-			b.putDouble(OurLocation.LONGITUDE, longitude);
-			b.putDouble(OurLocation.LATITUDE, latitude);
-			b.putString(OurLocation.PROVIDER, provider);
-			
-			resultReceiver.send(0, b);
-			log("sending answer...");
+			if(!firstTime){
+				Bundle b = new Bundle();
+				b.putString(OurLocation.RESPONSE_TYPE, OurLocation.LOCATION);
+				b.putFloat(OurLocation.ACCURACY, accuracy);
+				b.putDouble(OurLocation.LONGITUDE, longitude);
+				b.putDouble(OurLocation.LATITUDE, latitude);
+				b.putString(OurLocation.PROVIDER, provider);
+				resultReceiver.send(0, b);
+				log("sending answer...");
+				firstTime = true;
+			}
 		}
 	}
 	
@@ -235,5 +262,14 @@ public class LocationService extends Service{
 	
 	private void log(String s){
 		Log.d("LocationService", s);
+	}
+	
+	private Location isMACKnown(String mac, List<Location> knownLocations){
+		for(Location l : knownLocations){
+			if(l.getMac().equals(mac)){
+				return l;
+			}
+		}
+		return null;
 	}
 }

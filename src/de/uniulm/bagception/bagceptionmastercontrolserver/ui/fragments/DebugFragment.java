@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
@@ -27,6 +28,10 @@ import de.uniulm.bagception.services.attributes.OurLocation;
 public class DebugFragment extends Fragment implements Receiver{
 	
 	private MyResultReceiver mResultreceiver;
+	private TextView providerTV;
+	private TextView accuracyTV;
+	private TextView longitudeTV;
+	private TextView latitudeTV;
 
 
 	@Override
@@ -46,6 +51,10 @@ public class DebugFragment extends Fragment implements Receiver{
 		
 		mResultreceiver = new MyResultReceiver(new Handler());
 		mResultreceiver.setReceiver(this);
+		providerTV = (TextView) v.findViewById(R.id.providerTV);
+		accuracyTV = (TextView) v.findViewById(R.id.accuracyTV);
+		longitudeTV = (TextView) v.findViewById(R.id.longitudeTV);
+		latitudeTV = (TextView) v.findViewById(R.id.latitudeTV);
 
 		
 
@@ -69,7 +78,10 @@ public class DebugFragment extends Fragment implements Receiver{
 		log("answer received!");
 		if(resultData.containsKey(OurLocation.RESPONSE_TYPE)){
 			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.LOCATION)){
-				log("it works..." + resultData.getString(OurLocation.REQUEST_TYPE));
+				providerTV.setText(resultData.getString(OurLocation.PROVIDER, ""));
+				accuracyTV.setText(""+resultData.getFloat(OurLocation.ACCURACY, 0));
+				latitudeTV.setText(""+resultData.getDouble(OurLocation.LATITUDE, 0));
+				longitudeTV.setText(""+resultData.getDouble(OurLocation.LONGITUDE, 0));
 			}
 		}
 	}
