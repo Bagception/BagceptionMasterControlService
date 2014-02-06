@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -41,10 +42,8 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
-import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
-import de.uniulm.bagception.services.attributes.OurLocation;
 
 
 
@@ -72,6 +71,8 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
 	
+	private int batteryStatus=0;
+	
 	@Override
 		public void onCreate() {
 			debuginstance = this;
@@ -98,6 +99,8 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED);
 		registerReceiver(RFIDReceiver, f);
 		
+	    registerReceiver(this.mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+
 		
 		itemIndexSystem = new ItemIndexSystem();
 		activitySystem = new ActivitySystem();
@@ -115,6 +118,7 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		btHelper.unregister(this);
 		caseActor.unregister(this);
 		unregisterReceiver(RFIDReceiver);
+		unregisterReceiver(mBatteryInfoReceiver);
 		
 		//stop services
 		Intent i = new Intent();
@@ -383,7 +387,11 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 
 	
 	private void setStatusChanged(){
-		ContainerStateUpdate statusUpdate =  new ContainerStateUpdate(activitySystem.getCurrentActivity(),itemIndexSystem.getCurrentItems());
+		
+
+		
+		
+		ContainerStateUpdate statusUpdate =  new ContainerStateUpdate(activitySystem.getCurrentActivity(),itemIndexSystem.getCurrentItems(),batteryStatus);
 		for (int i = 0 ; i< statusUpdate.getItemList().size();i++){
 			Item it = statusUpdate.getItemList().get(i);
 			it.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));			
@@ -402,4 +410,18 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		debuginstance.setStatusChanged();
 	}
 
+	//battery
+	private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver(){
+	    @Override
+	    public void onReceive(Context ctxt, Intent intent) {
+	    	
+	    	int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+			float batteryPct = level / (float)scale;
+			batteryStatus = (int) batteryPct; 
+	      
+	    }
+	  };
+
+	
 }
