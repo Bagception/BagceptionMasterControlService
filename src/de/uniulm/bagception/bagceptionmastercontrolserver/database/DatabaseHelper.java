@@ -423,7 +423,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		Item item = null;
 		
-		if (itemData != null) {
+		if (itemData.getCount() > 0) {
 			itemData.moveToFirst();
 			
 			item = new Item(	id, 
@@ -457,9 +457,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor itemData = db.rawQuery(selectQuery, null);
 		itemData.moveToFirst();
 		
-		long item_id = itemData.getInt(0);
-		String item_name = itemData.getString(1);
-		int category_id = itemData.getInt(2);
+		long item_id = itemData.getLong(itemData.getColumnIndex(_ID));
+		String item_name = itemData.getString(itemData.getColumnIndex(NAME));
+		int category_id = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
 
 		
 		// Get category
@@ -518,7 +518,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			Cursor c = db.rawQuery(selectQuery, null);
 			
 			// looping through all rows and adding them to list
-			if(c.moveToFirst()) {
+			if(c.moveToFirst() && c.getCount() > 0) {
 				do {
 						String name = c.getString(c.getColumnIndex(NAME));
 						int item_id = c.getInt(c.getColumnIndex(_ID));
@@ -588,9 +588,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_TAGID + " WHERE " + TAG_ID + " = '" + tag_id + "'";
 		
 		Cursor c = db.rawQuery(selectQuery, null);
-		c.moveToFirst();
 		
-		if(c != null){
+		if(c.getCount() > 0){
+			c.moveToFirst();
 			item_id = c.getLong(c.getColumnIndex(ITEM_ID));
 			return item_id;
 		} else{
@@ -1162,7 +1162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor c = db.rawQuery(selectQuery, null);
 		
 		// looping through all rows and adding them to list
-		if(c.moveToFirst() && c != null) {
+		if(c.moveToFirst() && c.getCount() > 0) {
 			do {
 					long id = c.getLong(c.getColumnIndex(_ID));
 					String name = c.getString(c.getColumnIndex(NAME));
