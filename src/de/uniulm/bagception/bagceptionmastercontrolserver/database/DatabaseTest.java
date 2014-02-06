@@ -89,7 +89,6 @@ public class DatabaseTest extends android.app.Activity {
 			
 			
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
