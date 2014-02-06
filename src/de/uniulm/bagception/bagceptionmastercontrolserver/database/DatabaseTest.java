@@ -66,6 +66,13 @@ public class DatabaseTest extends android.app.Activity {
 		
 		Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
 		
+		try{
+			db.addItem(superItem);
+			Log.w("TEST", "Item erfolgreich hinzugefügt");
+		} catch(DatabaseException e){
+			e.printStackTrace();
+		}
+		
 		long tagid;
 		try {
 			tagid = db.getItemId("123456789");
@@ -74,10 +81,11 @@ public class DatabaseTest extends android.app.Activity {
 			long id = db.getItem(tagid).getId();
 			Log.w("TEST", "ItemID: " + id);
 			
-			db.putImage(id, bmp);
+			db.addImage(id, bmp);
+			Log.w("TEST", "Bild erfolgreich hinzugefügt");
 			
 			Bitmap b = db.getImage(id);
-			Log.w("TEST", "Bitmap: ");
+			Log.w("TEST", "Bitmap: " + b);
 			
 			
 		} catch (DatabaseException e) {
