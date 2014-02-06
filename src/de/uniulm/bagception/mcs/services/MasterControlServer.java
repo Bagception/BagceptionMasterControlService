@@ -334,9 +334,13 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
 				Log.d("bag", id);
 				LOGGER.C(this, "Tag scanned: "+id);
-				Item i;
+				Item i = null;
 				try {
-					i = dbHelper.getItemByName(id);
+//					i = dbHelper.getItemByName(id);
+					long item_id = dbHelper.getItemId(id);
+					if(item_id != -1){
+						i = dbHelper.getItem(item_id);
+					}
 					if (i!=null){
 						//tag exists in database
 						LOGGER.C(this, "TAG found: "+i.getName());
