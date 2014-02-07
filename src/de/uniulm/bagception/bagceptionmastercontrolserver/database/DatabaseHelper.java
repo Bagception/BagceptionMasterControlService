@@ -3,7 +3,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -74,7 +73,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String MAC = "mac";
 	
 	// Column TABLE_PHOTO
-	private static final String _DATA = "_data";
+	private static final String IMAGE = "_data";
+	private static final String IMAGE_HASH = "imgHash";
 	
 	
 	// Table create statements
@@ -154,11 +154,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
     
     
     private static final String CREATE_TABLE_PHOTO =
-    		"CREATE TABLE IF NOT EXISTS " + TABLE_TAGID
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_PHOTO
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ITEM_ID + " INTEGER NOT NULL UNIQUE, " 
-			+ _DATA + " BLOB,"
-			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT);";
+			+ ITEM_ID + " INTEGER NOT NULL, " 
+			+ IMAGE_HASH + " INTEGER, "
+			+ IMAGE + " BLOB,"
+			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE);";
 	
     
     @SuppressWarnings("unused")
@@ -271,7 +272,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Bitmap bmp = item.getImage();
 		
 		if(bmp != null){
-			putImage(item_id, bmp);
+			addImage(item_id, bmp);
 		}
 		
 	}
@@ -363,7 +364,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Bitmap bmp = item.getImage();
 			
 		if(bmp != null){
-			putImage(id, bmp);
+			addImage(id, bmp);
 		}
 				
 		
@@ -422,7 +423,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		Item item = null;
 		
-		if (itemData != null) {
+		if (itemData.getCount() > 0) {
 			itemData.moveToFirst();
 			
 			item = new Item(	id, 
@@ -456,9 +457,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor itemData = db.rawQuery(selectQuery, null);
 		itemData.moveToFirst();
 		
-		long item_id = itemData.getInt(0);
-		String item_name = itemData.getString(1);
-		int category_id = itemData.getInt(2);
+		long item_id = itemData.getLong(itemData.getColumnIndex(_ID));
+		String item_name = itemData.getString(itemData.getColumnIndex(NAME));
+		int category_id = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
 
 		
 		// Get category
@@ -517,7 +518,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			Cursor c = db.rawQuery(selectQuery, null);
 			
 			// looping through all rows and adding them to list
-			if(c.moveToFirst()) {
+			if(c.moveToFirst() && c.getCount() > 0) {
 				do {
 						String name = c.getString(c.getColumnIndex(NAME));
 						int item_id = c.getInt(c.getColumnIndex(_ID));
@@ -587,9 +588,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String selectQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_TAGID + " WHERE " + TAG_ID + " = '" + tag_id + "'";
 		
 		Cursor c = db.rawQuery(selectQuery, null);
-		c.moveToFirst();
 		
-		if(c != null){
+		if(c.getCount() > 0){
+			c.moveToFirst();
 			item_id = c.getLong(c.getColumnIndex(ITEM_ID));
 			return item_id;
 		} else{
@@ -920,12 +921,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	 * Add Picture
 	 */
 	public void addPhotoToItem(int image, long item_id) throws DatabaseException {
-		//TODO
+
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
-		values.put(_DATA, image);
+		values.put(IMAGE, image); 
 		
 		db.insert(TABLE_PHOTO, null, values);
 		
@@ -947,13 +948,109 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
-		values.put(_DATA, item.getImageHash());
+		values.put(IMAGE, item.getImageHash());
 		
 		return db.update(TABLE_PHOTO, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
 	}
 	
 	
+	@Override
+	public int getImageHash(long item_id) throws DatabaseException {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		int imgHash = 0;
+		
+		String selectQuery = "SELECT " + IMAGE_HASH + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(!(c.moveToFirst()) || c.getCount() == 0){
+			return imgHash;
+		} else {
+			c.moveToFirst();
+			
+			imgHash = c.getInt(c.getColumnIndex(IMAGE_HASH));
+			
+			return imgHash;
+		}
+		
+		
+	}
 	
+	
+	@Override
+	public void addImage(long item_id, Bitmap bmp) throws DatabaseException {
+
+		SQLiteDatabase db = this.getWritableDatabase();
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bmp.compress(Bitmap.CompressFormat.PNG, 100, bos);
+		
+		byte[] bArray = bos.toByteArray();
+		Log.w("TEST", "Item_ID: " + item_id);
+		Log.w("TEST", "Image: " + bArray);
+		
+		ContentValues values = new ContentValues();
+		values.put(ITEM_ID, item_id);
+		values.put(IMAGE, bArray);
+		
+		long id = db.insert(TABLE_PHOTO, null, values);
+		Log.w("TEST", "ID: " + id);
+	}
+
+
+	@Override
+	public Bitmap getImage(long item_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+
+		Log.w("TEST", "Erstelle Cursor");
+		String selectQuery = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		Log.w("TEST", "Photo-Cursor: " + c);
+		
+		byte[] bimg = new byte[1];
+		Bitmap bmp;
+		
+		if(c != null){
+			c.moveToFirst();
+			bimg = c.getBlob(c.getColumnIndex(IMAGE));
+		}
+		
+		bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
+	
+		return bmp;
+	}
+
+	
+	@Override
+	public Bitmap getImage(int hashCode) throws DatabaseException {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		
+		Bitmap bmp = null;
+		
+		String selectQuery = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + IMAGE_HASH + " = " + hashCode;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(!(c.moveToFirst()) || c.getCount() == 0){
+			return bmp;
+		} else {
+			c.moveToFirst();
+			
+			byte[] bimg = new byte[1];
+			bimg = c.getBlob(c.getColumnIndex(IMAGE));
+			
+			bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
+			
+			return bmp;
+		}
+	}
+	
+
 	// -------------------------------- "Activity" table methods -------------------------------- //
 
 	
@@ -1065,7 +1162,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor c = db.rawQuery(selectQuery, null);
 		
 		// looping through all rows and adding them to list
-		if(c.moveToFirst() && c != null) {
+		if(c.moveToFirst() && c.getCount() > 0) {
 			do {
 					long id = c.getLong(c.getColumnIndex(_ID));
 					String name = c.getString(c.getColumnIndex(NAME));
@@ -1437,57 +1534,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		return locations;
 	}
 
-
-	@Override
-	public void putImage(long item_id, Bitmap bmp) throws DatabaseException {
-
-		SQLiteDatabase db = this.getWritableDatabase();
-		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bmp.compress(Bitmap.CompressFormat.PNG, 100, bos);
-		
-		byte[] bArray = bos.toByteArray();
-		
-		ContentValues values = new ContentValues();
-		values.put(ITEM_ID, item_id);
-		values.put(_DATA, bArray);
-		
-		db.insert(TABLE_PHOTO, null, values);
-	}
-
-
-	@Override
-	public Bitmap getImage(long item_id) throws DatabaseException {
-		
-		SQLiteDatabase db = this.getReadableDatabase();
-
-		Log.w("TEST", "Erstelle Cursor");
-		String selectQuery = "SELECT " + _DATA + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
-		
-		Cursor c = db.rawQuery(selectQuery, null);
-		Log.w("TEST", "Photo-Cursor: " + c);
-		
-		byte[] bimg = new byte[1];
-		Bitmap bmp;
-		
-		if(c != null){
-			c.moveToFirst();
-			bimg = c.getBlob(0);
-		}
-		
-		bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
-	
-		return bmp;
-		//return BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-	}
-
-
-	@Override
-	public Bitmap getImage(int hashCode) throws DatabaseException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
 }
 
 
