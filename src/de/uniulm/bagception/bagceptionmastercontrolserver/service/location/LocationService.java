@@ -85,37 +85,37 @@ public class LocationService extends Service{
 		log("request received!");
 		
 		
+		
 		String requestType = "";
 		if(intent.hasExtra(OurLocation.REQUEST_TYPE))requestType = intent.getStringExtra(OurLocation.REQUEST_TYPE);
 		
 		
 		if(requestType.equals(OurLocation.GETLOCATION)){
 			storedLocations.clear();
-			log("RequestType: " + intent.getStringExtra(OurLocation.REQUEST_TYPE));
+			searchForWifiAccessPoints();
 			
 			// check if device supports bluetooth
-			if(bluetoothAdapter != null){
-				log("hasBT");
-				if(bluetoothAdapter.isEnabled()){
-					log("isEnabledBT");
-					searchForBluetoothDevices();
-					// TODO: BT search...
-					// http://developer.android.com/guide/topics/connectivity/bluetooth.html
-				}
-			}
+//			if(bluetoothAdapter != null){
+//				log("hasBT");
+//				if(bluetoothAdapter.isEnabled()){
+//					log("isEnabledBT");
+//					searchForBluetoothDevices();
+//				}
+//			}
 
 			// check if gps based location search is enabled
-			if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-				log("gps based enabled");
-			}
+//			if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+//				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+//				log("gps based enabled");
+//			}
 			
 			// check if network and cell based location search is enabled
+			log("kurz davor");
 			if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+				log("network based enabled");
 				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
 				// search for nearby wifi aps and check if their mac match with a location mac
 				searchForWifiAccessPoints();
-				log("network based enabled");
 			}
 			
 			
@@ -137,33 +137,37 @@ public class LocationService extends Service{
 	public void searchForWifiAccessPoints(){
 		log("searchForWifiAPs");
 		try {
-			// get all known locations from db
-			knownLocations = dbHelper.getLocations();
-			
 			WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-			IntentFilter i = new IntentFilter();
-		    i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-
-		    registerReceiver(new BroadcastReceiver(){
-		            @Override
-		            public void onReceive(Context context, Intent intent) {
-		                WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-		                mWifiManager.getScanResults();
-		                List<ScanResult> scanResults = mWifiManager.getScanResults();
-		                for(ScanResult sr : scanResults){
-		                	Location loc = isMACKnown(sr.BSSID, knownLocations);
-		                	if(loc != null){
-		                		android.location.Location location = new android.location.Location("WIFI");
-		                		location.setAccuracy(1);
-		                		location.setLatitude(loc.getLat());
-		                		location.setLongitude(loc.getLng());
-		                		sendBestPositionFromLocations(location);
-		                	}
-		                }
-		            }
-		        }
-		    ,i);
-		    mainWifi.startScan();
+			if(mainWifi.isWifiEnabled()){
+				knownLocations = dbHelper.getLocations();
+				if(knownLocations == null) return;
+				// get all known locations from db
+				IntentFilter i = new IntentFilter();
+				i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+				
+				registerReceiver(new BroadcastReceiver(){
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+						mWifiManager.getScanResults();
+						List<ScanResult> scanResults = mWifiManager.getScanResults();
+						for(ScanResult sr : scanResults){
+							log(sr.SSID + " " + sr.BSSID);
+							Location loc = isMACKnown(sr.BSSID, knownLocations);
+							if(loc != null){
+								android.location.Location location = new android.location.Location("WIFI");
+								location.setAccuracy(1);
+								location.setLatitude(loc.getLat());
+								location.setLongitude(loc.getLng());
+								sendBestPositionFromLocations(location);
+							}
+						}
+					}
+				}
+				,i);
+				mainWifi.startScan();
+				
+			}
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -172,10 +176,11 @@ public class LocationService extends Service{
 	}
 	
 	public void searchForBluetoothDevices() {
-		log("searchForBTDevices");
+		log("searchFobrBTDevices");
 		// get all known locations from db
 		try {
 			knownLocations = dbHelper.getLocations();
+			if(knownLocations == null) return;
 			// Create a BroadcastReceiver for ACTION_FOUND
 			mReceiver = new BroadcastReceiver() {
 				
