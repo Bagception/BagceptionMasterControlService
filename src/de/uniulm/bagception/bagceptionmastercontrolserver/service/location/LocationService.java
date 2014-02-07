@@ -1,7 +1,9 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.service.location;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
@@ -14,6 +16,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.ScanResult;
@@ -95,19 +99,19 @@ public class LocationService extends Service{
 			searchForWifiAccessPoints();
 			
 			// check if device supports bluetooth
-//			if(bluetoothAdapter != null){
-//				log("hasBT");
-//				if(bluetoothAdapter.isEnabled()){
-//					log("isEnabledBT");
-//					searchForBluetoothDevices();
-//				}
-//			}
+			if(bluetoothAdapter != null){
+				log("hasBT");
+				if(bluetoothAdapter.isEnabled()){
+					log("isEnabledBT");
+					searchForBluetoothDevices();
+				}
+			}
 
 			// check if gps based location search is enabled
-//			if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-//				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-//				log("gps based enabled");
-//			}
+			if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+				log("gps based enabled");
+			}
 			
 			// check if network and cell based location search is enabled
 			log("kurz davor");
@@ -122,9 +126,55 @@ public class LocationService extends Service{
 		}
 		
 		
-		if(requestType.equals(OurLocation.RESOLVE_ADDRESS)){
+		if(requestType.equals(OurLocation.RESOLVEADDRESS)){
+			String address = intent.getStringExtra(OurLocation.ADDRESS);
+			log("address: " + address);
 			
+			Geocoder coder = new Geocoder(this);
+			List<Address> addresses;
+			
+			try {
+				addresses = coder.getFromLocationName(address, 1);
+				if(addresses != null){
+					Address foundAddress = addresses.get(0);
+					Bundle b = new Bundle();
+					b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVEADDRESS);
+					b.putDouble(OurLocation.LONGITUDE, foundAddress.getLongitude());
+					b.putDouble(OurLocation.LATITUDE, foundAddress.getLatitude());
+					resultReceiver.send(0, b);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		if(requestType.equals(OurLocation.RESOLVECOORDS)){
+//			float lat = intent.getFloatExtra(OurLocation.LATITUDE, 0);
+//			float lng = intent.getFloatExtra(OurLocation.LONGITUDE, 0);
+			double lat = 48.40;
+			double lng = 9.98;
+			String address = "";
+			String city = "";
+			String country = "";
+			Geocoder geocoder;
+			List<Address> addresses;
+			geocoder = new Geocoder(this, Locale.getDefault());
+			try {
+				addresses = geocoder.getFromLocation(lat, lng, 1);
+				address = addresses.get(0).getAddressLine(0);
+				city = addresses.get(0).getAddressLine(1);
+				country = addresses.get(0).getAddressLine(2);
+				
+				log("address: " + address + " city: " + city + " country: " + country);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			Bundle b = new Bundle();
+			b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVECOORDS);
+			b.putString(OurLocation.ADDRESS, address + " " + city + " " + country);
+			resultReceiver.send(0, b);
+		}
+		
 		
 		return super.onStartCommand(intent, flags, startId);
 	}
