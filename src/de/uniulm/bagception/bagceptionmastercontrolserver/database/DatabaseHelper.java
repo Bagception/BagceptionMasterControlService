@@ -1185,26 +1185,37 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	// -------------------------------- "ActivityItem" table methods -------------------------------- //
 	
-	public void addActivityItem(long activity_id, Item item) {
+	@Override
+	public void addActivityItem(long activity_id, Item item, Category category) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
 		values.put(ACTIVITY_ID, activity_id);
 		values.put(ITEM_ID, item.getId());
-		values.put(CATEGORY_ID, item.getCategory().getId());
+		values.put(CATEGORY_ID, category.getId());
 			
 		db.insert(TABLE_ACTIVITYITEM, null, values);
 
 	}
 	
-	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
+	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
-		for(int i = 0; i < itemsForActivity.size(); i++) {
+		Item item = null;
+		Category category = null;
+		
+		for(int i = 0; i < items.size(); i++) {
 			
-			Item item = itemsForActivity.get(i);
+			item = items.get(i);
 			
-			addActivityItem(activity_id, item);
+			addActivityItem(activity_id, item, null);
+		}
+		
+		for(int c = 0; c < categoriesForActivity.size(); c++) {
+			
+			category = categoriesForActivity.get(c);
+			
+			addActivityItem(activity_id, null, category);
 		}
 		
 	}
@@ -1534,6 +1545,13 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		return locations;
 	}
 
+
+	@Override
+	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }
 
 

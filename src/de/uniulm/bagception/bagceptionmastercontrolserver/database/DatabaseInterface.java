@@ -279,8 +279,17 @@ public interface DatabaseInterface {
 		 * @param activity_id
 		 * @param item
 		 */
-		public void addActivityItem(long activity_id, Item item);
+		public void addActivityItem(long activity_id, Item item, Category category) throws DatabaseException;
 		
+		
+		/**
+		 * Get a list of items and categories and add them to database
+		 * @param activity_id
+		 * @param items
+		 * @param category
+		 * @throws DatabaseException
+		 */
+		public void addActivityItems(long activity_id, List<Item> items, List<Category> category) throws DatabaseException;
 		
 		/**
 		 * Add a list of items to an activity
