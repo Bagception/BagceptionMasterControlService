@@ -1,7 +1,9 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
+import android.hardware.Camera.Area;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -10,10 +12,15 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
+import de.uniulm.bagception.bluetoothclientmessengercommunication.service.BundleMessageHelper;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
+import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
@@ -32,7 +39,21 @@ public class DebugFragment extends Fragment implements Receiver{
 	private TextView accuracyTV;
 	private TextView longitudeTV;
 	private TextView latitudeTV;
+	
+	private Button   resolveAddressBtn;
+	private TextView resolveAddressLatTV;
+	private TextView resolveAddressLngTV;
+	private EditText resolveAddressTF;
+	private BundleMessageHelper helper;
 
+	
+	
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		helper = new BundleMessageHelper(getActivity());
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,22 +76,43 @@ public class DebugFragment extends Fragment implements Receiver{
 		accuracyTV = (TextView) v.findViewById(R.id.accuracyTV);
 		longitudeTV = (TextView) v.findViewById(R.id.longitudeTV);
 		latitudeTV = (TextView) v.findViewById(R.id.latitudeTV);
-
 		
+		
+		resolveAddressLatTV = (TextView) v.findViewById(R.id.rALatTV);
+		resolveAddressLngTV = (TextView) v.findViewById(R.id.rALngTV);
+		resolveAddressTF    = (EditText) v.findViewById(R.id.rATF);
+		resolveAddressBtn = (Button) v.findViewById(R.id.resolveAddressBtn);
+		resolveAddressBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				String address = resolveAddressTF.getText().toString();
+				Intent i = new Intent(getActivity(), LocationService.class);
+				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVEADDRESS);
+				i.putExtra(OurLocation.ADDRESS, address);
+				getActivity().startService(i);
+			}
+		});
 
 		Button testLocation = (Button) v.findViewById(R.id.testlocation);
 		testLocation.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
+				
+//				Intent i = new Intent(getActivity(),LocationService.class);
+//				i.putExtra("receiverTag", mResultreceiver);
+////				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
+////				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVEADDRESS);
+////				i.putExtra(OurLocation.ADDRESS, "Weinhof 20 89083 Ulm");
+//				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVECOORDS);
+////				i.putExtra(OurLocation.LATITUDE, 49);
+////				i.putExtra(OurLocation.LONGITUDE, 9.8);
+//				getActivity().startService(i);
+				
 				Intent i = new Intent(getActivity(),LocationService.class);
 				i.putExtra("receiverTag", mResultreceiver);
-//				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
-//				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVEADDRESS);
-//				i.putExtra(OurLocation.ADDRESS, "Weinhof 20 89083 Ulm");
-				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVECOORDS);
-//				i.putExtra(OurLocation.LATITUDE, 49);
-//				i.putExtra(OurLocation.LONGITUDE, 9.8);
+				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETWIFIAPS);
 				getActivity().startService(i);
 			}
 		});
@@ -87,6 +129,20 @@ public class DebugFragment extends Fragment implements Receiver{
 				accuracyTV.setText(""+resultData.getFloat(OurLocation.ACCURACY, 0));
 				latitudeTV.setText(""+resultData.getDouble(OurLocation.LATITUDE, 0));
 				longitudeTV.setText(""+resultData.getDouble(OurLocation.LONGITUDE, 0));
+				Intent i = new Intent(getActivity(),LocationService.class);
+				getActivity().stopService(i);
+			}
+			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.RESOLVEADDRESS)){
+				resolveAddressLatTV.setText(""+resultData.getString(OurLocation.LATITUDE, ""));
+				resolveAddressLngTV.setText(""+resultData.getString(OurLocation.LONGITUDE, ""));
+				Intent i = new Intent(getActivity(),LocationService.class);
+				getActivity().stopService(i);
+			}
+			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.GETWIFIAPS)){
+				log(resultData.getString(OurLocation.NAME) + " " + 
+						resultData.getString(OurLocation.MAC));
+				WifiBTDevice dev = new WifiBTDevice(resultData.getString(OurLocation.NAME), resultData.getString(OurLocation.MAC));
+				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WIFI_SEARCH_REQUEST, dev));
 			}
 		}
 	}
