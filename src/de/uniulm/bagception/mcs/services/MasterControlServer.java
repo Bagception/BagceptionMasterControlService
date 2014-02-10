@@ -419,10 +419,13 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 	    @Override
 	    public void onReceive(Context ctxt, Intent intent) {
 	    	
-	    	int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-			float batteryPct = level / (float)scale;
-			batteryStatus = (int) batteryPct; 
+	    	batteryStatus = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+//			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+//			
+//			float batteryPct = level / (float)scale;
+//			Log.d("battery",level+ " " +scale+ " "+ batteryPct);
+//			batteryStatus = (int) (batteryPct*100); 
+	    	
 	      
 	    }
 	  };
