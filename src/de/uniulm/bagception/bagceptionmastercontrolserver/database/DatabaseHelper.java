@@ -373,7 +373,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
-	@SuppressWarnings("unused")
 	@Override
 	public Item getItem(long id) throws DatabaseException {
 		
@@ -578,7 +577,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
-	@SuppressWarnings("unused")
 	public Long getItemId(String tag_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getReadableDatabase();
