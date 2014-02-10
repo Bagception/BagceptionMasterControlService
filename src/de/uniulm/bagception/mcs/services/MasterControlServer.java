@@ -419,6 +419,16 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
 				statusUpdate.toString());
 		btHelper.sendMessageBundle(toSend);
+		
+		
+//		ContainerStateUpdate statusUpdate =  new ContainerStateUpdate(activitySystem.getCurrentActivity(),itemIndexSystem.getCurrentItems(),batteryStatus);
+//		for (int i = 0 ; i< statusUpdate.getItemList().size();i++){
+//			Item it = statusUpdate.getItemList().get(i);
+//			it.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));			
+//		}
+//		
+//		Bundle toSend = BundleMessage.getInstance().createBundle(BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE, statusUpdate.toString());
+//		btHelper.sendMessageBundle(toSend);
 	}
 
 	public void sendToRemote(BUNDLE_MESSAGE msg, Object toSendObj) {

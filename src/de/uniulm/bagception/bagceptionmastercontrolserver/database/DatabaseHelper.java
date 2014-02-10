@@ -275,6 +275,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			addImage(item_id, bmp);
 		}
 		
+		int imageHash = item.getImageHash();
+		Log.w("TEST", "Image: " + imageHash);
+//		if(imageHash > 0){
+			addPhotoToItem(imageHash, item_id);
+//		}
+		
 	}
 
 
@@ -373,7 +379,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
-	@SuppressWarnings("unused")
 	@Override
 	public Item getItem(long id) throws DatabaseException {
 		
@@ -420,6 +425,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				tagids[j] = tids.get(j);
 			}
 		}
+		
+//		int imageHash = getImageHash(id);
+//		Log.w("TEST", "ImageHash: " + imageHash);
+		
+		Bitmap bmp = getImage(id);
 
 		Item item = null;
 		
@@ -437,6 +447,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 //			Log.w("TEST", "Neues Item: " + item);
 			
+			item.setImage(bmp);
 			return item;
 		} else {
 			return item;
@@ -530,7 +541,20 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						
 						Log.w("TEST", "Kategorie: " + category);
 						
+						
+						String selectPhoto = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+						Cursor p = db.rawQuery(selectPhoto, null);
+						Bitmap bmp = null;
+						
+						if(p.moveToFirst() && p.getCount() > 0){
+							byte[] b = p.getBlob(p.getColumnIndex(IMAGE));
+							bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
+						}
+						
 						Item item = new Item(item_id, name, category);
+						item.setImage(bmp);
+						
+						Log.w("TEST", "Item: " + item);
 						items.add(item);
 				} while(c.moveToNext());
 			}
@@ -578,7 +602,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 	
 	
-	@SuppressWarnings("unused")
 	public Long getItemId(String tag_id) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -926,7 +949,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
-		values.put(IMAGE, image); 
+		values.put(IMAGE_HASH, image); 
 		
 		db.insert(TABLE_PHOTO, null, values);
 		
@@ -1005,7 +1028,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 
-		Log.w("TEST", "Erstelle Cursor");
+//		Log.w("TEST", "Erstelle Cursor");
 		String selectQuery = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
@@ -1185,26 +1208,37 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	// -------------------------------- "ActivityItem" table methods -------------------------------- //
 	
-	public void addActivityItem(long activity_id, Item item) {
+	@Override
+	public void addActivityItem(long activity_id, Item item, Category category) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
 		values.put(ACTIVITY_ID, activity_id);
 		values.put(ITEM_ID, item.getId());
-		values.put(CATEGORY_ID, item.getCategory().getId());
+		values.put(CATEGORY_ID, category.getId());
 			
 		db.insert(TABLE_ACTIVITYITEM, null, values);
 
 	}
 	
-	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
+	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
-		for(int i = 0; i < itemsForActivity.size(); i++) {
+		Item item = null;
+		Category category = null;
+		
+		for(int i = 0; i < items.size(); i++) {
 			
-			Item item = itemsForActivity.get(i);
+			item = items.get(i);
 			
-			addActivityItem(activity_id, item);
+			addActivityItem(activity_id, item, null);
+		}
+		
+		for(int c = 0; c < categoriesForActivity.size(); c++) {
+			
+			category = categoriesForActivity.get(c);
+			
+			addActivityItem(activity_id, null, category);
 		}
 		
 	}
@@ -1534,6 +1568,13 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		return locations;
 	}
 
+
+	@Override
+	public void addActivityItem(long activity_id, List<Item> itemsForActivity) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 }
 
 

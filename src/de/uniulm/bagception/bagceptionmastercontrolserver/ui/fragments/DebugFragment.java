@@ -65,7 +65,12 @@ public class DebugFragment extends Fragment implements Receiver{
 			public void onClick(View v) {
 				Intent i = new Intent(getActivity(),LocationService.class);
 				i.putExtra("receiverTag", mResultreceiver);
-				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
+//				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
+//				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVEADDRESS);
+//				i.putExtra(OurLocation.ADDRESS, "Weinhof 20 89083 Ulm");
+				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVECOORDS);
+//				i.putExtra(OurLocation.LATITUDE, 49);
+//				i.putExtra(OurLocation.LONGITUDE, 9.8);
 				getActivity().startService(i);
 			}
 		});
