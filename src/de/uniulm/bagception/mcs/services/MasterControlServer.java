@@ -45,73 +45,66 @@ import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
 
+public class MasterControlServer extends ObservableService implements Runnable,
+		MessengerHelperCallback, CaseOpenServiceBroadcastReactor {
 
-
-public class MasterControlServer extends ObservableService implements Runnable, MessengerHelperCallback, CaseOpenServiceBroadcastReactor{
-
-/**
- * Handles the control flow of the container
- * @author phil
- *
- */
+	/**
+	 * Handles the control flow of the container
+	 * 
+	 * @author phil
+	 * 
+	 */
 
 	private static MasterControlServer debuginstance;
-	
+
 	private Thread mainThread;
 	private AdministrationDatabaseAdapter adminDBAdapter;
 	private DatabaseHelper dbHelper;
-	
-	//bt
+
+	// bt
 	private MessengerHelper btHelper;
-	
+
 	private CaseOpenBroadcastActor caseActor;
 	private volatile boolean isScanning = false;
-	
-	
+
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
-	
-	private int batteryStatus=0;
-	
+
+	private int batteryStatus = 0;
+
 	@Override
-		public void onCreate() {
-			debuginstance = this;
-			super.onCreate();
-		}
-	
+	public void onCreate() {
+		debuginstance = this;
+		super.onCreate();
+	}
+
 	@Override
 	protected void onFirstInit() {
 		dbHelper = new DatabaseHelper(this);
-	
-		adminDBAdapter = new AdministrationDatabaseAdapter(this,dbHelper);
+
+		adminDBAdapter = new AdministrationDatabaseAdapter(this, dbHelper);
 		mainThread = new Thread(this);
 		mainThread.setDaemon(true);
 		mainThread.start();
-		
+
 		caseActor = new CaseOpenBroadcastActor(this);
 		caseActor.register(this);
-		
-		
-		
-		IntentFilter f = new IntentFilter(BagceptionBroadcastContants.BROADCAST_RFID_FINISHED);
+
+		IntentFilter f = new IntentFilter(
+				BagceptionBroadcastContants.BROADCAST_RFID_FINISHED);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED);
 		registerReceiver(RFIDReceiver, f);
-		
-	    registerReceiver(this.mBatteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
-		
+		registerReceiver(this.mBatteryInfoReceiver, new IntentFilter(
+				Intent.ACTION_BATTERY_CHANGED));
+
 		itemIndexSystem = new ItemIndexSystem();
 		activitySystem = new ActivitySystem();
-		
-		
-		
-		
+
 	}
 
-
-	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
@@ -119,313 +112,336 @@ public class MasterControlServer extends ObservableService implements Runnable, 
 		caseActor.unregister(this);
 		unregisterReceiver(RFIDReceiver);
 		unregisterReceiver(mBatteryInfoReceiver);
-		
-		//stop services
+
+		// stop services
 		Intent i = new Intent();
-		for(ServiceInfo serviceInfo:ServiceStatusFragment.bagceptionSystemServices){
+		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
 			i.setAction(serviceInfo.getServiceSystemName());
 			stopService(i);
-			LOGGER.C(this, "stopping service "+serviceInfo.getName());
+			LOGGER.C(this, "stopping service " + serviceInfo.getName());
 		}
-		
-		
+
 		LOGGER.C(this, "MCS stopped");
 	}
-	
+
 	/**
 	 * starts all system components
 	 */
-	private void bootstrap(){
+	private void bootstrap() {
 		ServiceUtil.logRunningServices(this, "###");
-		//first start all necessary services
-		LOGGER.C(this, "initiating bootstrap method, starting necessary services");
+		// first start all necessary services
+		LOGGER.C(this,
+				"initiating bootstrap method, starting necessary services");
 		Intent i = new Intent();
-		for(ServiceInfo serviceInfo:ServiceStatusFragment.bagceptionSystemServices){
-			if (!ServiceUtil.isServiceRunning(this, serviceInfo.getServiceSystemName())){
-				LOGGER.C(this, "Service "+serviceInfo.getName() + " is offline.. starting it now");
+		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
+			if (!ServiceUtil.isServiceRunning(this,
+					serviceInfo.getServiceSystemName())) {
+				LOGGER.C(this, "Service " + serviceInfo.getName()
+						+ " is offline.. starting it now");
 				i.setAction(serviceInfo.getServiceSystemName());
 				startService(i);
-			}else{
-				LOGGER.C(this, "Service "+serviceInfo.getName() + " already online.. ");
+			} else {
+				LOGGER.C(this, "Service " + serviceInfo.getName()
+						+ " already online.. ");
 			}
 		}
-		
-		//then check if all are started
+
+		// then check if all are started
 		delayHandler.postDelayed(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				//check if all services are running
-				int runcount=0;
-				LOGGER.C(this, "All services should be activated now.. I will check that:");
-				for(ServiceInfo serviceInfo:ServiceStatusFragment.bagceptionSystemServices){
-					if (!ServiceUtil.isServiceRunning(MasterControlServer.this, serviceInfo.getServiceSystemName())){
-						LOGGER.C(this, "Service "+serviceInfo.getName() + " is still offline.. I think it is not installed");
+				// check if all services are running
+				int runcount = 0;
+				LOGGER.C(this,
+						"All services should be activated now.. I will check that:");
+				for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
+					if (!ServiceUtil.isServiceRunning(MasterControlServer.this,
+							serviceInfo.getServiceSystemName())) {
+						LOGGER.C(
+								this,
+								"Service "
+										+ serviceInfo.getName()
+										+ " is still offline.. I think it is not installed");
 						serviceInfo.setStatus(STATUS.NOT_INSTALLED);
-					}else{
+					} else {
 						runcount++;
-						
+
 					}
 				}
-				if (runcount==ServiceStatusFragment.bagceptionSystemServices.size()){
+				if (runcount == ServiceStatusFragment.bagceptionSystemServices
+						.size()) {
 					LOGGER.C(this, "All Services online :)");
-					//all services online:
-					btHelper = new MessengerHelper(MasterControlServer.this, ServiceNames.BLUETOOTH_SERVER_SERVICE);
+					// all services online:
+					btHelper = new MessengerHelper(MasterControlServer.this,
+							ServiceNames.BLUETOOTH_SERVER_SERVICE);
 					btHelper.register(MasterControlServer.this);
-					
+
 				}
 			}
 		}, 100);
 	}
-	
+
 	private final Handler delayHandler = new Handler();
-	
-//	private void serviceDiagnose(){
-//		
-//	}
+
+	// private void serviceDiagnose(){
+	//
+	// }
 
 	@Override
 	public void run() {
 		LOGGER.C(this, "MCS started");
 		bootstrap();
-		//stopSelf();
+		// stopSelf();
 	}
-	
 
-
-	//\\ MessengerHelperCallback //
+	// \\ MessengerHelperCallback //
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onBundleMessage(Bundle b) {
-		//this comes from the btclient
+		// this comes from the btclient
 		LOGGER.C(this, "bundleMessage recv");
-		
-		switch (BundleMessage.getInstance().getBundleMessageType(b)){
-			case IMAGE_REQUEST:
-				JSONObject o = BundleMessage.getInstance().extractObject(b);
-				String imageID = o.get("img").toString();
-				int imageIDInt=Integer.parseInt(imageID);
-				LOGGER.C(this, " img request for id "+imageID);
-				Bitmap bmp;
-				try {
+
+		switch (BundleMessage.getInstance().getBundleMessageType(b)) {
+		case IMAGE_REQUEST:
+			JSONObject o = BundleMessage.getInstance().extractObject(b);
+			String imageID = o.get("img").toString();
+			int imageIDInt = Integer.parseInt(imageID);
+			LOGGER.C(this, " img request for id " + imageID);
+			Bitmap bmp;
+			try {
+
+				if (dbHelper.getImage(imageIDInt) == null) {
+					Log.d("fhjeigdcjgidhgviegfvuegtfre", "Huren Dreck ist null");
+				} else {
 					bmp = dbHelper.getImage(imageIDInt);
 					String serializedImage = PictureSerializer.serialize(bmp);
-					
-					LOGGER.C(this, " deser id "+serializedImage.hashCode());
-					
+					LOGGER.C(this, " deser id " + serializedImage.hashCode());
+
 					JSONObject obj = new JSONObject();
 					obj.put("img", serializedImage);
-					btHelper.sendMessageBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-				}				
-				
-			break;
-			
-			case CONTAINER_STATUS_UPDATE_REQUEST:
-				LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
-				setStatusChanged();
-				break;
-				
-			case ADMINISTRATION_COMMAND:{
-				JSONObject json = BundleMessage.getInstance().extractObject(b);
-				AdministrationCommand<?> a_cmd = AdministrationCommand.fromJSONObject(json);
-				a_cmd.accept(adminDBAdapter);
-				LOGGER.C(this, "admin command "+a_cmd.getEntity().name()+ ", "+a_cmd.getOperation().name());
-				break;
+					btHelper.sendMessageBundle(BundleMessage.getInstance()
+							.createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
+				}
+
+			} catch (DatabaseException e) {
+				e.printStackTrace();
 			}
-				
+
+			break;
+
+		case CONTAINER_STATUS_UPDATE_REQUEST:
+			LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
+			setStatusChanged();
+			break;
+
+		case ADMINISTRATION_COMMAND: {
+			JSONObject json = BundleMessage.getInstance().extractObject(b);
+			AdministrationCommand<?> a_cmd = AdministrationCommand
+					.fromJSONObject(json);
+			a_cmd.accept(adminDBAdapter);
+			LOGGER.C(this, "admin command " + a_cmd.getEntity().name() + ", "
+					+ a_cmd.getOperation().name());
+			break;
+		}
+
 		default:
 			break;
 		}
-		
+
 	}
 
 	@Override
 	public void onResponseMessage(Bundle b) {
 		// nothing to do here
-		
+
 	}
 
 	@Override
 	public void onStatusMessage(Bundle b) {
 		// nothing to do here
 		StatusCode status = StatusCode.getStatusCode(b);
-		switch (status){
-			case DISCONNECTED:
-				//TODO?
-				break;
-			default: break;
+		switch (status) {
+		case DISCONNECTED:
+			// TODO?
+			break;
+		default:
+			break;
 		}
-		
+
 	}
 
 	@Override
 	public void onCommandMessage(Bundle b) {
-		//nothing to do here
-		
-		
+		// nothing to do here
+
 	}
 
 	@Override
 	public void onError(Exception e) {
-		//we assume this is not going to happen
+		// we assume this is not going to happen
 	}
 
 	@Override
 	public void connectedWithRemoteService() {
-		//we assume this works correctly
-		
+		// we assume this works correctly
+
 	}
 
 	@Override
 	public void disconnectedFromRemoteService() {
-		//we assume this works correctly
+		// we assume this works correctly
 
 	}
+
 	// MessengerHelperCallback \\
-
-
 
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
 
-
-
 	// \\CaseOpenServiceBroadcastReactor//
 	@Override
-	public void  caseOpened() {
+	public void caseOpened() {
 		synchronized (this) {
-			if(isScanning) return;
-			Intent rfidScanBC = new Intent(BagceptionBroadcastContants.BROADCAST_RFID_STARTSCAN);
+			if (isScanning)
+				return;
+			Intent rfidScanBC = new Intent(
+					BagceptionBroadcastContants.BROADCAST_RFID_STARTSCAN);
 			sendBroadcast(rfidScanBC);
 		}
-		
-		
-		
+
 	}
 
 	@Override
 	public void caseClosed() {
-		Intent rfidScanBC = new Intent(BagceptionBroadcastContants.BROADCAST_RFID_STOPSCAN);
+		Intent rfidScanBC = new Intent(
+				BagceptionBroadcastContants.BROADCAST_RFID_STOPSCAN);
 		sendBroadcast(rfidScanBC);
-		LOG.out(this,"case closed");
+		LOG.out(this, "case closed");
 		LOGGER.C(this, "case closed");
 	}
-	
-	//CaseOpenServiceBroadcastReactor\\
-	
-	private final ToneGenerator toneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+
+	// CaseOpenServiceBroadcastReactor\\
+
+	private final ToneGenerator toneGenerator = new ToneGenerator(
+			AudioManager.STREAM_MUSIC, 100);
 	private final BroadcastReceiver RFIDReceiver = new BroadcastReceiver() {
-		
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			
-			
-			if (BagceptionBroadcastContants.BROADCAST_RFID_FINISHED.equals(intent.getAction())){
-				//scan finished
-				
+
+			if (BagceptionBroadcastContants.BROADCAST_RFID_FINISHED
+					.equals(intent.getAction())) {
+				// scan finished
+
 				isScanning = false;
-				Toast.makeText(MasterControlServer.this, "scanning finished", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MasterControlServer.this, "scanning finished",
+						Toast.LENGTH_SHORT).show();
 				LOGGER.C(this, "stop rfid scan");
-			}else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND.equals(intent.getAction())){
-				//tag found
-				
+			} else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND
+					.equals(intent.getAction())) {
+				// tag found
+
 				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
-				
-				String id = intent.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
+
+				String id = intent
+						.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
 				Log.d("bag", id);
-				LOGGER.C(this, "Tag scanned: "+id);
+				LOGGER.C(this, "Tag scanned: " + id);
 				Item i = null;
 				try {
-//					i = dbHelper.getItemByName(id);
+					// i = dbHelper.getItemByName(id);
 					long item_id = dbHelper.getItemId(id);
-					if(item_id != -1){
+					if (item_id != -1) {
 						i = dbHelper.getItem(item_id);
 					}
-					if (i!=null){
-						//tag exists in database
-						LOGGER.C(this, "TAG found: "+i.getName());
-						if (itemIndexSystem.itemScanned(i)){
-							//item put in
-							LOGGER.C(this, "Item in: "+i.getName());
-						}else{
-							//item taken out
-							LOGGER.C(this, "Item out: "+i.getName());
+					if (i != null) {
+						// tag exists in database
+						LOGGER.C(this, "TAG found: " + i.getName());
+						if (itemIndexSystem.itemScanned(i)) {
+							// item put in
+							LOGGER.C(this, "Item in: " + i.getName());
+						} else {
+							// item taken out
+							LOGGER.C(this, "Item out: " + i.getName());
 						}
 						setStatusChanged();
-//						Bundle b = BundleMessage.getInstance().toItemFoundBundle(i);
-//						b.putBoolean("exists", true);
-//						LOG.out(this, b);
-//						btHelper.sendMessageBundle(b);
-					}else{
-						//tag not found in db
+						// Bundle b =
+						// BundleMessage.getInstance().toItemFoundBundle(i);
+						// b.putBoolean("exists", true);
+						// LOG.out(this, b);
+						// btHelper.sendMessageBundle(b);
+					} else {
+						// tag not found in db
 						ArrayList<String> ids = new ArrayList<String>();
 						ids.add(id);
-						btHelper.sendMessageBundle(BundleMessage.getInstance().toItemFoundNotBundle(new Item("",ids)));
+						btHelper.sendMessageBundle(BundleMessage.getInstance()
+								.toItemFoundNotBundle(new Item("", ids)));
 					}
 				} catch (DatabaseException e) {
 					e.printStackTrace();
-				} 
-						
-				
-					
-				
-			}else if (BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING.equals(intent.getAction())){
+				}
+
+			} else if (BagceptionBroadcastContants.BROADCAST_RFID_START_SCANNING
+					.equals(intent.getAction())) {
 				// rfid start scanning
-				
-				Toast.makeText(MasterControlServer.this, "start scanning", Toast.LENGTH_SHORT).show();
+
+				Toast.makeText(MasterControlServer.this, "start scanning",
+						Toast.LENGTH_SHORT).show();
 				LOGGER.C(this, "start rfid scan");
-			}else if (BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED.equals(intent.getAction())){
-				//rfid not connected
-				
-				Toast.makeText(MasterControlServer.this, "RFID scanner not connected", Toast.LENGTH_SHORT).show();
+			} else if (BagceptionBroadcastContants.BROADCAST_RFID_NOTCONNECTED
+					.equals(intent.getAction())) {
+				// rfid not connected
+
+				Toast.makeText(MasterControlServer.this,
+						"RFID scanner not connected", Toast.LENGTH_SHORT)
+						.show();
 				LOGGER.C(this, "RFID scanner not connected");
 			}
-			
-			
+
 		}
 	};
 
-	
-	private void setStatusChanged(){
-		
+	private void setStatusChanged() {
 
-		
-		
-		ContainerStateUpdate statusUpdate =  new ContainerStateUpdate(activitySystem.getCurrentActivity(),itemIndexSystem.getCurrentItems(),batteryStatus);
-		for (int i = 0 ; i< statusUpdate.getItemList().size();i++){
-			Item it = statusUpdate.getItemList().get(i);
-			it.setImage(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher));			
-		}
-		
-		Bundle toSend = BundleMessage.getInstance().createBundle(BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE, statusUpdate.toString());
+		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
+				activitySystem.getCurrentActivity(),
+				itemIndexSystem.getCurrentItems(), batteryStatus);
+//		for (int i = 0; i < statusUpdate.getItemList().size(); i++) {
+//			Item it = statusUpdate.getItemList().get(i);
+//			it.setImage(BitmapFactory.decodeResource(getResources(),
+//					R.drawable.ic_launcher));
+//		}
+
+		Bundle toSend = BundleMessage.getInstance().createBundle(
+				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
+				statusUpdate.toString());
 		btHelper.sendMessageBundle(toSend);
 	}
-	
-	public void sendToRemote(BUNDLE_MESSAGE msg,Object toSendObj){
-		Bundle toSendBun = BundleMessage.getInstance().createBundle(msg,toSendObj);
+
+	public void sendToRemote(BUNDLE_MESSAGE msg, Object toSendObj) {
+		Bundle toSendBun = BundleMessage.getInstance().createBundle(msg,
+				toSendObj);
 		btHelper.sendMessageBundle(toSendBun);
 	}
-	
-	public static void DEBUG(){
+
+	public static void DEBUG() {
 		debuginstance.setStatusChanged();
 	}
 
-	//battery
-	private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver(){
-	    @Override
-	    public void onReceive(Context ctxt, Intent intent) {
-	    	
-	    	int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-			float batteryPct = level / (float)scale;
-			batteryStatus = (int) batteryPct; 
-	      
-	    }
-	  };
+	// battery
+	private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context ctxt, Intent intent) {
 
-	
+			int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+			float batteryPct = level / (float) scale;
+			batteryStatus = (int) batteryPct;
+
+		}
+	};
+
 }
