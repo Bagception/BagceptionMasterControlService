@@ -275,6 +275,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			addImage(item_id, bmp);
 		}
 		
+		int imageHash = item.getImageHash();
+		
+		if(imageHash > 0){
+			addPhotoToItem(imageHash, item_id);
+		}
+		
 	}
 
 
@@ -419,6 +425,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				tagids[j] = tids.get(j);
 			}
 		}
+		
+		int imageHash = getImageHash(id);
 
 		Item item = null;
 		
@@ -428,7 +436,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			item = new Item(	id, 
 								itemData.getString(itemData.getColumnIndex(NAME)), 
 								cat, 
-								0, 
+								imageHash, 
 								isContextItem, 
 								isIndependent, 
 								attributes, 
@@ -924,7 +932,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
-		values.put(IMAGE, image); 
+		values.put(IMAGE_HASH, image); 
 		
 		db.insert(TABLE_PHOTO, null, values);
 		
