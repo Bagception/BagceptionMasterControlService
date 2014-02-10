@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseTest;
+//import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseTest;
 import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
 
 /**
