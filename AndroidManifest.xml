@@ -9,11 +9,12 @@
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="19" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.BLUETOOTH"/>
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
         android:allowBackup="true"
@@ -46,16 +47,15 @@
                 </action>
             </intent-filter>
         </service>
-        
         <service
-             android:name="de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService"
-             android:exported="true" >
+            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService" />
             </intent-filter>
         </service>
-        
-		<receiver android:name="de.uniulm.bagception.BootLoader" >
+
+        <receiver android:name="de.uniulm.bagception.BootLoader" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -69,13 +69,16 @@
             android:label="BagceptionProvider"
             android:readPermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.READ"
             android:writePermission="de.uniulm.bagception.bagceptionmastercontrolserver.database.BagceptionProvider.WRITE" >
-        </provider>
- -->
-        
+        </provider>
+        -->
 
         <activity
             android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseTest"
             android:label="@string/title_activity_database_test" >
+        </activity>
+        <activity
+            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.database.FICKENFUCKEN"
+            android:label="@string/title_activity_fickenfucken" >
         </activity>
     </application>
 

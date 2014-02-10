@@ -139,14 +139,15 @@ public class LocationService extends Service{
 					Address foundAddress = addresses.get(0);
 					Bundle b = new Bundle();
 					b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVEADDRESS);
-					b.putDouble(OurLocation.LONGITUDE, foundAddress.getLongitude());
-					b.putDouble(OurLocation.LATITUDE, foundAddress.getLatitude());
+					b.putString(OurLocation.LONGITUDE, ""+foundAddress.getLongitude());
+					b.putString(OurLocation.LATITUDE, ""+foundAddress.getLatitude());
 					resultReceiver.send(0, b);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		
 		
 		if(requestType.equals(OurLocation.RESOLVECOORDS)){
 //			float lat = intent.getFloatExtra(OurLocation.LATITUDE, 0);
@@ -175,6 +176,58 @@ public class LocationService extends Service{
 			resultReceiver.send(0, b);
 		}
 		
+		if(requestType.equals(OurLocation.GETWIFIAPS)){
+			log("getWIFIAPs");
+				WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+				if(mainWifi.isWifiEnabled()){
+					// get all known locations from db
+					IntentFilter i = new IntentFilter();
+					i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+					registerReceiver(new BroadcastReceiver(){
+						@Override
+						public void onReceive(Context context, Intent intent) {
+							WifiManager mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+							mWifiManager.getScanResults();
+							List<ScanResult> scanResults = mWifiManager.getScanResults();
+							for(ScanResult sr : scanResults){
+//								log(sr.SSID + " " + sr.BSSID);
+								log("sendAP");
+								Bundle b = new Bundle();
+								b.putString(OurLocation.RESPONSE_TYPE, OurLocation.GETWIFIAPS);
+								b.putString(OurLocation.NAME, sr.SSID);
+								b.putString(OurLocation.MAC, sr.BSSID);
+								resultReceiver.send(0, b);
+							}
+						}
+					}
+					,i);
+					mainWifi.startScan();
+				}
+		}
+		
+		
+		if(requestType.equals(OurLocation.GETBLUETOOTHDEVICES)){
+			
+			mReceiver = new BroadcastReceiver() {
+				public void onReceive(Context context, Intent intent) {
+					String action = intent.getAction();
+					// When discovery finds a device
+					if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+						// Get the BluetoothDevice object from the Intent
+						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+						Bundle b = new Bundle();
+						b.putString(OurLocation.RESPONSE_TYPE, OurLocation.GETBLUETOOTHDEVICES);
+						b.putString(OurLocation.NAME, device.getName());
+						b.putString(OurLocation.MAC, device.getAddress());
+						resultReceiver.send(0, b);
+					}
+				}
+			};
+			// Register the BroadcastReceiver
+			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+			registerReceiver(mReceiver, filter); // Don't forget to unregister
+			isBTRegistered = true;
+		}
 		
 		return super.onStartCommand(intent, flags, startId);
 	}

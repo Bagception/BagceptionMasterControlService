@@ -275,6 +275,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			addImage(item_id, bmp);
 		}
 		
+		int imageHash = item.getImageHash();
+		Log.w("TEST", "Image: " + imageHash);
+//		if(imageHash > 0){
+			addPhotoToItem(imageHash, item_id);
+//		}
+		
 	}
 
 
@@ -419,6 +425,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				tagids[j] = tids.get(j);
 			}
 		}
+		
+//		int imageHash = getImageHash(id);
+//		Log.w("TEST", "ImageHash: " + imageHash);
+		
+		Bitmap bmp = getImage(id);
 
 		Item item = null;
 		
@@ -436,6 +447,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 //			Log.w("TEST", "Neues Item: " + item);
 			
+			item.setImage(bmp);
 			return item;
 		} else {
 			return item;
@@ -529,7 +541,20 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						
 						Log.w("TEST", "Kategorie: " + category);
 						
+						
+						String selectPhoto = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+						Cursor p = db.rawQuery(selectPhoto, null);
+						Bitmap bmp = null;
+						
+						if(p.moveToFirst() && p.getCount() > 0){
+							byte[] b = p.getBlob(p.getColumnIndex(IMAGE));
+							bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
+						}
+						
 						Item item = new Item(item_id, name, category);
+						item.setImage(bmp);
+						
+						Log.w("TEST", "Item: " + item);
 						items.add(item);
 				} while(c.moveToNext());
 			}
@@ -924,7 +949,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
-		values.put(IMAGE, image); 
+		values.put(IMAGE_HASH, image); 
 		
 		db.insert(TABLE_PHOTO, null, values);
 		
@@ -1003,7 +1028,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 
-		Log.w("TEST", "Erstelle Cursor");
+//		Log.w("TEST", "Erstelle Cursor");
 		String selectQuery = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
