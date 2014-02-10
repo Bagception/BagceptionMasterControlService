@@ -215,13 +215,16 @@ public class MasterControlServer extends ObservableService implements Runnable,
 					Log.d("fhjeigdcjgidhgviegfvuegtfre", "Huren Dreck ist null");
 				} else {
 					bmp = dbHelper.getImage(imageIDInt);
-					String serializedImage = PictureSerializer.serialize(bmp);
-					LOGGER.C(this, " deser id " + serializedImage.hashCode());
+					if (bmp == null){
+						//picture is null
+					}else{
+						String serializedImage = PictureSerializer.serialize(bmp);
+						JSONObject obj = new JSONObject();
+						obj.put("img", serializedImage);
+						btHelper.sendMessageBundle(BundleMessage.getInstance()
+								.createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
+					}
 
-					JSONObject obj = new JSONObject();
-					obj.put("img", serializedImage);
-					btHelper.sendMessageBundle(BundleMessage.getInstance()
-							.createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
 				}
 
 			} catch (DatabaseException e) {
