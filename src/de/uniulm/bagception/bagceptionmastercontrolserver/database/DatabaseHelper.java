@@ -971,7 +971,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
-		values.put(IMAGE, item.getImageHash());
+		values.put(IMAGE_HASH, item.getImageHash());
+		values.put(IMAGE, Utility.getBytes(item.getImage()));
 		
 		return db.update(TABLE_PHOTO, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
 	}
@@ -1007,16 +1008,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		bmp.compress(Bitmap.CompressFormat.PNG, 100, bos);
-		
-		byte[] bArray = bos.toByteArray();
-		Log.w("TEST", "Item_ID: " + item_id);
-		Log.w("TEST", "Image: " + bArray);
-		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
-		values.put(IMAGE, bArray);
+		values.put(IMAGE, Utility.getBytes(bmp));
 		
 		long id = db.insert(TABLE_PHOTO, null, values);
 		Log.w("TEST", "ID: " + id);
@@ -1034,17 +1028,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Cursor c = db.rawQuery(selectQuery, null);
 		Log.w("TEST", "Photo-Cursor: " + c);
 		
-		byte[] bimg = new byte[1];
-		Bitmap bmp;
-		
 		if(c != null){
 			c.moveToFirst();
-			bimg = c.getBlob(c.getColumnIndex(IMAGE));
+			byte[] blob = c.getBlob(c.getColumnIndex(IMAGE));
+			
+			Bitmap bmp = Utility.getPhoto(blob);
+			return bmp;
 		}
 		
-		bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
 	
-		return bmp;
+		return null;
 	}
 
 	
@@ -1064,11 +1057,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		} else {
 			c.moveToFirst();
 			
-			byte[] bimg = new byte[1];
-			bimg = c.getBlob(c.getColumnIndex(IMAGE));
+			byte[] blob = c.getBlob(c.getColumnIndex(IMAGE));
 			
-			bmp = BitmapFactory.decodeByteArray(bimg, 0, bimg.length);
-			
+			bmp = Utility.getPhoto(blob);
 			return bmp;
 		}
 	}
