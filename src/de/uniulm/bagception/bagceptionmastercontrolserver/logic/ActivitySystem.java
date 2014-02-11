@@ -20,6 +20,7 @@ public class ActivitySystem {
 	private Location location;
 	private long activity_id;
 	private List<Item> items;
+	private List<Long> item_ids;
 	private Context context;
 	private DatabaseHelper db = new DatabaseHelper(context);
 	
@@ -33,17 +34,11 @@ public class ActivitySystem {
 //		activity_id = currentActivity.getId();
 //		List<Long> item_ids = db.getActivityItems(activity_id);
 //		
-//		for(int j = 0; j < item_ids.size(); j++){
-//			
-//			items.add(db.getItem(item_ids.get(j)));
-//		}
-		
-//		activity_id = currentActivity.getId();
-//		List<Long> item_ids = db.getActivityItems(activity_id);
-//		
-//		for(int j = 0; j < item_ids.size(); j++){
-//			
-//			items.add(db.getItem(item_ids.get(j)));
+//		if(item_ids != null){
+//			for(int j = 0; j < item_ids.size(); j++){
+//				
+//				items.add(db.getItem(item_ids.get(j)));
+//			}
 //		}
 //		
 	}
@@ -72,5 +67,26 @@ public class ActivitySystem {
 	public Activity getCurrentActivity(){
 		
 		return currentActivity;
+	}
+	
+	
+	public List<Activity> activityRecognition(List<Long> item_ids) throws DatabaseException{
+		
+		List<Activity> activityList = new ArrayList<Activity>();
+		
+		if(item_ids != null){
+			for(int j = 0; j < item_ids.size(); j++){
+				List<Activity> alist = db.getActivitesByItem(item_ids.get(j));
+				
+				if(alist != null){
+					for(int a = 0; a < alist.size(); a++){
+						Activity act = alist.get(a);
+						activityList.add(act);
+					}
+				}
+			}
+		}
+		
+		return activityList;
 	}
 }

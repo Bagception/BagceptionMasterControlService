@@ -212,14 +212,14 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			String imageID = o.get("img").toString();
 			long  imageIDInt = Integer.parseInt(imageID);
-			Log.w("TEST", "IMAGEHASH BEI DER ABFRAGE: " + imageIDInt);
+//			Log.w("TEST", "IMAGEHASH BEI DER ABFRAGE: " + imageIDInt);
 			
 			LOGGER.C(this, " img request for id " + imageID);
 			Bitmap bmp;
 			try {
 
 				if (dbHelper.getImageString(imageIDInt) == null) {
-					Log.d("fhjeigdcjgidhgviegfvuegtfre", "Huren Dreck ist null");
+					Log.w("TEST", "ImageString is null");
 				} else {
 					bmp = Item.deserialize(dbHelper.getImageString(imageIDInt));
 					if (bmp == null){
