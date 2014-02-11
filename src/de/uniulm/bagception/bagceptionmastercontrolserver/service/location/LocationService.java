@@ -127,8 +127,8 @@ public class LocationService extends Service{
 		
 		
 		if(requestType.equals(OurLocation.RESOLVEADDRESS)){
+			log("resolve address...");
 			String address = intent.getStringExtra(OurLocation.ADDRESS);
-			log("address: " + address);
 			
 			Geocoder coder = new Geocoder(this);
 			List<Address> addresses;
