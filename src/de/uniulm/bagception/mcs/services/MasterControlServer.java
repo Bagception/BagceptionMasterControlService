@@ -101,7 +101,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				Intent.ACTION_BATTERY_CHANGED));
 
 		itemIndexSystem = new ItemIndexSystem();
-		activitySystem = new ActivitySystem();
+		try {
+			activitySystem = new ActivitySystem();
+		} catch (DatabaseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
