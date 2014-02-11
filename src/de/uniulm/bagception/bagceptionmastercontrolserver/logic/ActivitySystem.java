@@ -37,6 +37,14 @@ public class ActivitySystem {
 //			
 //			items.add(db.getItem(item_ids.get(j)));
 //		}
+		
+//		activity_id = currentActivity.getId();
+//		List<Long> item_ids = db.getActivityItems(activity_id);
+//		
+//		for(int j = 0; j < item_ids.size(); j++){
+//			
+//			items.add(db.getItem(item_ids.get(j)));
+//		}
 //		
 	}
 	
@@ -46,7 +54,7 @@ public class ActivitySystem {
 	
 	public void setCurrentActivity(Activity activity){
 		this.currentActivity = activity;
-		location = activity.getLocation();
+//		location = activity.getLocation();
 	}
 	
 	public List<Activity> getAllActivities(){
