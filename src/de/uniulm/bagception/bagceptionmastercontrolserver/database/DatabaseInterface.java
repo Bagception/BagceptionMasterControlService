@@ -469,7 +469,7 @@ public interface DatabaseInterface {
 		 * @param bmp the image to save
 		 * @throws DatabaseException
 		 */
-		public void addImage(long item_id, Bitmap bmp) throws DatabaseException;
+		public void addImage(long item_id, Item item) throws DatabaseException;
 		
 		
 		public int getImageHash(long item_id) throws DatabaseException;
@@ -480,7 +480,7 @@ public interface DatabaseInterface {
 		 * @return the image for the hashcode
 		 * @throws DatabaseException
 		 */
-		public Bitmap getImage(long item_id) throws DatabaseException;
+		public String getImageString(long item_id) throws DatabaseException;
 		
 		
 		/**
@@ -489,7 +489,7 @@ public interface DatabaseInterface {
 		 * @return
 		 * @throws DatabaseException
 		 */
-		public Bitmap getImage(int hashCode) throws DatabaseException;
+		public String getImageString(int hashCode) throws DatabaseException;
 		
 		
 		/**

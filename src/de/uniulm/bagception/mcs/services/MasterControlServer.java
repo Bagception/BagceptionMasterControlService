@@ -211,21 +211,25 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		case IMAGE_REQUEST:
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			String imageID = o.get("img").toString();
-			int imageIDInt = Integer.parseInt(imageID);
+			long  imageIDInt = Integer.parseInt(imageID);
+			Log.w("TEST", "IMAGEHASH BEI DER ABFRAGE: " + imageIDInt);
+			
 			LOGGER.C(this, " img request for id " + imageID);
 			Bitmap bmp;
 			try {
 
-				if (dbHelper.getImage(imageIDInt) == null) {
+				if (dbHelper.getImageString(imageIDInt) == null) {
 					Log.d("fhjeigdcjgidhgviegfvuegtfre", "Huren Dreck ist null");
 				} else {
-					bmp = dbHelper.getImage(imageIDInt);
+					bmp = Item.deserialize(dbHelper.getImageString(imageIDInt));
 					if (bmp == null){
-						//picture is null
+						LOGGER.C(this, " no db entry for image " + imageID);
 					}else{
+						LOGGER.C(this, " image found: " + imageID);
 						String serializedImage = PictureSerializer.serialize(bmp);
 						JSONObject obj = new JSONObject();
 						obj.put("img", serializedImage);
+						obj.put("id", imageID);
 						btHelper.sendMessageBundle(BundleMessage.getInstance()
 								.createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
 					}
