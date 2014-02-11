@@ -552,7 +552,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						}
 						
 						Item item = new Item(item_id, name, category);
-						item.setImage(bmp);
+						
+						if(bmp != null){
+							item.setImage(bmp);
+						}
 						
 						Log.w("TEST", "Item: " + item);
 						items.add(item);
