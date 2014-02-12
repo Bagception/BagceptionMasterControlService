@@ -1,5 +1,8 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
@@ -16,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bluetoothclientmessengercommunication.service.BundleMessageHelper;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
@@ -25,6 +29,7 @@ import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
 import de.uniulm.bagception.services.attributes.OurLocation;
+import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 /**
  * Part of the multi-pane view<br>
@@ -110,9 +115,15 @@ public class DebugFragment extends Fragment implements Receiver{
 ////				i.putExtra(OurLocation.LONGITUDE, 9.8);
 //				getActivity().startService(i);
 				
-				Intent i = new Intent(getActivity(),LocationService.class);
+//				Intent i = new Intent(getActivity(),LocationService.class);
+//				i.putExtra("receiverTag", mResultreceiver);
+//				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETWIFIAPS);
+//				getActivity().startService(i);
+				
+				Intent i = new Intent(getActivity(),WeatherForecastService.class);
+				i.putExtra(WeatherForecast.LATITUDE, 9.8);
+				i.putExtra(WeatherForecast.LONGITUDE, 48);
 				i.putExtra("receiverTag", mResultreceiver);
-				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETWIFIAPS);
 				getActivity().startService(i);
 			}
 		});
@@ -123,28 +134,42 @@ public class DebugFragment extends Fragment implements Receiver{
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		log("answer received!");
-		if(resultData.containsKey(OurLocation.RESPONSE_TYPE)){
-			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.LOCATION)){
-				providerTV.setText(resultData.getString(OurLocation.PROVIDER, ""));
-				accuracyTV.setText(""+resultData.getFloat(OurLocation.ACCURACY, 0));
-				latitudeTV.setText(""+resultData.getDouble(OurLocation.LATITUDE, 0));
-				longitudeTV.setText(""+resultData.getDouble(OurLocation.LONGITUDE, 0));
-				Intent i = new Intent(getActivity(),LocationService.class);
-				getActivity().stopService(i);
-			}
-			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.RESOLVEADDRESS)){
-				resolveAddressLatTV.setText(""+resultData.getString(OurLocation.LATITUDE, ""));
-				resolveAddressLngTV.setText(""+resultData.getString(OurLocation.LONGITUDE, ""));
-				Intent i = new Intent(getActivity(),LocationService.class);
-				getActivity().stopService(i);
-			}
-			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.GETWIFIAPS)){
-				log(resultData.getString(OurLocation.NAME) + " " + 
-						resultData.getString(OurLocation.MAC));
-				WifiBTDevice dev = new WifiBTDevice(resultData.getString(OurLocation.NAME), resultData.getString(OurLocation.MAC));
-				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WIFI_SEARCH_REQUEST, dev));
-			}
+		
+		String s = resultData.getString("payload");
+		
+		try {
+			JSONObject object = new JSONObject(s);
+			String city = object.getString(WeatherForecast.CITY);
+			log(city);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+//		if(resultData.containsKey(OurLocation.RESPONSE_TYPE)){
+//			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.LOCATION)){
+//				providerTV.setText(resultData.getString(OurLocation.PROVIDER, ""));
+//				accuracyTV.setText(""+resultData.getFloat(OurLocation.ACCURACY, 0));
+//				latitudeTV.setText(""+resultData.getDouble(OurLocation.LATITUDE, 0));
+//				longitudeTV.setText(""+resultData.getDouble(OurLocation.LONGITUDE, 0));
+//				Intent i = new Intent(getActivity(),LocationService.class);
+//				getActivity().stopService(i);
+//			}
+//			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.RESOLVEADDRESS)){
+//				resolveAddressLatTV.setText(""+resultData.getString(OurLocation.LATITUDE, ""));
+//				resolveAddressLngTV.setText(""+resultData.getString(OurLocation.LONGITUDE, ""));
+//				Intent i = new Intent(getActivity(),LocationService.class);
+//				getActivity().stopService(i);
+//			}
+//			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.GETWIFIAPS)){
+//				log(resultData.getString(OurLocation.NAME) + " " + 
+//						resultData.getString(OurLocation.MAC));
+//				WifiBTDevice dev = new WifiBTDevice(resultData.getString(OurLocation.NAME), resultData.getString(OurLocation.MAC));
+//				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WIFI_SEARCH_REQUEST, dev));
+//			}
+//			
+//			
+//		}
 	}
 	
 	private void log(String s){

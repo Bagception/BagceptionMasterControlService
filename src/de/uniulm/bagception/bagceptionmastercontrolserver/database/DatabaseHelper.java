@@ -544,16 +544,26 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						
 						String selectPhoto = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 						Cursor p = db.rawQuery(selectPhoto, null);
+						Log.w("TEST", "Cursorzeilen: " + p.getCount());
+						Log.w("TEST", "Cursorspalten: " + p.getColumnCount());
+						Log.w("TEST", "Cursorspaltennamen: " + p.getColumnName(0));
+						
 						Bitmap bmp = null;
 						
 						if(p.moveToFirst() && p.getCount() > 0){
 							byte[] b = p.getBlob(p.getColumnIndex(IMAGE));
-							bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
+							Log.w("TEST", "Bytearray: " + b);
+							
+							if(b != null){
+								bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
+								Log.w("TEST", "Bitmap: " + bmp);
+							}
 						}
 						
 						Item item = new Item(item_id, name, category);
 						
 						if(bmp != null){
+							Log.w("TEST", "Set Bitmap");
 							item.setImage(bmp);
 						}
 						
