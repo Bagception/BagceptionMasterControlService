@@ -309,6 +309,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(NAME, item.getName());
 		values.put(CATEGORY_ID, item.getCategory().getId());
 		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
+		
 		return 0;
 	}
 	
@@ -336,11 +337,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		} else {
 			List<Long> ids = getIndependentItems();
 			
-			for(int j = 0; j < ids.size(); j++){
-				if(ids.get(j) == id){
-					deleteIndependentItem(id);
-				}
+			if(ids.contains(id)){
+				deleteIndependentItem(id);
 			}
+//			for(int j = 0; j < ids.size(); j++){
+//				if(ids.get(j) == id){
+//					deleteIndependentItem(id);
+//				}
+//			}
 		}
 				
 		// If "contextItem" is selected, add item to ContextItem table
@@ -350,31 +354,30 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		} else {
 			List<Long> ids = getContextItems();
 			
-			for(int j = 0; j < ids.size(); j++){
-				if(ids.get(j) == id){
-					deleteContextItem(id);
-				}
+			if(ids.contains(id)){
+				deleteContextItem(id);
 			}
+//			for(int j = 0; j < ids.size(); j++){
+//				if(ids.get(j) == id){
+//					deleteContextItem(id);
+//				}
+//			}
 		}
 				
 		// If attributes != null
 		ItemAttribute iA = item.getAttribute();
-		Log.w("TEST", "Attr.: " + iA);
+
 		if(iA != null) {
-			Log.w("TEST", "Attribute einfügen!");
 			addItemAttribute(id, item);
 		}
 				
 		// If Photo exists, add photo to Photo table
-//		int image = item.getImageHash();
 		Bitmap bmp = item.getImage();
 			
 		if(bmp != null){
 			addImage(id, item);
 		}
 				
-		
-//		Log.w("TEST", "UPDATE CONTENTRESOLVER: " + values);
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
 	}
 	
@@ -392,9 +395,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		itemData.moveToFirst();
 		
 		int category_id = -1;
+		
 		if(itemData.moveToFirst() || itemData.getCount() > 0){
+			
 			category_id = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
-			Log.w("TEST", "KategorieID: " + category_id);
+//			Log.w("TEST", "KategorieID: " + category_id);
 		}
 		
 		// Get category
@@ -402,7 +407,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 		Cursor categoryName = null;
 		
-		if(category_id != -1 || category_id != 0){
+		if(category_id > 0){
 			categoryName = db.rawQuery(getCategoryQuery, null);
 		}
 		
@@ -424,7 +429,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		boolean isIndependent = getIndependentItem(id);
 		boolean isContextItem = getContextItem(id);
-		Log.w("TEST", "CONTEXTITEM: " + isContextItem);
+//		Log.w("TEST", "CONTEXTITEM: " + isContextItem);
 		ItemAttribute attributes = getItemAttribute(id);
 		List<String> tids = getTagId(id);
 		String[] tagids = new String[tids.size()];
@@ -475,12 +480,17 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Log.e(LOG, selectQuery);
 		
 		Cursor itemData = db.rawQuery(selectQuery, null);
-		itemData.moveToFirst();
 		
-		long item_id = itemData.getLong(itemData.getColumnIndex(_ID));
-		String item_name = itemData.getString(itemData.getColumnIndex(NAME));
-		int category_id = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
-
+		long item_id = -1;
+		String item_name = null; 
+		int category_id = -1;
+		
+		if(itemData.moveToFirst() && itemData.getCount() > 0){
+		
+			item_id = itemData.getLong(itemData.getColumnIndex(_ID));
+			item_name = itemData.getString(itemData.getColumnIndex(NAME));
+			category_id = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
+		}
 		
 		// Get category
 		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category_id;
@@ -491,7 +501,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String catName;
 		Category cat = null;
 		
-		if(categoryName != null){
+		if(categoryName.getCount() > 0){
 			categoryName.moveToFirst();
 			
 			catID = categoryName.getInt(0);
@@ -543,44 +553,30 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						int item_id = c.getInt(c.getColumnIndex(_ID));
 						int cat = c.getInt(c.getColumnIndex(CATEGORY_ID));
 						
-						Log.w("TEST", "GET ALL ITEMS: NAME: " + name + ", KATEGORIEID: " + cat);
-						
 						Category category = getCategory(cat);
-						
-						Log.w("TEST", "Kategorie: " + category);
-						
 						
 						String selectPhoto = "SELECT * FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 						Cursor p = db.rawQuery(selectPhoto, null);
 						
 						int imgHash = 0;
 						String imageString=null;
+						
 						if(p.moveToFirst() && p.getCount() > 0){
+
 							byte[] b = p.getBlob(p.getColumnIndex(IMAGE));
 							imgHash = p.getInt(p.getColumnIndex(IMAGE_HASH));
 							
-							Log.w("TEST", "Bytearray: " + b);
-							Log.w("TEST", "ImgHash: " + imgHash);
-							
 							if(b != null){
 								imageString = new String(b);
-								Log.w("TEST", "Bitmap by get: " + imageString);
 							}
 						}
 						
-//						Item item = new Item(item_id, name, category);
 						Item item = new Item(item_id, name, category, false, false, null);
 						
 						if(imageString != null){
-							Log.w("TEST", "Set Bitmap");
 							item.setImageString(imageString);
 						}
 						
-//						if(imgHash != 0){
-//							item.set
-//						}
-						
-						Log.w("TEST", "Item: " + item);
 						items.add(item);
 				} while(c.moveToNext());
 			}
