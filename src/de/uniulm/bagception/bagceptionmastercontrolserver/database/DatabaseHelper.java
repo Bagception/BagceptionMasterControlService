@@ -398,7 +398,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		if(itemData.moveToFirst() || itemData.getCount() > 0){
 			
 			category_id = itemData.getInt(itemData.getColumnIndex(CATEGORY_ID));
-//			Log.w("TEST", "KategorieID: " + category_id);
 		}
 		
 		// Get category
@@ -439,9 +438,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			}
 		}
 		
-//		int imageHash = getImageHash(id);
-//		Log.w("TEST", "ImageHash: " + imageHash);
-		
 		String bmp = getImageString(id);
 		
 		Item item = null;
@@ -456,8 +452,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 								isIndependent, 
 								attributes, 
 								tagids);
-			
-//			Log.w("TEST", "Neues Item: " + item);
 			
 			item.setImageString(bmp);
 			return item;
@@ -522,8 +516,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 								false, 
 								null, 
 								new ArrayList<String>());
-			
-			Log.w("TEST", "Neues Item: " + item);
 			
 			return item;
 		} else {
@@ -605,7 +597,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public void addTagIds(long item_id, List<String> tag_ids) throws DatabaseException {
 
-		for(int j = 0; j < tag_ids.size(); j++){
+		int size = tag_ids.size();
+		for(int j = 0; j < size; j++){
 			
 			String tag_id = tag_ids.get(j);
 			addTagId(item_id, tag_id);
@@ -1251,14 +1244,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		Item item = null;
 		Category category = null;
+		int itemsize = items.size();
+		int categorysize = categoriesForActivity.size();
 		
-		for(int i = 0; i < items.size(); i++) {
+		for(int i = 0; i < itemsize; i++) {
 			
 			item = items.get(i);
 			addActivityItem(activity_id, item, null);
 		}
 		
-		for(int c = 0; c < categoriesForActivity.size(); c++) {
+		for(int c = 0; c < categorysize; c++) {
 			
 			category = categoriesForActivity.get(c);
 			addActivityItem(activity_id, null, category);
