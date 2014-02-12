@@ -4,12 +4,19 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseConnector;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseInterface;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class ItemIndexSystem {
 
 	private final HashSet<String> itemsInContainer = new HashSet<String>();
+	private final DatabaseInterface dbHelper;
+	
+	
+	public ItemIndexSystem(DatabaseInterface dbHelper){
+		this.dbHelper = dbHelper;
+	}
 	
 	
 	/**
@@ -54,8 +61,17 @@ public class ItemIndexSystem {
 	public List<Item> getCurrentItems(){
 		ArrayList<Item> ret = new ArrayList<Item>();
 		for (String id_:itemsInContainer){
-			Item i = DatabaseConnector.getItem(id_);
-			ret.add(i);
+			Item i;
+			
+			try {
+				long itemId=dbHelper.getItemId(id_);
+				i = dbHelper.getItem(itemId);
+				ret.add(i);
+			} catch (DatabaseException e) {
+				e.printStackTrace();
+			}
+			
+			
 		}
 		return ret;
 	}

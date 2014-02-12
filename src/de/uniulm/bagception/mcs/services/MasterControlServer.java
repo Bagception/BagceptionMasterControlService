@@ -96,7 +96,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		registerReceiver(this.mBatteryInfoReceiver, new IntentFilter(
 				Intent.ACTION_BATTERY_CHANGED));
 
-		itemIndexSystem = new ItemIndexSystem();
+		itemIndexSystem = new ItemIndexSystem(dbHelper);
 		try {
 			activitySystem = new ActivitySystem();
 		} catch (DatabaseException e) {
@@ -356,7 +356,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 				String id = intent
 						.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
-				Log.d("bag", id);
 				LOGGER.C(this, "Tag scanned: " + id);
 				Item i = null;
 				try {
