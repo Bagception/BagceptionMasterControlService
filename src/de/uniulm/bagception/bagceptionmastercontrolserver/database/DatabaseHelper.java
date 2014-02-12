@@ -211,7 +211,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	// -------------------------------- "Item" table methods -------------------------------- //
 
 	/**
-	 * Create a new Item
+	 * Add a item to the database
 	 */
 	@Override
 	public void addItem(Item item) throws DatabaseException {
@@ -282,7 +282,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 	}
 
-
+	/**
+	 * Delete an Item from the database
+	 */
 	@Override
 	public void deleteItem(Item item) throws DatabaseException {
 
@@ -297,7 +299,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
 	}
-
 
 	@Override
 	public int editItem(Item item,Item editValues) throws DatabaseException {
@@ -805,7 +806,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(WEATHER, weather);
 		values.put(LIGHTNESS, light);
 		
-		long id = db.insert(TABLE_ITEMATTRIBUTE, null, values);
+		db.insert(TABLE_ITEMATTRIBUTE, null, values);
 	}
 	
 	
@@ -1011,7 +1012,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(IMAGE, item.getImageString().getBytes());
 		values.put(IMAGE_HASH, item_id);
 		
-		long id = db.insert(TABLE_PHOTO, null, values);
+		db.insert(TABLE_PHOTO, null, values);
 	}
 
 

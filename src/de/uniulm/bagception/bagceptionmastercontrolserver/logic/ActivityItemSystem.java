@@ -16,13 +16,19 @@ public class ActivityItemSystem {
 		this.context = context;
 	}
 	
+	/**
+	 * Gets all Items that belong to an Activity
+	 * @param activity_id
+	 * @return List<Item>
+	 * @throws DatabaseException
+	 */
 	public List<Item> getAllActivityItems(long activity_id) throws DatabaseException{
 		
 		List<Long> item_ids = db.getActivityItems(activity_id);
 		
 		if(item_ids != null){
-			
-			for(int j = 0; j < item_ids.size(); j++){
+			int size = item_ids.size();
+			for(int j = 0; j < size; j++){
 				items.add(db.getItem(item_ids.get(j)));
 			}
 		} else {
@@ -32,7 +38,12 @@ public class ActivityItemSystem {
 		return items;
 	}
 
-	
+	/**
+	 * Return a List<Item> of the missing items, after an Item is put into Bag
+	 * @param itemList
+	 * @param item
+	 * @return List<Item>
+	 */
 	public List<Item> addItemToBag(List<Item> itemList, Item item){
 		
 		items = itemList;
@@ -43,7 +54,12 @@ public class ActivityItemSystem {
 		return items;
 	}
 	
-	
+	/**
+	 * Return a List<Item> of the missing items, after an Item is taken from the Bag
+	 * @param itemList
+	 * @param item
+	 * @return List<Item>
+	 */
 	public List<Item> removeItemFromBag(List<Item> itemList, Item item){
 		
 		items = itemList;

@@ -36,6 +36,10 @@ public class ActivitySystem {
 //		location = activity.getLocation();
 	}
 	
+	/**
+	 * Return a List of all Activites
+	 * @return List<Activtiy>
+	 */
 	public List<Activity> getAllActivities(){
 		
 		List<Activity> activities = new ArrayList<Activity>();
@@ -48,18 +52,29 @@ public class ActivitySystem {
 		return activities;
 	}
 	
+	/**
+	 * Return the current activtiy
+	 * @return Activity
+	 */
 	public Activity getCurrentActivity(){
 		
 		return currentActivity;
 	}
 	
-	
+	/**
+	 * Method to guess the activity the user want to start. The method return a List of all possible activites
+	 * @param item_ids
+	 * @return List<Activity>
+	 * @throws DatabaseException
+	 */
 	public List<Activity> activityRecognition(List<Long> item_ids) throws DatabaseException{
 		
 		List<Activity> activityList = new ArrayList<Activity>();
 		
 		if(item_ids != null){
-			for(int j = 0; j < item_ids.size(); j++){
+			
+			int size = item_ids.size();
+			for(int j = 0; j < size; j++){
 				List<Activity> alist = db.getActivitesByItem(item_ids.get(j));
 				
 				if(alist != null){

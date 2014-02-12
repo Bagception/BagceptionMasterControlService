@@ -35,7 +35,7 @@ public interface DatabaseInterface {
 		
 		
 		/**
-		 * changes an item
+		 * Deprecated! Use "updateItem(Item item)" instead!
 		 * @param itemBefore the item to change
 		 * @param after the new item values
 		 * @param int the new id
@@ -45,8 +45,8 @@ public interface DatabaseInterface {
 		
 		
 		/**
-		 * Update item
-		 * @param item
+		 * Update item. Its important to set the old _id value from the item
+		 * @param the new item
 		 * @throws DatabaseException
 		 */
 		public void updateItem(Item item) throws DatabaseException;
@@ -54,14 +54,14 @@ public interface DatabaseInterface {
 		
 		/**
 		 * get a specific item
-		 * @param id
+		 * @param id of the item
 		 * @return the requested Item, null if no item is present with this id
 		 * @throws DatabaseException
 		 */
 		public Item getItem(long id) throws DatabaseException;
 		
 		/**
-		 * 
+		 * Deprecated! Get an item through his name
 		 * @param name
 		 * @return the requested Item, null if no item is present with this name
 		 * @throws DatabaseException
@@ -69,7 +69,7 @@ public interface DatabaseInterface {
 		public Item getItemByName(String name) throws DatabaseException;
 		
 		/**
-		 * 
+		 * Return a list of all items
 		 * @return a list of all Items
 		 * @throws DatabaseException
 		 */
@@ -241,7 +241,7 @@ public interface DatabaseInterface {
 		
 		
 		/**
-		 * edits an activity
+		 * Deprecated! Edits an activity
 		 * @param toEdit the activity to edit
 		 * @param after the new values
 		 * @throws DatabaseException
@@ -250,7 +250,7 @@ public interface DatabaseInterface {
 		
 		
 		/**
-		 * Update activity
+		 * Update activity. Its important that the id of the activity is set
 		 * @param activity
 		 * @throws DatabaseException
 		 */
@@ -267,7 +267,7 @@ public interface DatabaseInterface {
 	
 		
 		/**
-		 * 
+		 * A list of all activites
 		 * @return a list of all Activities (not AndroidActivities)
 		 * @throws DatabaseException
 		 */
@@ -380,7 +380,7 @@ public interface DatabaseInterface {
 		
 		
 		/**
-		 * 
+		 * Return a list of all categories
 		 * @return a list of all Categories
 		 * @throws DatabaseException
 		 */
@@ -445,7 +445,7 @@ public interface DatabaseInterface {
 		public Location getLocation(long loc_id) throws DatabaseException;
 		
 		/**
-		 * 
+		 * Return all locations
 		 * @return a list of all Locations
 		 * @throws DatabaseException
 		 */
@@ -455,7 +455,7 @@ public interface DatabaseInterface {
 				
 				
 		/**
-		 * 
+		 * Get a tag_id and return the corresponding item_id
 		 * @param tagId the tagId for a specific Tag
 		 * @return the item for the given tagId, null of no Item is found with the given Id
 		 * @throws DatabaseException 
@@ -471,7 +471,12 @@ public interface DatabaseInterface {
 		 */
 		public void addImage(long item_id, Item item) throws DatabaseException;
 		
-		
+		/**
+		 * Return the the corresponding ImageHash
+		 * @param item_id
+		 * @return
+		 * @throws DatabaseException
+		 */
 		public int getImageHash(long item_id) throws DatabaseException;
 		
 		/**
