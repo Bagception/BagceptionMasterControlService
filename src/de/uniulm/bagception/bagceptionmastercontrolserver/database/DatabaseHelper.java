@@ -269,9 +269,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 //		int image = item.getImageHash();
 		Log.d("TEST","adding...");
 		Bitmap bmp = item.getImage();
-		Log.d("TEST","bmp: " + bmp);
+
 		if(bmp != null){
-			Log.w("TEST", "Lege Image an");
 			addImage(item_id, item);
 		}
 		
@@ -429,7 +428,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		boolean isIndependent = getIndependentItem(id);
 		boolean isContextItem = getContextItem(id);
-//		Log.w("TEST", "CONTEXTITEM: " + isContextItem);
 		ItemAttribute attributes = getItemAttribute(id);
 		List<String> tids = getTagId(id);
 		String[] tagids = new String[tids.size()];
@@ -1032,16 +1030,11 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		Log.w("TEST", "Item_ID: " + item_id);
-//		Log.w("TEST", "Bitmap: " + item);
 		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
 		values.put(IMAGE, item.getImageString().getBytes());
-		Log.w("TEST", "Bitmap by set: " + item.getImageString());
-
 		values.put(IMAGE_HASH, item_id);
-		
-		Log.w("TEST", "IMAGEHASH BEIM ANLEGEN: " + item_id);
 		
 		long id = db.insert(TABLE_PHOTO, null, values);
 		Log.w("TEST", "Photo_ID: " + id);
@@ -1057,15 +1050,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String selectQuery = "SELECT " + IMAGE + " FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
-//		Log.w("TEST", "Photo-Cursor: " + c);
 		
 		if(c.getCount() != 0){
 			c.moveToFirst();
-//			Log.w("TEST", "Cursorcount: " + c.getCount());
-//			Log.w("TEST", "Cursorspalten: " + c.getColumnCount());
-//			Log.w("TEST", "Cursorinhalt: " + c.getBlob(0));
 			byte[] blob = c.getBlob(c.getColumnIndex(IMAGE));
-//			Log.w("TEST", "Bytearray: " + blob);
 			
 			return new String(blob);
 		}
