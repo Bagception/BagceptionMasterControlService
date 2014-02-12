@@ -33,6 +33,8 @@ public class WeatherForecastService extends IntentService {
 		resultReceiver = intent.getParcelableExtra("receiverTag");
 		double lat = intent.getDoubleExtra(WeatherForecast.LATITUDE, 0);
 		double lng = intent.getDoubleExtra(WeatherForecast.LONGITUDE, 0);
+//		double lat = 48.38;
+//		double lng = 10.00;
 		String unit = intent.getStringExtra(WeatherForecast.UNIT);
 		
 		if(unit!=null){
@@ -76,8 +78,6 @@ public class WeatherForecastService extends IntentService {
 						response += s;
 					}
 					jsonObject = new JSONObject(response);
-					Log.d("complete json", jsonObject.toString());
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -111,32 +111,32 @@ public class WeatherForecastService extends IntentService {
 				if(main.has("temp")){
 					answer.put(WeatherForecast.TEMP, main.getString("temp"));
 				}else{
-					answer.put(WeatherForecast.TEMP, "");
+					answer.put(WeatherForecast.TEMP, -1f);
 				}
 				if(main.has("temp_min")){
 					answer.put(WeatherForecast.TEMP_MIN, main.getString("temp_min"));
 				}else{
-					answer.put(WeatherForecast.TEMP_MIN, "");
+					answer.put(WeatherForecast.TEMP_MIN, -1f);
 				}
 				if(main.has("temp_max")){
 					answer.put(WeatherForecast.TEMP_MAX, main.getString("temp_max"));
 				}else{
-					answer.put(WeatherForecast.TEMP_MAX, "");
+					answer.put(WeatherForecast.TEMP_MAX, -1f);
 				}
 				if(list.has("wind")){
 					answer.put(WeatherForecast.WIND, wind.getString("speed"));
 				}else{
-					answer.put(WeatherForecast.WIND, "");
+					answer.put(WeatherForecast.WIND, -1f);
 				}
 				if(rain!=null && rain.has("3h")){
 					answer.put(WeatherForecast.RAIN, Double.parseDouble(rain.getString("3h"))*100);
 				}else{
-					answer.put(WeatherForecast.RAIN, "");
+					answer.put(WeatherForecast.RAIN, -1f);
 				}
 				if(list.has("clouds")){
 					answer.put(WeatherForecast.CLOUDS, clouds.getString("all"));
 				}else{
-					answer.put(WeatherForecast.CLOUDS, "");
+					answer.put(WeatherForecast.CLOUDS, -1f);
 				}
 				
 //				Log.d("answer", answer.toString());
@@ -152,6 +152,7 @@ public class WeatherForecastService extends IntentService {
 		protected void onPostExecute(JSONObject jsonObject) {
 			Bundle b = new Bundle();
 			b.putString("payload", jsonObject.toString());
+			b.putString(WeatherForecast.RESPONSE_TYPE, WeatherForecast.WEATHERFORECAST);
 			resultReceiver.send(0, b);
 		}
 

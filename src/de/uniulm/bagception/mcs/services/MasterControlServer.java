@@ -1,15 +1,12 @@
 package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
-
 import org.json.simple.JSONObject;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
@@ -21,7 +18,6 @@ import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ObservableService;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.AdministrationDatabaseAdapter;
@@ -211,21 +207,25 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		case IMAGE_REQUEST:
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			String imageID = o.get("img").toString();
-			int imageIDInt = Integer.parseInt(imageID);
+			long  imageIDInt = Integer.parseInt(imageID);
+//			Log.w("TEST", "IMAGEHASH BEI DER ABFRAGE: " + imageIDInt);
+			
 			LOGGER.C(this, " img request for id " + imageID);
 			Bitmap bmp;
 			try {
 
-				if (dbHelper.getImage(imageIDInt) == null) {
-					Log.d("fhjeigdcjgidhgviegfvuegtfre", "Huren Dreck ist null");
+				if (dbHelper.getImageString(imageIDInt) == null) {
+					Log.w("TEST", "ImageString is null");
 				} else {
-					bmp = dbHelper.getImage(imageIDInt);
+					bmp = Item.deserialize(dbHelper.getImageString(imageIDInt));
 					if (bmp == null){
-						//picture is null
+						LOGGER.C(this, " no db entry for image " + imageID);
 					}else{
+						LOGGER.C(this, " image found: " + imageID);
 						String serializedImage = PictureSerializer.serialize(bmp);
 						JSONObject obj = new JSONObject();
 						obj.put("img", serializedImage);
+						obj.put("id", imageID);
 						btHelper.sendMessageBundle(BundleMessage.getInstance()
 								.createBundle(BUNDLE_MESSAGE.IMAGE_REPLY, obj));
 					}
