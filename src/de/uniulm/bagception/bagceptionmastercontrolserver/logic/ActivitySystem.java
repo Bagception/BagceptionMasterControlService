@@ -25,10 +25,6 @@ public class ActivitySystem {
 	private DatabaseHelper db = new DatabaseHelper(context);
 	
 	public ActivitySystem() throws DatabaseException {
-		ArrayList<Item> items = new ArrayList<Item>();
-		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_HOSE));
-		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_REGENJACKE));
-		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_TRINKEN));
 		currentActivity = new Activity("dummy activity",items,new Location(1,"locName",123f,456f,10,"0xaffe"));
 		
 	}

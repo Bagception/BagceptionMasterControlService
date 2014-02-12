@@ -360,14 +360,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				LOGGER.C(this, "Tag scanned: " + id);
 				Item i = null;
 				try {
-					// i = dbHelper.getItemByName(id);
 					long item_id = dbHelper.getItemId(id);
+					
 					if (item_id != -1) {
 						i = dbHelper.getItem(item_id);
 					}
+					
 					if (i != null) {
 						// tag exists in database
-						LOGGER.C(this, "TAG found: " + i.getName());
+						LOGGER.C(this, "TAG found: " + i.getName()+", hash: "+i.getImageHash());
 						if (itemIndexSystem.itemScanned(i)) {
 							// item put in
 							LOGGER.C(this, "Item in: " + i.getName());
@@ -376,11 +377,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
 						setStatusChanged();
-						// Bundle b =
-						// BundleMessage.getInstance().toItemFoundBundle(i);
-						// b.putBoolean("exists", true);
-						// LOG.out(this, b);
-						// btHelper.sendMessageBundle(b);
 					} else {
 						// tag not found in db
 						ArrayList<String> ids = new ArrayList<String>();
@@ -417,11 +413,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
 				itemIndexSystem.getCurrentItems(), batteryStatus);
-//		for (int i = 0; i < statusUpdate.getItemList().size(); i++) {
-//			Item it = statusUpdate.getItemList().get(i);
-//			it.setImage(BitmapFactory.decodeResource(getResources(),
-//					R.drawable.ic_launcher));
-//		}
 
 		Bundle toSend = BundleMessage.getInstance().createBundle(
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
@@ -445,15 +436,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver(){
 	    @Override
 	    public void onReceive(Context ctxt, Intent intent) {
-	    	
 	    	batteryStatus = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-//			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-//			
-//			float batteryPct = level / (float)scale;
-//			Log.d("battery",level+ " " +scale+ " "+ batteryPct);
-//			batteryStatus = (int) (batteryPct*100); 
-	    	
-	      
 	    }
 	  };
 
