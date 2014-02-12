@@ -1,6 +1,5 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import android.content.ContentValues;
@@ -9,9 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.util.Log;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -1332,7 +1329,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 			while(c.isAfterLast() == false){
 				items.add(c.getLong(c.getColumnIndex(ITEM_ID)));
-				items.add(c.getLong(c.getColumnIndex(CATEGORY_ID)));
+//				items.add(c.getLong(c.getColumnIndex(CATEGORY_ID)));
 				c.moveToNext();
 			}
 			

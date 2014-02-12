@@ -31,16 +31,6 @@ public class ActivitySystem {
 		items.add(DatabaseConnector.getItemByName(DatabaseConnector.ITEM_TRINKEN));
 		currentActivity = new Activity("dummy activity",items,new Location(1,"locName",123f,456f,10,"0xaffe"));
 		
-//		activity_id = currentActivity.getId();
-//		List<Long> item_ids = db.getActivityItems(activity_id);
-//		
-//		if(item_ids != null){
-//			for(int j = 0; j < item_ids.size(); j++){
-//				
-//				items.add(db.getItem(item_ids.get(j)));
-//			}
-//		}
-//		
 	}
 	
 	public ActivitySystem(Context context) {
