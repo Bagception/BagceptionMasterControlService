@@ -252,6 +252,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		case ADMINISTRATION_COMMAND: {
 			JSONObject json = BundleMessage.getInstance().extractObject(b);
+			Log.d("IMG",json+"");
 			AdministrationCommand<?> a_cmd = AdministrationCommand
 					.fromJSONObject(json);
 			a_cmd.accept(adminDBAdapter);
