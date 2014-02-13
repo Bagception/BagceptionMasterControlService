@@ -1,5 +1,7 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
+import java.util.ArrayList;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,25 +20,29 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bluetoothclientmessengercommunication.service.BundleMessageHelper;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
+import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Position;
 import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
+import de.uniulm.bagception.services.ServiceNames;
+import de.uniulm.bagception.services.attributes.Calendar;
 import de.uniulm.bagception.services.attributes.OurLocation;
 import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 /**
  * Part of the multi-pane view<br>
  * provides the UI for the {@link LOGGER}
- * @author phil
+ * @author phil, xaffe
  *
  */
 public class DebugFragment extends Fragment implements Receiver{
@@ -49,6 +55,8 @@ public class DebugFragment extends Fragment implements Receiver{
 	private Button getWifiAPBtn;
 	private Button getBTDevicesBtn;
 	private Button getWeatherForecastBtn;
+	private Button calendarNamesBtn;
+	private Button calendarEventsBtn;
 
 	
 	private BundleMessageHelper helper;
@@ -73,6 +81,8 @@ public class DebugFragment extends Fragment implements Receiver{
 		getWifiAPBtn = (Button) v.findViewById(R.id.getWifiAPBtn);
 		getBTDevicesBtn = (Button) v.findViewById(R.id.getBTDevicesBtn);
 		getWeatherForecastBtn = (Button) v.findViewById(R.id.weatherBtn);
+		calendarNamesBtn = (Button) v.findViewById(R.id.calendarNamesBtn);
+		calendarEventsBtn = (Button) v.findViewById(R.id.calendarEventsBtn);
 		
 		
 		getLocationBtn.setOnClickListener(new OnClickListener() {
@@ -136,6 +146,35 @@ public class DebugFragment extends Fragment implements Receiver{
 				i.putExtra(WeatherForecast.LATITUDE, 48.399014);
 				i.putExtra(WeatherForecast.LONGITUDE, 9.99275);
 				i.putExtra("receiverTag", mResultreceiver);
+				getActivity().startService(i);
+			}
+		});
+		calendarNamesBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				String serviceString = ServiceNames.CALENDAR_SERVICE;
+				Intent i = new Intent(getActivity(),CalendarService.class);
+				i.putExtra("receiverTag", mResultreceiver);
+//				int[] calendarIDs = {1};
+//				i.putExtra(Calendar.NUMBER_OF_EVENTS, 3);
+				// adding optional calendar ids or names
+//				i.putExtra("calendarIDs", calendarIDs);
+//				i.putExtra(Calendar.CALENDAR_NAMES, calendarNames);
+				i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_EVENTS);
+				getActivity().startService(i);
+			}
+		});
+		calendarEventsBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), CalendarService.class);
+				i.putExtra("receiverTag", mResultreceiver);
+				// limit the amount of requesting calendar events
+//				i.putExtra(Calendar.NUMBER_OF_EVENTS, 3);
+				// adding optional calendar ids or names
+//				i.putExtra("calendarIDs", calendarIDs);
+//				i.putExtra(Calendar.CALENDAR_NAMES, calendarNames);
+				i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_EVENTS);
 				getActivity().startService(i);
 			}
 		});
@@ -247,6 +286,21 @@ public class DebugFragment extends Fragment implements Receiver{
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+			}
+			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_NAMES)){
+				log("------- GET CALENDAR NAMES ------");
+				ArrayList<String> calendarNames = new ArrayList<String>();
+				ArrayList<CalendarEvent> calendarEvents = new ArrayList<CalendarEvent>();
+				String s = resultData.getString("payload");
+				if(resultData.containsKey("calendarEvents")){
+					calendarNames = resultData.getStringArrayList("calendarNames");
+					for(String st : calendarNames){
+						calendarEvents.add(new CalendarEvent("", st, "", "", -1, -1));
+						log(st);
+					}
+				}
+				//TODO: send to client...
+				// kann ich eine arraylist mit calendarevent ssenden?
 			}
 			
 		}

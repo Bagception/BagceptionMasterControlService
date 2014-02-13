@@ -16,6 +16,8 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
 
     <application
         android:allowBackup="true"
@@ -63,7 +65,14 @@
                 <action android:name="de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService" />
             </intent-filter>
         </service>
-
+        <service
+            android:name="de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService" />
+            </intent-filter>
+        </service>
+        
         <receiver android:name="de.uniulm.bagception.BootLoader" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
