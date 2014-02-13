@@ -2,12 +2,14 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.service.location;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
+import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
 import de.uniulm.bagception.services.attributes.OurLocation;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -39,6 +41,7 @@ public class LocationService extends Service{
 	private boolean isBTRegistered = false;
 	private boolean firstTime = false;
 	private List<Location> knownLocations = null; 
+	private HashMap<String, String> wifiBTDevices;
 	
 	
 	private ArrayList<android.location.Location> storedLocations;
@@ -78,9 +81,15 @@ public class LocationService extends Service{
 	
 	@Override
 	public void onDestroy() {
-		super.onDestroy();
 		unregisterListeners();
+		super.onDestroy();
 	}
+	
+	public void onStop(){
+		
+	}
+	
+	
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -88,15 +97,13 @@ public class LocationService extends Service{
 		resultReceiver = intent.getParcelableExtra("receiverTag");
 		log("request received!");
 		
-		
-		
 		String requestType = "";
 		if(intent.hasExtra(OurLocation.REQUEST_TYPE))requestType = intent.getStringExtra(OurLocation.REQUEST_TYPE);
 		
 		
 		if(requestType.equals(OurLocation.GETLOCATION)){
 			storedLocations.clear();
-			searchForWifiAccessPoints();
+//			searchForWifiAccessPoints();
 			
 			// check if device supports bluetooth
 			if(bluetoothAdapter != null){
@@ -121,8 +128,6 @@ public class LocationService extends Service{
 				// search for nearby wifi aps and check if their mac match with a location mac
 				searchForWifiAccessPoints();
 			}
-			
-			
 		}
 		
 		
@@ -146,14 +151,13 @@ public class LocationService extends Service{
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			stopSelf();
 		}
 		
 		
 		if(requestType.equals(OurLocation.RESOLVECOORDS)){
-//			float lat = intent.getFloatExtra(OurLocation.LATITUDE, 0);
-//			float lng = intent.getFloatExtra(OurLocation.LONGITUDE, 0);
-			double lat = 48.40;
-			double lng = 9.98;
+			double lat = intent.getDoubleExtra(OurLocation.LATITUDE, 0);
+			double lng = intent.getDoubleExtra(OurLocation.LONGITUDE, 0);
 			String address = "";
 			String city = "";
 			String country = "";
@@ -165,20 +169,23 @@ public class LocationService extends Service{
 				address = addresses.get(0).getAddressLine(0);
 				city = addresses.get(0).getAddressLine(1);
 				country = addresses.get(0).getAddressLine(2);
+				Bundle b = new Bundle();
+				b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVECOORDS);
+				b.putString(OurLocation.ADDRESS, address + ", " + city + ", " + country);
+				resultReceiver.send(0, b);
 				
-				log("address: " + address + " city: " + city + " country: " + country);
+//				log("address: " + address + " city: " + city + " country: " + country);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			Bundle b = new Bundle();
-			b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVECOORDS);
-			b.putString(OurLocation.ADDRESS, address + " " + city + " " + country);
-			resultReceiver.send(0, b);
+			stopSelf();
+
 		}
 		
 		if(requestType.equals(OurLocation.GETWIFIAPS)){
 			log("getWIFIAPs");
 				WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+				wifiBTDevices = new HashMap<String, String>();
 				if(mainWifi.isWifiEnabled()){
 					// get all known locations from db
 					IntentFilter i = new IntentFilter();
@@ -191,12 +198,14 @@ public class LocationService extends Service{
 							List<ScanResult> scanResults = mWifiManager.getScanResults();
 							for(ScanResult sr : scanResults){
 //								log(sr.SSID + " " + sr.BSSID);
-								log("sendAP");
-								Bundle b = new Bundle();
-								b.putString(OurLocation.RESPONSE_TYPE, OurLocation.GETWIFIAPS);
-								b.putString(OurLocation.NAME, sr.SSID);
-								b.putString(OurLocation.MAC, sr.BSSID);
-								resultReceiver.send(0, b);
+								if(!wifiBTDevices.containsKey(sr.BSSID)){
+									wifiBTDevices.put(sr.BSSID, sr.SSID);
+									Bundle b = new Bundle();
+									b.putString(OurLocation.RESPONSE_TYPE, OurLocation.GETWIFIAPS);
+									b.putString(OurLocation.NAME, sr.SSID);
+									b.putString(OurLocation.MAC, sr.BSSID);
+									resultReceiver.send(0, b);
+								}
 							}
 						}
 					}
@@ -207,19 +216,24 @@ public class LocationService extends Service{
 		
 		
 		if(requestType.equals(OurLocation.GETBLUETOOTHDEVICES)){
-			
+			wifiBTDevices = new HashMap<String, String>();
 			mReceiver = new BroadcastReceiver() {
 				public void onReceive(Context context, Intent intent) {
 					String action = intent.getAction();
 					// When discovery finds a device
 					if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+						
+						
 						// Get the BluetoothDevice object from the Intent
 						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-						Bundle b = new Bundle();
-						b.putString(OurLocation.RESPONSE_TYPE, OurLocation.GETBLUETOOTHDEVICES);
-						b.putString(OurLocation.NAME, device.getName());
-						b.putString(OurLocation.MAC, device.getAddress());
-						resultReceiver.send(0, b);
+						if(!wifiBTDevices.containsKey(device.getAddress())){
+							wifiBTDevices.put(device.getAddress(), device.getName());
+							Bundle b = new Bundle();
+							b.putString(OurLocation.RESPONSE_TYPE, OurLocation.GETBLUETOOTHDEVICES);
+							b.putString(OurLocation.NAME, device.getName());
+							b.putString(OurLocation.MAC, device.getAddress());
+							resultReceiver.send(0, b);
+						}
 					}
 				}
 			};
@@ -239,6 +253,7 @@ public class LocationService extends Service{
 	 */
 	public void searchForWifiAccessPoints(){
 		log("searchForWifiAPs");
+		wifiBTDevices = new HashMap<String, String>();
 		try {
 			WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			if(mainWifi.isWifiEnabled()){
@@ -255,14 +270,17 @@ public class LocationService extends Service{
 						mWifiManager.getScanResults();
 						List<ScanResult> scanResults = mWifiManager.getScanResults();
 						for(ScanResult sr : scanResults){
-							log(sr.SSID + " " + sr.BSSID);
-							Location loc = isMACKnown(sr.BSSID, knownLocations);
-							if(loc != null){
-								android.location.Location location = new android.location.Location("WIFI");
-								location.setAccuracy(1);
-								location.setLatitude(loc.getLat());
-								location.setLongitude(loc.getLng());
-								sendBestPositionFromLocations(location);
+							if(!wifiBTDevices.containsKey(sr.BSSID)){
+								wifiBTDevices.put(sr.BSSID, sr.SSID);
+								log(sr.SSID + " " + sr.BSSID);
+								Location loc = isMACKnown(sr.BSSID, knownLocations);
+								if(loc != null){
+									android.location.Location location = new android.location.Location("WIFI");
+									location.setAccuracy(1);
+									location.setLatitude(loc.getLat());
+									location.setLongitude(loc.getLng());
+									sendBestPositionFromLocations(location);
+								}
 							}
 						}
 					}
@@ -275,7 +293,6 @@ public class LocationService extends Service{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	public void searchForBluetoothDevices() {
@@ -308,13 +325,11 @@ public class LocationService extends Service{
 			// Register the BroadcastReceiver
 			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 			registerReceiver(mReceiver, filter); // Don't forget to unregister
-													// during onDestroy
 			isBTRegistered = true;
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 	
 

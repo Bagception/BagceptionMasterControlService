@@ -14,152 +14,117 @@
         android:text="sendUpdate" />
 
     <Button
-        android:id="@+id/testlocation"
+        android:id="@+id/getLocationBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/sendupdate"
         android:text="get Location" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/testlocation"
-        android:layout_marginLeft="22dp"
-        android:layout_marginTop="14dp"
-        android:text="Accuracy" />
-
-    <TextView
-        android:id="@+id/textView5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/textView3"
-        android:layout_below="@+id/textView3"
-        android:text="Latitude" />
-
-    <TextView
-        android:id="@+id/textView7"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/textView5"
-        android:layout_below="@+id/textView5"
-        android:text="Longitude" />
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView5"
-        android:layout_below="@+id/textView7"
-        android:text="Provider" />
-
-    <TextView
-        android:id="@+id/providerTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView1"
-        android:layout_alignBottom="@+id/textView1"
-        android:layout_marginLeft="24dp"
-        android:layout_toRightOf="@+id/textView1"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/accuracyTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView5"
-        android:layout_alignLeft="@+id/providerTV"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/latitudeTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/textView7"
-        android:layout_alignLeft="@+id/accuracyTV"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/longitudeTV"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/providerTV"
-        android:layout_alignLeft="@+id/providerTV"
-        android:text="TextView" />
-
-    <EditText
-        android:id="@+id/rATF"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="46dp"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
-
     <Button
         android:id="@+id/resolveAddressBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/rATF"
+        android:layout_below="@+id/getLocationBtn"
+        android:layout_marginTop="44dp"
         android:text="resolve Address" />
 
-    <TextView
-        android:id="@+id/rALatTV"
+    <EditText
+        android:id="@+id/resolveAddressEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/rATF"
-        android:layout_toRightOf="@+id/rATF"
-        android:text="TextView" />
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/getLocationBtn"
+        android:layout_marginTop="16dp"
+        android:ems="10" />
 
     <TextView
-        android:id="@+id/rALngTV"
+        android:id="@+id/resolveAddressTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/rALatTV"
+        android:layout_alignBaseline="@+id/resolveAddressEditText"
+        android:layout_alignBottom="@+id/resolveAddressEditText"
         android:layout_alignParentRight="true"
         android:text="TextView" />
 
     <EditText
-        android:id="@+id/rCLatTF"
+        android:id="@+id/resolveCoordsLatEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignRight="@+id/textView7"
         android:layout_below="@+id/resolveAddressBtn"
-        android:layout_marginTop="18dp"
-        android:ems="10" />
+        android:ems="10" >
+
+        <requestFocus />
+    </EditText>
 
     <EditText
-        android:id="@+id/rCLngTF"
+        android:id="@+id/resolveCoordsLngEditText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/rCLatTF"
-        android:layout_alignBottom="@+id/rCLatTF"
-        android:layout_alignRight="@+id/providerTV"
-        android:layout_toRightOf="@+id/rCLatTF"
+        android:layout_alignBaseline="@+id/resolveCoordsLatEditText"
+        android:layout_alignBottom="@+id/resolveCoordsLatEditText"
+        android:layout_alignParentRight="true"
         android:ems="10" />
+
+    <TextView
+        android:id="@+id/resolveCoordsTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/resolveCoordsLatEditText"
+        android:text="TextView" />
 
     <Button
         android:id="@+id/resolveCoordsBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/rCLatTF"
+        android:layout_below="@+id/resolveCoordsTextView"
         android:text="resolve Coords" />
 
-    <TextView
-        android:id="@+id/rCTV"
+    <Button
+        android:id="@+id/getWifiAPBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/resolveCoordsBtn"
+        android:text="get WIFI APS" />
+
+    <Button
+        android:id="@+id/getBTDevicesBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/rCLngTF"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:text="TextView" />
+        android:layout_below="@+id/getWifiAPBtn"
+        android:text="get Bluetooth Devices" />
+
+    <Button
+        android:id="@+id/weatherBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:text="get Weather Forecast" />
+
+    <EditText
+        android:id="@+id/weatherLatEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/getBTDevicesBtn"
+        android:layout_toLeftOf="@+id/resolveCoordsLngEditText"
+        android:ems="10" />
+
+    <EditText
+        android:id="@+id/weatherLngEditText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/weatherBtn"
+        android:layout_toRightOf="@+id/resolveCoordsLatEditText"
+        android:ems="10" />
 
 </RelativeLayout>
