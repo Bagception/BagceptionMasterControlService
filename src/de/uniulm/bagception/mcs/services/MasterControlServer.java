@@ -1,15 +1,12 @@
 package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
-
 import org.json.simple.JSONObject;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.BatteryManager;
@@ -21,7 +18,6 @@ import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.ServiceUtil;
 import de.philipphock.android.lib.services.observation.ObservableService;
-import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenBroadcastActor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.actor_reactor.CaseOpenServiceBroadcastReactor;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.AdministrationDatabaseAdapter;
@@ -104,7 +100,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		registerReceiver(this.mBatteryInfoReceiver, new IntentFilter(
 				Intent.ACTION_BATTERY_CHANGED));
 
-		itemIndexSystem = new ItemIndexSystem();
+		itemIndexSystem = new ItemIndexSystem(dbHelper);
 		try {
 			activitySystem = new ActivitySystem();
 		} catch (DatabaseException e) {
@@ -217,14 +213,14 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			String imageID = o.get("img").toString();
 			long  imageIDInt = Integer.parseInt(imageID);
-			Log.w("TEST", "IMAGEHASH BEI DER ABFRAGE: " + imageIDInt);
+//			Log.w("TEST", "IMAGEHASH BEI DER ABFRAGE: " + imageIDInt);
 			
 			LOGGER.C(this, " img request for id " + imageID);
 			Bitmap bmp;
 			try {
 
 				if (dbHelper.getImageString(imageIDInt) == null) {
-					Log.d("fhjeigdcjgidhgviegfvuegtfre", "Huren Dreck ist null");
+					Log.w("TEST", "ImageString is null");
 				} else {
 					bmp = Item.deserialize(dbHelper.getImageString(imageIDInt));
 					if (bmp == null){
@@ -409,18 +405,18 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 				String id = intent
 						.getStringExtra(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
-				Log.d("bag", id);
 				LOGGER.C(this, "Tag scanned: " + id);
 				Item i = null;
 				try {
-					// i = dbHelper.getItemByName(id);
 					long item_id = dbHelper.getItemId(id);
+					
 					if (item_id != -1) {
 						i = dbHelper.getItem(item_id);
 					}
+					
 					if (i != null) {
 						// tag exists in database
-						LOGGER.C(this, "TAG found: " + i.getName());
+						LOGGER.C(this, "TAG found: " + i.getName()+", hash: "+i.getImageHash());
 						if (itemIndexSystem.itemScanned(i)) {
 							// item put in
 							LOGGER.C(this, "Item in: " + i.getName());
@@ -429,11 +425,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
 						setStatusChanged();
-						// Bundle b =
-						// BundleMessage.getInstance().toItemFoundBundle(i);
-						// b.putBoolean("exists", true);
-						// LOG.out(this, b);
-						// btHelper.sendMessageBundle(b);
 					} else {
 						// tag not found in db
 						ArrayList<String> ids = new ArrayList<String>();
@@ -470,11 +461,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
 				itemIndexSystem.getCurrentItems(), batteryStatus);
-//		for (int i = 0; i < statusUpdate.getItemList().size(); i++) {
-//			Item it = statusUpdate.getItemList().get(i);
-//			it.setImage(BitmapFactory.decodeResource(getResources(),
-//					R.drawable.ic_launcher));
-//		}
 
 		Bundle toSend = BundleMessage.getInstance().createBundle(
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
@@ -498,15 +484,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private BroadcastReceiver mBatteryInfoReceiver = new BroadcastReceiver(){
 	    @Override
 	    public void onReceive(Context ctxt, Intent intent) {
-	    	
 	    	batteryStatus = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-//			int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-//			
-//			float batteryPct = level / (float)scale;
-//			Log.d("battery",level+ " " +scale+ " "+ batteryPct);
-//			batteryStatus = (int) (batteryPct*100); 
-	    	
-	      
 	    }
 	  };
 
