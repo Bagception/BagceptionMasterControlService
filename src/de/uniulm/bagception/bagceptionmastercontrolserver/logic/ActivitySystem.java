@@ -78,8 +78,7 @@ public class ActivitySystem {
 				List<Activity> alist = db.getActivitesByItem(item_ids.get(j));
 				
 				if(alist != null){
-					for(int a = 0; a < alist.size(); a++){
-						Activity act = alist.get(a);
+					for(Activity act : alist){
 						activityList.add(act);
 					}
 				}

@@ -28,6 +28,7 @@ public class ActivityItemSystem {
 		
 		if(item_ids != null){
 			int size = item_ids.size();
+			
 			for(int j = 0; j < size; j++){
 				items.add(db.getItem(item_ids.get(j)));
 			}
