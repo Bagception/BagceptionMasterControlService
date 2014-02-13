@@ -216,6 +216,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void addItem(Item item) throws DatabaseException {
 
+		Log.w("TEST", "Erhaltenes Item: " + item);
+		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		Category c = item.getCategory();
@@ -572,6 +574,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				} while(c.moveToNext());
 			}
 			
+		Log.w("TEST", "Die Items: " + items);
 		return items;
 	}
 
