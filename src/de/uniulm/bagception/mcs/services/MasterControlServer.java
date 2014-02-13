@@ -1,7 +1,10 @@
 package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
+
 import org.json.simple.JSONObject;
+
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,7 +40,6 @@ import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
