@@ -25,6 +25,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseExcep
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
+import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ServiceSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -36,10 +37,12 @@ import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
+import de.uniulm.bagception.services.attributes.OurLocation;
 
 public class MasterControlServer extends ObservableService implements Runnable,
 		MessengerHelperCallback, CaseOpenServiceBroadcastReactor {
@@ -65,6 +68,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
+	private ServiceSystem serviceSystem;
 
 	private int batteryStatus = 0;
 
@@ -103,6 +107,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		serviceSystem = new ServiceSystem(this);
 
 	}
 
@@ -204,7 +209,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		LOGGER.C(this, "bundleMessage recv");
 
 		switch (BundleMessage.getInstance().getBundleMessageType(b)) {
-		case IMAGE_REQUEST:
+		case IMAGE_REQUEST:{
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			String imageID = o.get("img").toString();
 			long  imageIDInt = Integer.parseInt(imageID);
@@ -236,11 +241,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			}
 
 			break;
-
-		case CONTAINER_STATUS_UPDATE_REQUEST:
+		}
+		case CONTAINER_STATUS_UPDATE_REQUEST:{
 			LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
 			setStatusChanged();
 			break;
+		}
 
 		case ADMINISTRATION_COMMAND: {
 			JSONObject json = BundleMessage.getInstance().extractObject(b);
@@ -250,8 +256,51 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			LOGGER.C(this, "admin command " + a_cmd.getEntity().name() + ", "
 					+ a_cmd.getOperation().name());
 			break;
+			
 		}
-
+		case LOCATION_REQUEST:{
+			LOGGER.C(this, "LOCATION_REQUEST");
+			serviceSystem.locationRequest();
+			break;
+		}
+		
+		case RESOLVE_ADDRESS_REQUEST:{
+			LOGGER.C(this, "RESOLVE_ADDRESS_REQUEST");
+			JSONObject o = BundleMessage.getInstance().extractObject(b);
+			String address = o.get(OurLocation.ADDRESS).toString();
+			serviceSystem.resolveAddressRequest(address);
+			break;
+		}
+		
+		case RESOLVE_COORDS_REQUEST:{
+			LOGGER.C(this, "RESOLVE_COORDS_REQUEST");
+			JSONObject o = BundleMessage.getInstance().extractObject(b);
+			float lat = Float.parseFloat(o.get(OurLocation.LATITUDE).toString());
+			float lng = Float.parseFloat(o.get(OurLocation.LONGITUDE).toString());
+			serviceSystem.resolveCoordsRequest(lat, lng);
+			break;
+		}
+		
+		case WIFI_SEARCH_REQUEST:{
+			Log.d("MCS", "TADAAA...wifi request");
+			LOGGER.C(this, "WIFI_SEARCH_REQUEST");
+			serviceSystem.wifiSearchRequest();
+			break;
+		}
+			
+		case BLUETOOTH_SEARCH_REQUEST:
+			LOGGER.C(this, "BLUETOOTH_SEARCH_REQUEST");
+			serviceSystem.bluetoothSearchRequest();
+			break;
+			
+		case WEATHERFORECAST_REQUEST:
+			LOGGER.C(this, "WEATHERFORECAST_REQUEST");
+			JSONObject o = BundleMessage.getInstance().extractObject(b);
+			float lat = Float.parseFloat(o.get(OurLocation.LATITUDE).toString());
+			float lng = Float.parseFloat(o.get(OurLocation.LONGITUDE).toString());
+			serviceSystem.weatherForecastRequest(lat, lng);
+			break;
+			
 		default:
 			break;
 		}
