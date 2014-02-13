@@ -155,12 +155,7 @@ public class DebugFragment extends Fragment implements Receiver{
 				String serviceString = ServiceNames.CALENDAR_SERVICE;
 				Intent i = new Intent(getActivity(),CalendarService.class);
 				i.putExtra("receiverTag", mResultreceiver);
-//				int[] calendarIDs = {1};
-//				i.putExtra(Calendar.NUMBER_OF_EVENTS, 3);
-				// adding optional calendar ids or names
-//				i.putExtra("calendarIDs", calendarIDs);
-//				i.putExtra(Calendar.CALENDAR_NAMES, calendarNames);
-				i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_EVENTS);
+				i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_NAMES);
 				getActivity().startService(i);
 			}
 		});
@@ -292,7 +287,7 @@ public class DebugFragment extends Fragment implements Receiver{
 				ArrayList<String> calendarNames = new ArrayList<String>();
 				ArrayList<CalendarEvent> calendarEvents = new ArrayList<CalendarEvent>();
 				String s = resultData.getString("payload");
-				if(resultData.containsKey("calendarEvents")){
+				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
 					calendarNames = resultData.getStringArrayList("calendarNames");
 					for(String st : calendarNames){
 						calendarEvents.add(new CalendarEvent("", st, "", "", -1, -1));

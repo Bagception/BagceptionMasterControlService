@@ -1,20 +1,26 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bluetoothclientmessengercommunication.service.BundleMessageHelper;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
+import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Position;
 import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
+import de.uniulm.bagception.services.ServiceNames;
+import de.uniulm.bagception.services.attributes.Calendar;
 import de.uniulm.bagception.services.attributes.OurLocation;
 import de.uniulm.bagception.services.attributes.WeatherForecast;
 
@@ -22,14 +28,12 @@ public class ServiceSystem implements Receiver{
 	
 	private MyResultReceiver mResultreceiver;
 	private MasterControlServer mcs;
-	private BundleMessageHelper helper;
 
 	
 	public ServiceSystem(MasterControlServer mcs){
 		this.mcs = mcs;
 		mResultreceiver = new MyResultReceiver(new Handler());
 		mResultreceiver.setReceiver(this);
-		helper = new BundleMessageHelper(mcs);
 	}
 
 	
@@ -85,6 +89,21 @@ public class ServiceSystem implements Receiver{
 		mcs.startService(i);
 	}
 	
+	public void calendarNameRequest() {
+		// CALENDAR NAME
+		Intent i = new Intent(mcs, CalendarService.class);
+		i.putExtra("receiverTag", mResultreceiver);
+		i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_NAMES);
+		mcs.startService(i);
+	}
+	
+	public void calendarEventRequest() {
+		Intent i = new Intent(mcs, CalendarService.class);
+		i.putExtra("receiverTag", mResultreceiver);
+		i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_EVENTS);
+		mcs.startService(i);
+	}
+	
 	private void log(String s){
 		Log.d("MCS", s);
 	}
@@ -113,7 +132,7 @@ public class ServiceSystem implements Receiver{
 														resultData.getFloat(OurLocation.LATITUDE, 0),
 														resultData.getFloat(OurLocation.LONGITUDE, 0),
 														resultData.getFloat(OurLocation.ACCURACY, 0));
-				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.LOCATION_REPLY, currentPosition));
+				mcs.sendToRemote(BUNDLE_MESSAGE.LOCATION_REPLY, currentPosition);
 			}
 			
 			// LOCATIONSERVICE RESOLVE ADDRESS REPLY
@@ -144,7 +163,7 @@ public class ServiceSystem implements Receiver{
 				log("mac: " + resultData.getString(OurLocation.MAC));
 				// sending access points name and mac to client
 				WifiBTDevice dev = new WifiBTDevice(resultData.getString(OurLocation.NAME), resultData.getString(OurLocation.MAC));
-				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WIFI_SEARCH_REPLY, dev));
+				mcs.sendToRemote(BUNDLE_MESSAGE.WIFI_SEARCH_REPLY, dev);
 			}
 			
 			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.GETBLUETOOTHDEVICES)){
@@ -153,7 +172,7 @@ public class ServiceSystem implements Receiver{
 				log("mac: " + resultData.getString(OurLocation.MAC));
 				// sending access points name and mac to client
 				WifiBTDevice dev = new WifiBTDevice(resultData.getString(OurLocation.NAME), resultData.getString(OurLocation.MAC));
-				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.BLUETOOTH_SEARCH_REPLY, dev));
+//				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.BLUETOOTH_SEARCH_REPLY, dev));
 			}
 			
 			// WEATHERFORECASTSERVICE FORECAST REPLY
@@ -184,8 +203,26 @@ public class ServiceSystem implements Receiver{
 //					e.printStackTrace();
 //				}
 			}
-			
+			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_NAMES)){
+				log("------- GET CALENDAR NAMES ------");
+				ArrayList<String> calendarNames = new ArrayList<String>();
+				ArrayList<CalendarEvent> calendarEvents = new ArrayList<CalendarEvent>();
+				String s = resultData.getString("payload");
+				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
+					calendarNames = resultData.getStringArrayList("calendarNames");
+					for(String st : calendarNames){
+						calendarEvents.add(new CalendarEvent("", st, "", "", -1, -1));
+						log(st);
+					}
+				}
+				//TODO: send to client...
+				// kann ich eine arraylist mit calendarevent ssenden?
+			}
+			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_EVENTS)){
+				
+			}
 		}
 	}
+
 
 }

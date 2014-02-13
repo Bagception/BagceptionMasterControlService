@@ -291,18 +291,30 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			break;
 		}
 			
-		case BLUETOOTH_SEARCH_REQUEST:
+		case BLUETOOTH_SEARCH_REQUEST:{
 			LOGGER.C(this, "BLUETOOTH_SEARCH_REQUEST");
 			serviceSystem.bluetoothSearchRequest();
 			break;
+		}
 			
-		case WEATHERFORECAST_REQUEST:
+		case WEATHERFORECAST_REQUEST:{
 			LOGGER.C(this, "WEATHERFORECAST_REQUEST");
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			float lat = Float.parseFloat(o.get(OurLocation.LATITUDE).toString());
 			float lng = Float.parseFloat(o.get(OurLocation.LONGITUDE).toString());
 			serviceSystem.weatherForecastRequest(lat, lng);
 			break;
+		}
+		case CALENDAR_NAME_REQUEST:{
+			LOGGER.C(this, "CALENDAR_NAME_REQUEST");
+			serviceSystem.calendarNameRequest();
+			break;
+		}
+		case CALENDAR_EVENT_REQUEST:{
+			LOGGER.C(this, "CALENDAR_NAME_REQUEST");
+			serviceSystem.calendarEventRequest();
+			break;
+		}
 			
 		default:
 			break;
