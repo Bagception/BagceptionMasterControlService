@@ -24,7 +24,7 @@ public class LOGGER {
 	private static final StringBuilder sb = new StringBuilder();
 	private static Context context;
 	
-	
+	private static final Object lock = new Object();
 	
 	@SuppressLint("SimpleDateFormat")
 	private static final SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
@@ -39,38 +39,45 @@ public class LOGGER {
 //		
 //	}
 	
-	public static synchronized void C(Object origin, Object message){
-		if (origin instanceof Context){
-			LOGGER.context = (Context) origin;	
+	public static void C(Object origin, Object message){
+		synchronized (lock) {
+			
+		
+			if (origin instanceof Context){
+				LOGGER.context = (Context) origin;	
+			}
+			
+			if (out_to_logcat)
+				LOG.out(origin, message);
+			
+			sb.setLength(0);
+			
+			sb.append("[");
+			sb.append(getTime());
+			sb.append("]:\n");
+			sb.append(message);
+			logList.add(sb.toString());
+			
+			if (logList.size()>LOG_LIST_MAX){
+				logList.remove(0);
+			}
+			Intent logIntent = new Intent("de.uniulm.bagception.bc.log");
+			if (context == null) return;
+			LocalBroadcastManager.getInstance(context).sendBroadcast(logIntent);
 		}
-		
-		if (out_to_logcat)
-			LOG.out(origin, message);
-		
-		sb.setLength(0);
-		
-		sb.append("[");
-		sb.append(getTime());
-		sb.append("]:\n");
-		sb.append(message);
-		logList.add(sb.toString());
-		
-		if (logList.size()>LOG_LIST_MAX){
-			logList.remove(0);
-		}
-		Intent logIntent = new Intent("de.uniulm.bagception.bc.log");
-		if (context == null) return;
-		LocalBroadcastManager.getInstance(context).sendBroadcast(logIntent);
-		
 	}
 	
 	
 	public static void clear(){
-		logList.clear();
+		synchronized (lock) {
+			logList.clear();
+		}
 	}
 	
 	public static final List<String> getLogs(){
-		return logList;
+		synchronized (lock) {
+			return logList;
+		}
 				
 	}
 	
