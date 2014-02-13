@@ -1071,10 +1071,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			loc_id = activity.getLocation().getId();
 		}
 		
+		
+		
 		ContentValues values = new ContentValues();
 		values.put(NAME, activity.getName());
 		values.put(LOCATION_ID, loc_id);
-			
+		
 		db.insert(TABLE_ACTIVITY, null, values);
 		
 	}
