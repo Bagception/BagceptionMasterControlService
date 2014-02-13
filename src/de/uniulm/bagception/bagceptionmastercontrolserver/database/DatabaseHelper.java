@@ -1007,7 +1007,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	@Override
 	public void addImage(long item_id, Item item) throws DatabaseException {
-
+		if (item.getImageString()==null) return;
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
@@ -1066,6 +1066,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void addActivity(Activity activity) throws DatabaseException {
 
+		Log.w("TEST", "Activity: " + activity);
+		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		long loc_id = -1;
@@ -1082,7 +1084,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		if(activity.getItemsForActivity() != null){
 			List<Item> iA = activity.getItemsForActivity();
-			
+			Log.w("TEST", "Liste: " + iA);
 			addActivityItems(id, iA, null);
 		}
 		
@@ -1252,6 +1254,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
+		Log.w("TEST", "ActivityItems: " + items);
+		
 		Item item = null;
 		Category category = null;
 		int itemsize = 0;
