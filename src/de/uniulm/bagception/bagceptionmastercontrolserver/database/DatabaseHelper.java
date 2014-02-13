@@ -1074,13 +1074,17 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			loc_id = activity.getLocation().getId();
 		}
 		
-		
-		
 		ContentValues values = new ContentValues();
 		values.put(NAME, activity.getName());
 		values.put(LOCATION_ID, loc_id);
 		
-		db.insert(TABLE_ACTIVITY, null, values);
+		long id = db.insert(TABLE_ACTIVITY, null, values);
+		
+		if(activity.getItemsForActivity() != null){
+			List<Item> iA = activity.getItemsForActivity();
+			
+			addActivityItems(id, iA, null);
+		}
 		
 	}
 
@@ -1250,8 +1254,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		Item item = null;
 		Category category = null;
-		int itemsize = items.size();
-		int categorysize = categoriesForActivity.size();
+		int itemsize = 0;
+		int categorysize = 0;
+		
+		if(items != null){
+			itemsize = items.size();
+		}
+		
+		if(categoriesForActivity != null){
+			categorysize = categoriesForActivity.size();
+		}
 		
 		for(int i = 0; i < itemsize; i++) {
 			
