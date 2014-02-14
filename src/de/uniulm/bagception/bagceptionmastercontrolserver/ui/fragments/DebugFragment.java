@@ -3,7 +3,9 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 import java.util.ArrayList;
 
 import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -258,45 +260,60 @@ public class DebugFragment extends Fragment implements Receiver{
 			// WEATHERFORECASTSERVICE FORECAST REPLY
 			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
 				String s = resultData.getString("payload");
-				try {
-					JSONObject object = new JSONObject(s);
-					String city = object.getString("city");
-					float temp = Float.parseFloat(object.getString(WeatherForecast.TEMP));
-					float wind = Float.parseFloat(object.getString(WeatherForecast.WIND));
-					float clouds = Float.parseFloat(object.getString(WeatherForecast.CLOUDS));
-					float temp_min = Float.parseFloat(object.getString(WeatherForecast.TEMP_MIN));
-					float temp_max = Float.parseFloat(object.getString(WeatherForecast.TEMP_MAX));
-					float rain = Float.parseFloat(object.getString(WeatherForecast.RAIN));
-					// sending weatherforecast to client
-					de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(city, temp, wind, clouds, temp_min, temp_max, rain);
-					helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WEATHERFORECAST_REPLY, forecast));
-					log("------- GET WEATHER FORECAST------");
-					log(" city: " + forecast.getCity());
-					log(" temp: " + forecast.getTemp());
-					log(" wind: " + forecast.getWind()); 
-					log(" clouds: " + forecast.getClouds());
-					log(" tempMin: " + forecast.getTemp_min());
-					log(" tempMax: " + forecast.getTemp_max()); 
-					log(" rain: " + forecast.getRain());
+//				try {
+//					JSONObject object = new JSONObject(s);
+//					String city = object.getString("city");
+//					float temp = Float.parseFloat(object.getString(WeatherForecast.TEMP));
+//					float wind = Float.parseFloat(object.getString(WeatherForecast.WIND));
+//					float clouds = Float.parseFloat(object.getString(WeatherForecast.CLOUDS));
+//					float temp_min = Float.parseFloat(object.getString(WeatherForecast.TEMP_MIN));
+//					float temp_max = Float.parseFloat(object.getString(WeatherForecast.TEMP_MAX));
+//					float rain = Float.parseFloat(object.getString(WeatherForecast.RAIN));
+//					// sending weatherforecast to client
+//					de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(city, temp, wind, clouds, temp_min, temp_max, rain);
+//					helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WEATHERFORECAST_REPLY, forecast));
+//					log("------- GET WEATHER FORECAST------");
+//					log(" city: " + forecast.getCity());
+//					log(" temp: " + forecast.getTemp());
+//					log(" wind: " + forecast.getWind()); 
+//					log(" clouds: " + forecast.getClouds());
+//					log(" tempMin: " + forecast.getTemp_min());
+//					log(" tempMax: " + forecast.getTemp_max()); 
+//					log(" rain: " + forecast.getRain());
 					//TODO: stop service
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+//				}
 			}
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_NAMES)){
 				log("------- GET CALENDAR NAMES ------");
 				ArrayList<String> calendarNames = new ArrayList<String>();
-				ArrayList<CalendarEvent> calendarEvents = new ArrayList<CalendarEvent>();
 				String s = resultData.getString("payload");
 				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
 					calendarNames = resultData.getStringArrayList("calendarNames");
 					for(String st : calendarNames){
-						calendarEvents.add(new CalendarEvent("", st, "", "", -1, -1));
 						log(st);
 					}
 				}
-				//TODO: send to client...
-				// kann ich eine arraylist mit calendarevent ssenden?
+			}
+			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_EVENTS)){
+				log("------- GET CALENDAR EVENTS ------");
+					String s = resultData.getString("payload");
+					if(resultData.containsKey(Calendar.CALENDAR_EVENTS)){
+						ArrayList<String> calendarEvents = resultData.getStringArrayList("calendarEvents");
+						JSONParser parser = new JSONParser();
+						JSONObject obj = null;
+						for(String st : calendarEvents){
+							log(st);
+							try {
+								obj = (JSONObject) parser.parse(st);
+								CalendarEvent event = CalendarEvent.fromJSON(obj);
+								log("IT WORKED!!!!");
+								log(event.getName() + " " + event.getLocation());
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
 			}
 			
 		}
