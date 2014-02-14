@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
 
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,9 +37,11 @@ import de.uniulm.bagception.bluetoothservermessengercommunication.messenger.Mess
 import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandProcessor;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
@@ -258,6 +259,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			a_cmd.accept(adminDBAdapter);
 			LOGGER.C(this, "admin command " + a_cmd.getEntity().name() + ", "
 					+ a_cmd.getOperation().name());
+			
+			a_cmd.accept(activityProcessor);
+			
 			break;
 			
 		}
@@ -316,6 +320,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			break;
 		}
 			
+		
+		
 		default:
 			break;
 		}
@@ -502,5 +508,17 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	    }
 	  };
 
+	  
+	private final AdministrationCommandProcessor activityProcessor = new AdministrationCommandProcessor(){
+		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
+			activitySystem.setCurrentActivity(a);
+			setStatusChanged();
+		};
+		public void onActivityStop(Activity a, AdministrationCommand<Activity> cmd) {
+			activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
+			setStatusChanged();
+		};
+		
+	};
 
 }
