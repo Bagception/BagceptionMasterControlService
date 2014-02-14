@@ -38,7 +38,6 @@ public class LocationService extends Service{
 	private LocationListener locationListener;
 	private BluetoothAdapter bluetoothAdapter;
 	private BroadcastReceiver mReceiver;
-	private boolean isBTRegistered = false;
 	private boolean firstTime = false;
 	private List<Location> knownLocations = null; 
 	private HashMap<String, String> wifiBTDevices;
@@ -216,6 +215,7 @@ public class LocationService extends Service{
 		
 		
 		if(requestType.equals(OurLocation.GETBLUETOOTHDEVICES)){
+			log("###### requestType correct! searching for bt devices");
 			wifiBTDevices = new HashMap<String, String>();
 			mReceiver = new BroadcastReceiver() {
 				public void onReceive(Context context, Intent intent) {
@@ -223,6 +223,7 @@ public class LocationService extends Service{
 					// When discovery finds a device
 					if (BluetoothDevice.ACTION_FOUND.equals(action)) {
 						
+						log("###### device found!");
 						
 						// Get the BluetoothDevice object from the Intent
 						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -233,14 +234,16 @@ public class LocationService extends Service{
 							b.putString(OurLocation.NAME, device.getName());
 							b.putString(OurLocation.MAC, device.getAddress());
 							resultReceiver.send(0, b);
+							log("###### device send!");
+
 						}
 					}
 				}
 			};
 			// Register the BroadcastReceiver
-			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-			registerReceiver(mReceiver, filter); // Don't forget to unregister
-			isBTRegistered = true;
+			IntentFilter registerFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+			registerReceiver(mReceiver, registerFilter); 
+			log("...");
 		}
 		
 		return super.onStartCommand(intent, flags, startId);
@@ -305,9 +308,11 @@ public class LocationService extends Service{
 			mReceiver = new BroadcastReceiver() {
 				
 				public void onReceive(Context context, Intent intent) {
+					log("started...");
 					String action = intent.getAction();
 					// When discovery finds a device
 					if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+						log("device found...");
 						// Get the BluetoothDevice object from the Intent
 						BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 						
@@ -319,13 +324,15 @@ public class LocationService extends Service{
 	                		location.setLongitude(loc.getLng());
 	                		sendBestPositionFromLocations(location);
 	                	}
+					}else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+						log("discovery finished...");
+						unregisterReceiver(mReceiver);
 					}
 				}
 			};
 			// Register the BroadcastReceiver
 			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 			registerReceiver(mReceiver, filter); // Don't forget to unregister
-			isBTRegistered = true;
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -376,10 +383,6 @@ public class LocationService extends Service{
 	
 	private void unregisterListeners(){
 		// unregisterBluetooth
-		if(isBTRegistered){
-			unregisterReceiver(mReceiver); 
-			isBTRegistered=false;
-		}
 		locationManager.removeUpdates(locationListener);
 	}
 	

@@ -172,7 +172,7 @@ public class ServiceSystem implements Receiver{
 				log("mac: " + resultData.getString(OurLocation.MAC));
 				// sending access points name and mac to client
 				WifiBTDevice dev = new WifiBTDevice(resultData.getString(OurLocation.NAME), resultData.getString(OurLocation.MAC));
-//				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.BLUETOOTH_SEARCH_REPLY, dev));
+				mcs.sendToRemote(BUNDLE_MESSAGE.BLUETOOTH_SEARCH_REPLY, dev);
 			}
 			
 			// WEATHERFORECASTSERVICE FORECAST REPLY
@@ -211,13 +211,12 @@ public class ServiceSystem implements Receiver{
 				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
 					calendarNames = resultData.getStringArrayList("calendarNames");
 					for(String st : calendarNames){
-						calendarEvents.add(new CalendarEvent("", st, "", "", -1, -1));
-						log(st);
+						CalendarEvent name = new CalendarEvent("", st, "", "", -1, -1);
+						mcs.sendToRemote(BUNDLE_MESSAGE.CALENDAR_NAME_REPLY, name);
 					}
 				}
-				//TODO: send to client...
-				// kann ich eine arraylist mit calendarevent ssenden?
 			}
+			
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_EVENTS)){
 				
 			}

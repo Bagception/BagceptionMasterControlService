@@ -131,6 +131,7 @@ public class DebugFragment extends Fragment implements Receiver{
 		getBTDevicesBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				log("button pressed");
 				// GET ALL BLUETOOTH DEVICES
 				Intent i = new Intent(getActivity(),LocationService.class);
 				i.putExtra("receiverTag", mResultreceiver);
