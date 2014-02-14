@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import org.json.simple.JSONObject;
+
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 
 import android.content.Context;
@@ -19,16 +21,16 @@ public class CalendarReader {
 	private String[] EVENT_PROJECTION;						// select statement
 	private String SELECTION;								//  where statement
 	private Cursor cursor;
-	private ArrayList<String> calendarEvents;				// return value
+	private ArrayList<CalendarEvent> calendarEvents;				// return value
 	private HashMap<String, Integer> idNameHashMap;			// hashmap of unique calendar name id pairs
 	private Uri uri;
 	private Context context;
 
 	
-	public ArrayList<String> readCalendarEvent(Context context, String[] calendarNames, int[] calendarIDs, int numberOfEvents) {
+	public ArrayList<CalendarEvent> readCalendarEvent(Context context, String[] calendarNames, int[] calendarIDs, int numberOfEvents) {
 		this.context = context;
 		cursor = null;
-		calendarEvents = new ArrayList<String>();			
+		calendarEvents = new ArrayList<CalendarEvent>();			
 		idNameHashMap = new HashMap<String, Integer>();		
 
 		
@@ -107,14 +109,8 @@ public class CalendarReader {
 			if(!cursor.getString(4).isEmpty()) startDate = Long.parseLong(cursor.getString(4));
 			if(!cursor.getString(5).isEmpty()) endDate = Long.parseLong(cursor.getString(5));
 			
-//			log("name: " + name);
-//			log("calendarName: " + calendarName);
-//			log("description: " + description);
-//			log("location: " + location);
-//			log("startDate: " + getDate(startDate));
-//			log("endDate: " + getDate(endDate));
 			CalendarEvent event = new CalendarEvent(name, calendarName, description, location, startDate, endDate);
-			calendarEvents.add(event.toString());
+			calendarEvents.add(event);
 			number++;
 		}
 		return calendarEvents;

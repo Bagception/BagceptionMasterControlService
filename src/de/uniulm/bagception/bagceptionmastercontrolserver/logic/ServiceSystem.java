@@ -3,6 +3,10 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -206,7 +210,6 @@ public class ServiceSystem implements Receiver{
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_NAMES)){
 				log("------- GET CALENDAR NAMES ------");
 				ArrayList<String> calendarNames = new ArrayList<String>();
-				ArrayList<CalendarEvent> calendarEvents = new ArrayList<CalendarEvent>();
 				String s = resultData.getString("payload");
 				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
 					calendarNames = resultData.getStringArrayList("calendarNames");
@@ -218,7 +221,23 @@ public class ServiceSystem implements Receiver{
 			}
 			
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_EVENTS)){
-				
+//				log("------- GET CALENDAR EVENTS ------");
+				if(resultData.containsKey(Calendar.CALENDAR_EVENTS)){
+					ArrayList<String> calendarEvents = resultData.getStringArrayList("calendarEvents");
+					JSONParser parser = new JSONParser();
+					JSONObject obj = null;
+					for(String st : calendarEvents){
+						log(st);
+						try {
+							obj = (JSONObject) parser.parse(st);
+							CalendarEvent event = CalendarEvent.fromJSON(obj);
+							mcs.sendToRemote(BUNDLE_MESSAGE.CALENDAR_EVENT_REPLY, event);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+
 			}
 		}
 	}

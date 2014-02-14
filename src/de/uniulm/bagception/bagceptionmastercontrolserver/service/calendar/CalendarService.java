@@ -1,5 +1,10 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar;
 
+import java.util.ArrayList;
+
+import org.json.simple.JSONObject;
+
+import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.services.attributes.Calendar;
 import android.app.IntentService;
 import android.content.Intent;
@@ -23,9 +28,10 @@ public class CalendarService extends IntentService {
 		resultReceiver = intent.getParcelableExtra("receiverTag");
 		log("calendar request received!");
 		
-		
+		//TODO: get calendarnames from db
 		if(intent.hasExtra(Calendar.REQUEST_TYPE)){
 			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.CALENDAR_EVENTS)){
+				log("requesting calendar events");
 				// getting intent extras
 				String[] calendarNames = intent.getStringArrayExtra(Calendar.CALENDAR_NAMES);
 				int[] calendarIDs = intent.getIntArrayExtra(Calendar.CALENDAR_IDS);
@@ -33,13 +39,17 @@ public class CalendarService extends IntentService {
 				
 				// getting and sending calendar events
 				Bundle b = new Bundle();
-				b.putStringArrayList(Calendar.CALENDAR_EVENTS, reader.readCalendarEvent(this, calendarNames, calendarIDs, numberOfEvents));
+				ArrayList<CalendarEvent> events = reader.readCalendarEvent(this, calendarNames, calendarIDs, numberOfEvents);
+				ArrayList<String> stringEvents = new ArrayList<String>();
+				for(CalendarEvent ce : events){
+					stringEvents.add(ce.toJSONObject().toString());
+				}
 				b.putString(Calendar.RESPONSE_TYPE, Calendar.CALENDAR_EVENTS);
+				b.putStringArrayList(Calendar.CALENDAR_EVENTS, stringEvents);
 				resultReceiver.send(0, b);
-				log("sending calendar events...");
+//				log("sending calendar events...");
 			}
 			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.CALENDAR_NAMES)){
-				log("calendar names requested");
 				Bundle b = new Bundle();
 				b.putStringArrayList(Calendar.CALENDAR_NAMES, reader.getCalendarNames(this));
 				b.putString(Calendar.RESPONSE_TYPE, Calendar.CALENDAR_NAMES);
