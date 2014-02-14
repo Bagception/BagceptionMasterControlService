@@ -1249,16 +1249,22 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		ContentValues values = new ContentValues();
 		values.put(ACTIVITY_ID, activity_id);
-		values.put(ITEM_ID, item.getId());
-		values.put(CATEGORY_ID, category.getId());
-			
+		
+		if(item != null){
+			values.put(ITEM_ID, item.getId());
+		}
+		
+		if(category != null){
+			values.put(CATEGORY_ID, category.getId());
+		}
+		
 		db.insert(TABLE_ACTIVITYITEM, null, values);
 
 	}
 	
 	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
-		Log.w("TEST", "ActivityItems: " + items);
+		Log.w("TEST", "ActivityItems Database: " + items);
 		
 		Item item = null;
 		Category category = null;
