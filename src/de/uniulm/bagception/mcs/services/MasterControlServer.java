@@ -285,7 +285,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 		
 		case WIFI_SEARCH_REQUEST:{
-			Log.d("MCS", "TADAAA...wifi request");
 			LOGGER.C(this, "WIFI_SEARCH_REQUEST");
 			serviceSystem.wifiSearchRequest();
 			break;
