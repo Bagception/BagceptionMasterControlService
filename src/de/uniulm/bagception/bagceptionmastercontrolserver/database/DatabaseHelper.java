@@ -798,6 +798,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ItemAttribute iA = item.getAttribute();
+		Log.w("TEST", "ItemAttributes werden jetzt in Tabelle geschrieben: " + iA);
 		
 		String temp = iA.getTemperature();
 		String weather = iA.getWeather();
@@ -808,6 +809,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(TEMPERATURE, temp);
 		values.put(WEATHER, weather);
 		values.put(LIGHTNESS, light);
+		
+		Log.w("TEST", "ContentValues Attribute: " + values);
 		
 		db.insert(TABLE_ITEMATTRIBUTE, null, values);
 	}
