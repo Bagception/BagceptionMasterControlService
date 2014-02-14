@@ -99,7 +99,6 @@ public class LocationService extends Service{
 		String requestType = "";
 		if(intent.hasExtra(OurLocation.REQUEST_TYPE))requestType = intent.getStringExtra(OurLocation.REQUEST_TYPE);
 		
-		
 		if(requestType.equals(OurLocation.GETLOCATION)){
 			storedLocations.clear();
 //			searchForWifiAccessPoints();
@@ -133,6 +132,7 @@ public class LocationService extends Service{
 		if(requestType.equals(OurLocation.RESOLVEADDRESS)){
 			log("resolve address...");
 			String address = intent.getStringExtra(OurLocation.ADDRESS);
+			log("address to resolve: " + address);
 			
 			Geocoder coder = new Geocoder(this);
 			List<Address> addresses;
@@ -155,8 +155,9 @@ public class LocationService extends Service{
 		
 		
 		if(requestType.equals(OurLocation.RESOLVECOORDS)){
-			double lat = intent.getDoubleExtra(OurLocation.LATITUDE, 0);
-			double lng = intent.getDoubleExtra(OurLocation.LONGITUDE, 0);
+			log("resolvecoords!!!");
+			float lat = intent.getFloatExtra(OurLocation.LATITUDE, 0);
+			float lng = intent.getFloatExtra(OurLocation.LONGITUDE, 0);
 			String address = "";
 			String city = "";
 			String country = "";
@@ -175,6 +176,11 @@ public class LocationService extends Service{
 				
 //				log("address: " + address + " city: " + city + " country: " + country);
 			} catch (IOException e) {
+				log("address not found");
+				Bundle b = new Bundle();
+				b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVECOORDS);
+				b.putString(OurLocation.ADDRESS, "address not found");
+				resultReceiver.send(0, b);
 				e.printStackTrace();
 			}
 			stopSelf();
