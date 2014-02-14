@@ -1137,6 +1137,38 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 
 	
+	public Activity getActivity(long id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		Activity activity = null;
+		
+		String selectQuery = "SELECT * FROM " + TABLE_ACTIVITY + " WHERE " + _ID + " = " + id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		String ac_name = null;
+		long locid = -1;
+		
+		if(c.getCount() > 0){
+			c.moveToFirst();
+			
+//			id = c.getLong(c.getColumnIndex(_ID));
+			ac_name = c.getString(c.getColumnIndex(NAME));
+			locid = c.getLong(c.getColumnIndex(LOCATION_ID));
+		}
+		
+		Location location = null;
+		
+		if(locid > 0){
+			location = getLocation(locid);
+		}
+		
+		activity = new Activity(id, ac_name, new ArrayList<Item>(), location);
+		
+		return activity;
+	}
+
+	
 	public Activity getActivity(String name) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -1173,6 +1205,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public List<Activity> getActivities() throws DatabaseException {
 
 		List<Activity> activities = new ArrayList<Activity>();
+		List<Item> items = new ArrayList<Item>();
+		Item item = null;
 		
 		String selectQuery = "SELECT * FROM " + TABLE_ACTIVITY;
 		
@@ -1192,8 +1226,25 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					if(loc_id != -1){
 						location = getLocation(loc_id);
 					}
+					
+					
+					// Get item_ids which belong to the activity
+					String itemIdQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
+					Cursor iC = db.rawQuery(itemIdQuery, null);
+					
+					if(iC.moveToFirst() && iC.getCount() > 0){
 						
-					Activity activity = new Activity(id, name, new ArrayList<Item>(), location);
+						do {
+							long item_id = iC.getLong(iC.getColumnIndex(ITEM_ID));
+							
+							// Get items from TABLE_ITEM
+							item = getItem(item_id);
+							items.add(item);
+							
+						} while(iC.moveToNext());
+					}
+						
+					Activity activity = new Activity(id, name, items, location);
 					activities.add(activity);
 			} while(c.moveToNext());
 		}

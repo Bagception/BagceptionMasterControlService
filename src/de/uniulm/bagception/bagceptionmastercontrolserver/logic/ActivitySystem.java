@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
@@ -31,10 +32,27 @@ public class ActivitySystem {
 		this.context = context;
 	}
 	
-	public void setCurrentActivity(Activity activity){
-		this.currentActivity = activity;
+	public void setCurrentActivity(Activity activity) throws DatabaseException{
+//		this.currentActivity = activity;
 //		location = activity.getLocation();
+		
+		DatabaseHelper dh = new DatabaseHelper(context);
+
+		long id = activity.getId();
+		
+		List<Long> item_ids = dh.getActivityItems(id);
+		List<Item> items = new ArrayList<Item>();
+		int size = item_ids.size();
+		
+		for(int j = 0; j < size; j++){
+			
+			Item i = dh.getItem(item_ids.get(j));
+			items.add(i);
+		}
+		
+		currentActivity = new Activity(id, activity.getName(), items, activity.getLocation());
 	}
+	
 	
 	/**
 	 * Return a List of all Activites
