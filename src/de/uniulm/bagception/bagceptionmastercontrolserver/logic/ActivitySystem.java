@@ -63,6 +63,8 @@ public class ActivitySystem {
 	 */
 	public Activity getCurrentActivity(){
 		
+		//TODO 
+		// Add independent items
 		return currentActivity;
 	}
 	
