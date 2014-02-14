@@ -1235,10 +1235,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						
 						do {
 							long item_id = iC.getLong(iC.getColumnIndex(ITEM_ID));
-							Log.w("TEST", "Item_ID bei getActivity: " + item_id);
+
 							// Get items from TABLE_ITEM
 							item = getItem(item_id);
-							Log.w("TEST", "Item: " + item);
 							items.add(item);
 							
 						} while(iC.moveToNext());
@@ -1248,7 +1247,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					activities.add(activity);
 			} while(c.moveToNext());
 		}
-		Log.w("TEST", "Activity aus Datenbank: " + activities);
 		return activities;
 	}
 	
