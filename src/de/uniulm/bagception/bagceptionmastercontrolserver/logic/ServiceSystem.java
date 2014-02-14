@@ -14,10 +14,12 @@ import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bluetoothclientmessengercommunication.service.BundleMessageHelper;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Position;
 import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
@@ -41,16 +43,16 @@ public class ServiceSystem implements Receiver{
 	}
 
 	
+	// GET CURRENT LOCATION
 	public void locationRequest(){
-		// GET CURRENT LOCATION
 		Intent i = new Intent(mcs,LocationService.class);
 		i.putExtra("receiverTag", mResultreceiver);
 		i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
 		mcs.startService(i);
 	}
 	
+	// RESOLVE ADDRESS TO COORDS
 	public void resolveAddressRequest(String address){
-		// RESOLVE ADDRESS TO COORDS
 		Intent i = new Intent(mcs,LocationService.class);
 		i.putExtra("receiverTag", mResultreceiver);
 		i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVEADDRESS);
@@ -142,12 +144,15 @@ public class ServiceSystem implements Receiver{
 			// LOCATIONSERVICE RESOLVE ADDRESS REPLY
 			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.RESOLVEADDRESS)){
 				log("------- RESOLVE ADDRESS REPLY------");
-				log("latitude: " + resultData.getString(OurLocation.LATITUDE, ""));
-				log("longitude: " + resultData.getString(OurLocation.LONGITUDE, ""));
+				float lat = Float.parseFloat(resultData.getString(OurLocation.LATITUDE, "-1"));
+				float lng = Float.parseFloat(resultData.getString(OurLocation.LONGITUDE, "-1"));
+//				log("latitude: " + resultData.getString(OurLocation.LATITUDE, ""));
+//				log("longitude: " + resultData.getString(OurLocation.LONGITUDE, ""));
 				// stop service
 				Intent i = new Intent(mcs,LocationService.class);
 				mcs.stopService(i);
-				//TODO: send stuff
+				Location loc = new Location("", lat, lng, -1);
+				mcs.sendToRemote(BUNDLE_MESSAGE.RESOLVE_ADDRESS_REPLY, loc);
 			}
 			
 			// LOCATIONSERVICE RESOLVE COORDS REPLY
@@ -157,7 +162,11 @@ public class ServiceSystem implements Receiver{
 				// stop service
 				Intent i = new Intent(mcs,LocationService.class);
 				mcs.stopService(i);
-				//TODO: send stuff
+				String address = resultData.getString(OurLocation.ADDRESS, "");
+				// sending address value as name attribute ;)
+				Location loc = new Location(address, "");
+				mcs.sendToRemote(BUNDLE_MESSAGE.RESOLVE_COORDS_REPLY, loc);
+
 			}
 			
 			// LOCATIONSERVICE GET WIFI ACCESS POINTS REPLY

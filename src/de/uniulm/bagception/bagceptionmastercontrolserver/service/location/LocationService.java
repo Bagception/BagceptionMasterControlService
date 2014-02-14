@@ -129,7 +129,7 @@ public class LocationService extends Service{
 			}
 		}
 		
-		
+		// RESOLVE ADDRESS TO COORDS
 		if(requestType.equals(OurLocation.RESOLVEADDRESS)){
 			log("resolve address...");
 			String address = intent.getStringExtra(OurLocation.ADDRESS);

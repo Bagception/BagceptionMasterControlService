@@ -40,6 +40,7 @@ import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandProcessor;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
@@ -274,17 +275,17 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		case RESOLVE_ADDRESS_REQUEST:{
 			LOGGER.C(this, "RESOLVE_ADDRESS_REQUEST");
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
-			String address = o.get(OurLocation.ADDRESS).toString();
-			serviceSystem.resolveAddressRequest(address);
+			Location addressLocation = Location.fromJSON(o);
+			// HACK: address is stored in name attribute of the location object ;)
+			serviceSystem.resolveAddressRequest(addressLocation.getName());
 			break;
 		}
 		
 		case RESOLVE_COORDS_REQUEST:{
 			LOGGER.C(this, "RESOLVE_COORDS_REQUEST");
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
-			float lat = Float.parseFloat(o.get(OurLocation.LATITUDE).toString());
-			float lng = Float.parseFloat(o.get(OurLocation.LONGITUDE).toString());
-			serviceSystem.resolveCoordsRequest(lat, lng);
+			Location coordsLocation = Location.fromJSON(o);
+			serviceSystem.resolveCoordsRequest(coordsLocation.getLat(), coordsLocation.getLng());
 			break;
 		}
 		
