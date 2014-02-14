@@ -283,8 +283,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		
 		case RESOLVE_COORDS_REQUEST:{
 			LOGGER.C(this, "RESOLVE_COORDS_REQUEST");
+			Log.d("TEST", "resolve coords request arrived!");
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			Location coordsLocation = Location.fromJSON(o);
+			Log.d("TEST", "lat: " + coordsLocation.getLat() + " lng: " + coordsLocation.getLng());
 			serviceSystem.resolveCoordsRequest(coordsLocation.getLat(), coordsLocation.getLng());
 			break;
 		}
