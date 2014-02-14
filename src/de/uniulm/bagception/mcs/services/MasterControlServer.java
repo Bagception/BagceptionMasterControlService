@@ -511,11 +511,21 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	  
 	private final AdministrationCommandProcessor activityProcessor = new AdministrationCommandProcessor(){
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
-			activitySystem.setCurrentActivity(a);
+			try {
+				activitySystem.setCurrentActivity(a);
+			} catch (DatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			setStatusChanged();
 		};
 		public void onActivityStop(Activity a, AdministrationCommand<Activity> cmd) {
-			activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
+			try {
+				activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
+			} catch (DatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			setStatusChanged();
 		};
 		
