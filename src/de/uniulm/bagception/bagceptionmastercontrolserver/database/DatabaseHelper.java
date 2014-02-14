@@ -798,6 +798,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ItemAttribute iA = item.getAttribute();
+		Log.w("TEST", "ItemAttributes werden jetzt in Tabelle geschrieben: " + iA);
 		
 		String temp = iA.getTemperature();
 		String weather = iA.getWeather();
@@ -808,6 +809,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(TEMPERATURE, temp);
 		values.put(WEATHER, weather);
 		values.put(LIGHTNESS, light);
+		
+		Log.w("TEST", "ContentValues Attribute: " + values);
 		
 		db.insert(TABLE_ITEMATTRIBUTE, null, values);
 	}
@@ -1246,16 +1249,22 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		ContentValues values = new ContentValues();
 		values.put(ACTIVITY_ID, activity_id);
-		values.put(ITEM_ID, item.getId());
-		values.put(CATEGORY_ID, category.getId());
-			
+		
+		if(item != null){
+			values.put(ITEM_ID, item.getId());
+		}
+		
+		if(category != null){
+			values.put(CATEGORY_ID, category.getId());
+		}
+		
 		db.insert(TABLE_ACTIVITYITEM, null, values);
 
 	}
 	
 	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
-		Log.w("TEST", "ActivityItems: " + items);
+		Log.w("TEST", "ActivityItems Database: " + items);
 		
 		Item item = null;
 		Category category = null;
