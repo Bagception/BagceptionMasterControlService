@@ -406,7 +406,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// Get category
 		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category_id;
 	
-		Cursor categoryName = null;
+		Cursor categoryName = db.rawQuery(getCategoryQuery, null);
 		
 		if(category_id > 0){
 			categoryName = db.rawQuery(getCategoryQuery, null);
@@ -414,11 +414,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		int catID;
 		String catName;
-		Category cat;
+		Category cat = null;
 		
-		if(!(categoryName.moveToFirst()) || categoryName.getCount() == 0){
-			cat = null;
-		} else {
+		if(categoryName.getCount() > 0){
+			
 			categoryName.moveToFirst();
 			
 			catID = categoryName.getInt(categoryName.getColumnIndex(CATEGORY_ID));
@@ -1236,9 +1235,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						
 						do {
 							long item_id = iC.getLong(iC.getColumnIndex(ITEM_ID));
-							
+							Log.w("TEST", "Item_ID bei getActivity: " + item_id);
 							// Get items from TABLE_ITEM
 							item = getItem(item_id);
+							Log.w("TEST", "Item: " + item);
 							items.add(item);
 							
 						} while(iC.moveToNext());
@@ -1248,6 +1248,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					activities.add(activity);
 			} while(c.moveToNext());
 		}
+		Log.w("TEST", "Activity aus Datenbank: " + activities);
 		return activities;
 	}
 	

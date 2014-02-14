@@ -33,24 +33,9 @@ public class ActivitySystem {
 	}
 	
 	public void setCurrentActivity(Activity activity) throws DatabaseException{
-//		this.currentActivity = activity;
+		this.currentActivity = activity;
 //		location = activity.getLocation();
-		
-		DatabaseHelper dh = new DatabaseHelper(context);
 
-		long id = activity.getId();
-		
-		List<Long> item_ids = dh.getActivityItems(id);
-		List<Item> items = new ArrayList<Item>();
-		int size = item_ids.size();
-		
-		for(int j = 0; j < size; j++){
-			
-			Item i = dh.getItem(item_ids.get(j));
-			items.add(i);
-		}
-		
-		currentActivity = new Activity(id, activity.getName(), items, activity.getLocation());
 	}
 	
 	
