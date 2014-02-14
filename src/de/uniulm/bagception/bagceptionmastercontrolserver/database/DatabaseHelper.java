@@ -1084,6 +1084,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		if(activity.getItemsForActivity() != null){
 			List<Item> iA = activity.getItemsForActivity();
+			
 			Log.w("TEST", "Liste: " + iA);
 			addActivityItems(id, iA, null);
 		}
