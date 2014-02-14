@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
@@ -22,6 +23,7 @@ public class ActivitySystem {
 	private List<Long> item_ids;
 	private Context context;
 	private DatabaseHelper db = new DatabaseHelper(context);
+	private ItemIndexSystem iiS = new ItemIndexSystem(db);
 	
 	public ActivitySystem() throws DatabaseException {
 		currentActivity = new Activity("dummy activity",items,new Location(1,"locName",123f,456f,10,"0xaffe"));
