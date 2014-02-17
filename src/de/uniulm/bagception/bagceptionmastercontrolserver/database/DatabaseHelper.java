@@ -216,19 +216,16 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void addItem(Item item) throws DatabaseException {
 
-		Log.w("TEST", "Erhaltenes Item: " + item);
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		Category c = item.getCategory();
-		Log.w("TEST", "Kategorie ID beim anlegen: " + c);
 		long cid = 0;
 		
 		if(c != null){
 			cid = c.getId();
 		}
 		
-		Log.w("TEST", "getIds(): " + item.getIds());
 		
 		List<String> tag_ids = item.getIds();
 		
@@ -239,7 +236,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		// Insert row to Item table
 		long item_id = db.insert(TABLE_ITEM, null, values);
-		Log.w("TEST", "ItemID beim einfügen: " + item_id);
 		
 		// Insert "TagID" in the correct table		
 		if(tag_ids != null){
@@ -249,28 +245,23 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// If "independentItem" is selected, add item to IndependentItem table
 		boolean independentItem = item.getIndependentItem();
 		if (independentItem == true) {
-			Log.w("TEST", "Ich füge jetzt ein IndependentItem hinzu: " + independentItem);
 			addIndependentItem(item_id);
 		}
 		
 		// If "contextItem" is selected, add item to ContextItem table
 		boolean contextItem = item.getContextItem();
 		if (contextItem == true) {
-			Log.w("TEST", "Ich füge jetzt ein ContextItem hinzu: " + contextItem);
 			addContextItem(item_id);
 		}
 		
 		// If attributes != null
 		ItemAttribute iA = item.getAttribute();
-		Log.w("TEST", "Attr.: " + iA);
 		if(iA != null) {
-			Log.w("TEST", "Attribute einfügen!");
 			addItemAttribute(item_id, item);
 		}
 		
 		// If Photo exists, add photo to Photo table
 //		int image = item.getImageHash();
-		Log.d("TEST","adding...");
 		Bitmap bmp = item.getImage();
 
 		if(bmp != null){
@@ -545,10 +536,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						String name = c.getString(c.getColumnIndex(NAME));
 						long item_id = c.getInt(c.getColumnIndex(_ID));
 						long cat = c.getInt(c.getColumnIndex(CATEGORY_ID));
-						Log.w("TEST", "Kategorie ID: " + cat);
 						
 						Category category = getCategory(cat);
-						Log.w("TEST", "Kategorie: " + category);
 						
 						String selectPhoto = "SELECT * FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 						Cursor p = db.rawQuery(selectPhoto, null);
@@ -846,7 +835,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ItemAttribute iA = item.getAttribute();
-		Log.w("TEST", "ItemAttributes werden jetzt in Tabelle geschrieben: " + iA);
 		
 		String temp = iA.getTemperature();
 		String weather = iA.getWeather();
@@ -857,8 +845,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(TEMPERATURE, temp);
 		values.put(WEATHER, weather);
 		values.put(LIGHTNESS, light);
-		
-		Log.w("TEST", "ContentValues Attribute: " + values);
 		
 		db.insert(TABLE_ITEMATTRIBUTE, null, values);
 	}
@@ -1136,7 +1122,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		if(activity.getItemsForActivity() != null){
 			List<Item> iA = activity.getItemsForActivity();
 			
-			Log.w("TEST", "Liste: " + iA);
 			addActivityItems(id, iA, null);
 		}
 		
@@ -1447,12 +1432,34 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				c.moveToNext();
 			}
 			
-//			List<Long> ind_item_ids = getIndependentItems();
-//			
-//			items.addAll(ind_item_ids);
 			return items;
 		} else {		
 			return items;
+		}
+	}
+	
+	
+	public List<Long> getActivityFromItem(long item_id) throws DatabaseException {
+		
+		SQLiteDatabase db = this.getReadableDatabase();
+		List<Long> activity_ids = new ArrayList<Long>();
+		
+		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ITEM_ID + " = " + item_id;
+		
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if (c.getCount() > 0){
+			c.moveToFirst();
+			
+			while(c.isAfterLast() == false){
+				activity_ids.add(c.getLong(c.getColumnIndex(ACTIVITY_ID)));
+//				items.add(c.getLong(c.getColumnIndex(CATEGORY_ID)));
+				c.moveToNext();
+			}
+			
+			return activity_ids;
+		} else {		
+			return activity_ids;
 		}
 	}
 		
