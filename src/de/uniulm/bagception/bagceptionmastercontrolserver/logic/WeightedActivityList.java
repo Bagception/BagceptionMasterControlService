@@ -37,6 +37,17 @@ public class WeightedActivityList{
 		ArrayList<Activity> ret = new ArrayList<Activity>(sorter.keySet());
 		return ret;
 	}
+	public int[] getWeight(){
+		int[] ret = new int[sorter.size()];
+		int i=0;
+		
+		for(Map.Entry<Activity,Integer> entry : sorter.entrySet()) {
+			  Integer value = entry.getValue();
+			  ret[i++]=value;
+			  
+			}
+		return ret;
+	}
 	
 	public class ActivityWeightComparator implements Comparator<Activity>{
 		private final Map<Activity, Integer> base;
