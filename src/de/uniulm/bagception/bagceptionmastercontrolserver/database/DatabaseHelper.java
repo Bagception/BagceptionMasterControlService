@@ -295,17 +295,71 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 
 	@Override
-	public int editItem(Item item,Item editValues) throws DatabaseException {
+	public void editItem(Item oldItem,Item item) throws DatabaseException {
 		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
+		long id = oldItem.getId();
+		List<String> tag_ids = oldItem.getIds();
+		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
-		values.put(CATEGORY_ID, item.getCategory().getId());
-		db.update(TABLE_ITEM, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
 		
-		return 0;
+		if(item.getCategory() != null){
+			values.put(CATEGORY_ID, item.getCategory().getId());
+		}
+		
+		
+		// Insert "TagID" in the correct table		
+		if(tag_ids != null){
+			addTagIds(id, tag_ids);
+		}
+				
+		// If "independentItem" is selected, add item to IndependentItem table
+		boolean independentItem = item.getIndependentItem();
+		if (independentItem == true) {
+			addIndependentItem(id);
+		} else {
+			List<Long> ids = getIndependentItems();
+			
+			if(ids.contains(id)){
+				deleteIndependentItem(id);
+			}
+			
+		}
+				
+		// If "contextItem" is selected, add item to ContextItem table
+		boolean contextItem = item.getContextItem();
+		if (contextItem == true) {
+			addContextItem(id);
+		} else {
+			List<Long> ids = getContextItems();
+			
+			if(ids.contains(id)){
+				deleteContextItem(id);
+			}
+
+		}
+				
+		// If attributes != null
+		ItemAttribute iA = item.getAttribute();
+
+		if(iA != null) {
+			deleteItemAttributes(id);
+			addItemAttribute(id, item);
+		}
+				
+		// If Photo exists, add photo to Photo table
+		Bitmap bmp = item.getImage();
+			
+		if(bmp != null){
+			deletePhoto(id);
+			addImage(id, item);
+		}
+				
+		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
 	}
+	
 	
 	public void updateItem(Item item) throws DatabaseException {
 		
@@ -334,11 +388,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			if(ids.contains(id)){
 				deleteIndependentItem(id);
 			}
-//			for(int j = 0; j < ids.size(); j++){
-//				if(ids.get(j) == id){
-//					deleteIndependentItem(id);
-//				}
-//			}
+			
 		}
 				
 		// If "contextItem" is selected, add item to ContextItem table
@@ -351,11 +401,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			if(ids.contains(id)){
 				deleteContextItem(id);
 			}
-//			for(int j = 0; j < ids.size(); j++){
-//				if(ids.get(j) == id){
-//					deleteContextItem(id);
-//				}
-//			}
+
 		}
 				
 		// If attributes != null

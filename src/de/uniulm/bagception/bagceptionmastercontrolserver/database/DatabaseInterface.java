@@ -41,7 +41,7 @@ public interface DatabaseInterface {
 		 * @param int the new id
 		 * @throws DatabaseException
 		 */
-		public int editItem(Item toEdit, Item values) throws DatabaseException;
+		public void editItem(Item toEdit, Item values) throws DatabaseException;
 		
 		
 		/**
