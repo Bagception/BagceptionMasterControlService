@@ -221,6 +221,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		Category c = item.getCategory();
+		Log.w("TEST", "Kategorie ID beim anlegen: " + c);
 		long cid = 0;
 		
 		if(c != null){
@@ -542,10 +543,12 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			if(c.moveToFirst() && c.getCount() > 0) {
 				do {
 						String name = c.getString(c.getColumnIndex(NAME));
-						int item_id = c.getInt(c.getColumnIndex(_ID));
-						int cat = c.getInt(c.getColumnIndex(CATEGORY_ID));
+						long item_id = c.getInt(c.getColumnIndex(_ID));
+						long cat = c.getInt(c.getColumnIndex(CATEGORY_ID));
+						Log.w("TEST", "Kategorie ID: " + cat);
 						
 						Category category = getCategory(cat);
+						Log.w("TEST", "Kategorie: " + category);
 						
 						String selectPhoto = "SELECT * FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
 						Cursor p = db.rawQuery(selectPhoto, null);
@@ -563,7 +566,51 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 							}
 						}
 						
-						Item item = new Item(item_id, name, category, false, false, null);
+						
+						// Check if independent Item
+						String selectIndependent = "SELECT * FROM " + TABLE_INDEPENDENTITEM + " WHERE " + ITEM_ID + " = " + item_id;
+						Cursor independentItems = db.rawQuery(selectIndependent, null);
+						
+						boolean isIndependentItem = false;
+						if(independentItems.getCount() > 0){
+							isIndependentItem = true;
+						}
+						
+						
+						// Check if contextindependent Item
+						String selectContextIndependent = "SELECT * FROM " + TABLE_CONTEXTITEM + " WHERE " + ITEM_ID + " = " + item_id;
+						Cursor contextIndependent = db.rawQuery(selectContextIndependent, null);
+						
+						boolean isActivityIndependent = false;
+						if(contextIndependent.getCount() > 0){
+							isActivityIndependent = true;
+						}
+						
+						
+						// Get ItemAttributes
+						ItemAttribute itemAttribute = null;
+						if(getItemAttribute(item_id) != null) {
+							itemAttribute = getItemAttribute(item_id);
+						}
+						
+						// Get TagIDs
+						String[] tagIDs = null;
+						if(getTagId(item_id) != null){
+							
+							int size = getTagId(item_id).size();
+							
+							for(int j = 0; j < size; j ++){
+								tagIDs[j] = getTagId(item_id).get(j);
+							}
+						}
+						
+//						new Item(id, name, category, isActivityIndependent, isIndependentItem, attributes, tagIDs)
+						Item item; 
+						if(tagIDs != null){
+							item = new Item(item_id, name, category, isActivityIndependent, isIndependentItem, itemAttribute, tagIDs);
+						} else {
+							item = new Item(item_id, name, category, isActivityIndependent, isIndependentItem, itemAttribute);
+						}
 						
 						if(imageString != null){
 							item.setImageString(imageString);
@@ -572,6 +619,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						items.add(item);
 				} while(c.moveToNext());
 			}
+			
+			
 			
 		Log.w("TEST", "Die Items: " + items);
 		return items;
@@ -1477,7 +1526,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Category category = null;
 		
 		if(c.moveToFirst() && c.getCount() > 0){
-				category = new Category(c.getInt(c.getColumnIndex(_ID)), c.getString(c.getColumnIndex(NAME)));
+			
+			category = new Category(c.getInt(c.getColumnIndex(_ID)), c.getString(c.getColumnIndex(NAME)));
 		}
 		
 		return category;
@@ -1488,12 +1538,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		String selectQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + id;
 		
+		Log.w("TEST", "SUCHE KATEGORIE MIT ID: " + id);
+		
 		Log.e(LOG, selectQuery);
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor c = db.rawQuery(selectQuery, null);
 		Category category = null;
 		
+		Log.w("TEST", "KATEGORIE CURSORGRÖßE: " + c.getCount());
 		if(c.moveToFirst() && c.getCount() > 0){
 				category = new Category(c.getInt(c.getColumnIndex(_ID)), c.getString(c.getColumnIndex(NAME)));
 		}
