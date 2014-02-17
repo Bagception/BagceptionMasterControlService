@@ -1308,6 +1308,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public List<Activity> getActivitesByItem(long item_id) throws DatabaseException {
 		
 		List<Activity> activites = new ArrayList<Activity>();
+		List<Item> items = new ArrayList<Item>();
+		Item item = null;
 		
 		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ITEM_ID + " = " + item_id;
 		
@@ -1328,12 +1330,29 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						String name = c.getString(c.getColumnIndex(NAME));
 						long loc_id = c.getLong(c.getColumnIndex(LOCATION_ID));
 						
+						
+						// Get item_ids which belong to the activity
+						String itemIdQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
+						Cursor iC = db.rawQuery(itemIdQuery, null);
+						
+						if(iC.moveToFirst() && iC.getCount() > 0){
+							
+							do {
+								long itemID = iC.getLong(iC.getColumnIndex(ITEM_ID));
+
+								// Get items from TABLE_ITEM
+								item = getItem(itemID);
+								items.add(item);
+								
+							} while(iC.moveToNext());
+						}
+						
 						Location location = null;
 						if(loc_id > 0){
 							location = getLocation(loc_id);
 						}
 						
-						Activity activity = new Activity(id, name, new ArrayList<Item>(), location);
+						Activity activity = new Activity(id, name, items, location);
 						activites.add(activity);
 					} while(ac.moveToNext());
 				}
@@ -1435,31 +1454,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			return items;
 		} else {		
 			return items;
-		}
-	}
-	
-	
-	public List<Long> getActivityFromItem(long item_id) throws DatabaseException {
-		
-		SQLiteDatabase db = this.getReadableDatabase();
-		List<Long> activity_ids = new ArrayList<Long>();
-		
-		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ITEM_ID + " = " + item_id;
-		
-		Cursor c = db.rawQuery(selectQuery, null);
-		
-		if (c.getCount() > 0){
-			c.moveToFirst();
-			
-			while(c.isAfterLast() == false){
-				activity_ids.add(c.getLong(c.getColumnIndex(ACTIVITY_ID)));
-//				items.add(c.getLong(c.getColumnIndex(CATEGORY_ID)));
-				c.moveToNext();
-			}
-			
-			return activity_ids;
-		} else {		
-			return activity_ids;
 		}
 	}
 		
