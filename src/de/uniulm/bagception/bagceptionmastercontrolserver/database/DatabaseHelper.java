@@ -1242,6 +1242,26 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 							
 						} while(iC.moveToNext());
 					}
+					
+					
+					// Get independent_items
+					String indItemsQuery = "SELECT * FROM " + TABLE_INDEPENDENTITEM;
+					Cursor indC = db.rawQuery(indItemsQuery, null);
+					
+					if(indC.moveToFirst() && indC.getCount() > 0){
+						
+						do {
+							long item_id = indC.getLong(indC.getColumnIndex(ITEM_ID));
+
+							item = getItem(item_id);
+							
+							if(items.contains(item) == false){
+								items.add(item);
+							}
+								
+							
+						} while(indC.moveToNext());
+					}
 						
 					Activity activity = new Activity(id, name, items, location);
 					activities.add(activity);
@@ -1378,6 +1398,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				c.moveToNext();
 			}
 			
+//			List<Long> ind_item_ids = getIndependentItems();
+//			
+//			items.addAll(ind_item_ids);
 			return items;
 		} else {		
 			return items;

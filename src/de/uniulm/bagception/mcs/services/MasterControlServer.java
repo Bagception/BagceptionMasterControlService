@@ -248,7 +248,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 		case CONTAINER_STATUS_UPDATE_REQUEST:{
 			LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
-			setStatusChanged();
+				setStatusChanged();
 			break;
 		}
 
@@ -515,12 +515,14 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
+//				activitySystem.getIndependentItems();
 			} catch (DatabaseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			setStatusChanged();
-		};
+				setStatusChanged();
+		}
+	};
 		public void onActivityStop(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
@@ -528,9 +530,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			setStatusChanged();
+				setStatusChanged();
 		};
 		
-	};
-
 }

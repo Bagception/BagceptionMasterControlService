@@ -58,15 +58,18 @@ public class ActivitySystem {
 	}
 	
 	/**
-	 * Return the current activtiy
+	 * Return the current activitiy
 	 * @return Activity
+	 * @throws  
 	 */
-	public Activity getCurrentActivity(){
+	public Activity getCurrentActivity() {
 		
 		//TODO 
 		// Add independent items
+		
 		return currentActivity;
 	}
+	
 	
 	/**
 	 * Method to guess the activity the user want to start. The method return a List of all possible activites
