@@ -2,10 +2,9 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
@@ -70,32 +69,34 @@ public class ActivitySystem {
 		return currentActivity;
 	}
 	
-	
+
 	/**
-	 * Method to guess the activity the user want to start. The method return a List of all possible activites
-	 * @param item_ids
-	 * @return List<Activity>
+	 * Tries to recognize an activity by the given items
+	 * @param itemsInBag the given items
+	 * @return a tuple(a,b) with a: a List of Activities that are possible, b: the matching item count  
 	 * @throws DatabaseException
 	 */
-	public List<Activity> activityRecognition(List<Long> item_ids) throws DatabaseException{
-		
-		List<Activity> activityList = new ArrayList<Activity>();
-		
-		if(item_ids != null){
-			
-			int size = item_ids.size();
-			for(int j = 0; j < size; j++){
-				List<Activity> alist = db.getActivitesByItem(item_ids.get(j));
-				
-				if(alist != null){
-					for(Activity act : alist){
-						activityList.add(act);
-					}
-				}
+	public Tuple<List<Activity>,int[]> activityRecognition(List<Item> itemsInBag) throws DatabaseException{
+		WeightedActivityList wl = new WeightedActivityList();
+		for(Item i:itemsInBag){
+			if (i.getIndependentItem()){
+				continue;
 			}
+			List<Activity> as = db.getActivitesByItem(i.getId());
+			wl.put(as);
 		}
 		
-		return activityList;
+		return new Tuple<List<Activity>, int[]>(wl.getSorted(),wl.getWeight());
+		
 	}
+
+	public class Tuple<X, Y> { 
+		  public final X x; 
+		  public final Y y; 
+		  public Tuple(X x, Y y) { 
+		    this.x = x; 
+		    this.y = y; 
+		  } 
+		} 
 	
 }
