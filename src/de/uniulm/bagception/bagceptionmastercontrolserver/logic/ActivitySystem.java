@@ -1,6 +1,7 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.Context;
@@ -72,30 +73,24 @@ public class ActivitySystem {
 	
 	
 	/**
-	 * Method to guess the activity the user want to start. The method return a List of all possible activites
+	 * Method to guess the activity the user want to start. The method returns a List of all possible activites
 	 * @param item_ids
 	 * @return List<Activity>
 	 * @throws DatabaseException
 	 */
-	public List<Activity> activityRecognition(List<Long> item_ids) throws DatabaseException{
-		
-		List<Activity> activityList = new ArrayList<Activity>();
-		
-		if(item_ids != null){
-			
-			int size = item_ids.size();
-			for(int j = 0; j < size; j++){
-				List<Activity> alist = db.getActivitesByItem(item_ids.get(j));
-				
-				if(alist != null){
-					for(Activity act : alist){
-						activityList.add(act);
-					}
-				}
+	public List<Activity> activityRecognition(List<Item> itemsInBag) throws DatabaseException{
+		WeightedActivityList wl = new WeightedActivityList();
+		for(Item i:itemsInBag){
+			if (i.getIndependentItem()){
+				continue;
 			}
+			List<Activity> as = db.getActivitesByItem(i.getId());
+			wl.put(as);
 		}
 		
-		return activityList;
+		return wl.getSorted();
+		
 	}
+
 	
 }
