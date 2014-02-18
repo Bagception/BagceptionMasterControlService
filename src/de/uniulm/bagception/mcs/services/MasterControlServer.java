@@ -132,8 +132,11 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		btHelper.unregister(this);
-		caseActor.unregister(this);
+		if (btHelper!=null)
+			btHelper.unregister(this);
+		
+		if (caseActor!=null)
+			caseActor.unregister(this);
 		unregisterReceiver(RFIDReceiver);
 		unregisterReceiver(mBatteryInfoReceiver);
 
@@ -157,12 +160,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		LOGGER.C(this,
 				"initiating bootstrap method, starting necessary services");
 		Intent i = new Intent();
-		
-//		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
-//			Intent i2 = new Intent();
-//			i2.setAction(serviceInfo.getServiceSystemName());
-//			stopService(i2);
-//		}
 		
 		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
 			if (!ServiceUtil.isServiceRunning(this,

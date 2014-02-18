@@ -16,8 +16,12 @@ public class BootLoader extends BroadcastReceiver{
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		LOGGER.C(this, "Bootstrap code reached");
+		BootLoader.start(context);
+	}
+	
+	public static void start(Context context){
 		 Intent startServiceIntent = new Intent(context, MasterControlServer.class);
-	        context.startService(startServiceIntent);		
+	        context.startService(startServiceIntent);	
 	}
 
 }
