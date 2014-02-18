@@ -444,9 +444,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// Get category
 		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category_id;
 	
-		Cursor categoryName = db.rawQuery(getCategoryQuery, null);
+		Cursor categoryName = null;
 		
-		if(category_id > 0){
+		if(category_id != -1){
 			categoryName = db.rawQuery(getCategoryQuery, null);
 		}
 		
@@ -454,7 +454,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String catName;
 		Category cat = null;
 		
-		if(categoryName.getCount() > 0){
+		Log.w("TEST", "Category: " + categoryName.getCount());
+		
+		if(categoryName != null && categoryName.getCount() > 0){
 			
 			categoryName.moveToFirst();
 			
