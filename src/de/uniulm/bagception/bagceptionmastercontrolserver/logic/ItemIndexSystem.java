@@ -66,7 +66,9 @@ public class ItemIndexSystem {
 			try {
 				long itemId=dbHelper.getItemId(id_);
 				i = dbHelper.getItem(itemId);
-				ret.add(i);
+				if (!ret.contains(i)){
+					ret.add(i);
+				}
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
