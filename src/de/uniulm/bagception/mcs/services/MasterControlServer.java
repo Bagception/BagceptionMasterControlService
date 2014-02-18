@@ -3,6 +3,8 @@ package de.uniulm.bagception.mcs.services;
 import java.util.ArrayList;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,6 +30,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelpe
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ServiceSystem;
+import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -44,12 +47,15 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommandProcessor;
 import de.uniulm.bagception.bundlemessageprotocol.serializer.PictureSerializer;
+import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
+import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
 import de.uniulm.bagception.services.attributes.OurLocation;
+import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 public class MasterControlServer extends ObservableService implements Runnable,
-		MessengerHelperCallback, CaseOpenServiceBroadcastReactor {
+		MessengerHelperCallback, CaseOpenServiceBroadcastReactor, Receiver {
 
 	/**
 	 * Handles the control flow of the container
@@ -63,6 +69,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private Thread mainThread;
 	private AdministrationDatabaseAdapter adminDBAdapter;
 	private DatabaseHelper dbHelper;
+	private MyResultReceiver resultReceiver;
 
 	// bt
 	private MessengerHelper btHelper;
@@ -93,6 +100,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		caseActor = new CaseOpenBroadcastActor(this);
 		caseActor.register(this);
+		
+		resultReceiver = new MyResultReceiver(new Handler());
+		resultReceiver.setReceiver(this);
 
 		IntentFilter f = new IntentFilter(
 				BagceptionBroadcastContants.BROADCAST_RFID_FINISHED);
@@ -515,7 +525,20 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
-//				activitySystem.getIndependentItems();
+
+				if(a.getLocation() != null){
+					Log.w("TEST", "Location vorhanden");
+					
+					Location loc = a.getLocation();
+					
+					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
+					i.putExtra("receiverTag", resultReceiver);
+					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
+					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
+					startService(i);
+					
+				}
+				
 			} catch (DatabaseException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -531,6 +554,46 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				e.printStackTrace();
 			}
 				setStatusChanged();
-		};
+		}
+
+		
+		@Override
+		public void onReceiveResult(int resultCode, Bundle resultData) {
+
+			if(resultData.getString(WeatherForecast.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
+				
+				String s = resultData.getString("payload");
+				JSONParser parser = new JSONParser();
+				JSONObject object = null;
+				de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = null;
+				try {
+					object = (JSONObject) parser.parse(s);
+					forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(
+						object.get("city").toString(), 
+						Float.parseFloat(object.get("temp").toString()),
+						Float.parseFloat(object.get("wind").toString()),
+						Float.parseFloat(object.get("clouds").toString()),
+						Float.parseFloat(object.get("temp_min").toString()),
+						Float.parseFloat(object.get("temp_max").toString()),
+						Float.parseFloat(object.get("rain").toString())
+					);
+					
+					log("------- GET WEATHER FORECAST------");
+					log(" city: " + forecast.getCity());
+					log(" temp: " + forecast.getTemp());
+					log(" wind: " + forecast.getWind()); 
+					log(" clouds: " + forecast.getClouds());
+					log(" tempMin: " + forecast.getTemp_min());
+					log(" tempMax: " + forecast.getTemp_max()); 
+					log(" rain: " + forecast.getRain());
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		private void log(String s){
+			Log.d("MCS", s);
+		}
 		
 }
