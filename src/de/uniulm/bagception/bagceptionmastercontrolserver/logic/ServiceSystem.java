@@ -146,8 +146,8 @@ public class ServiceSystem implements Receiver{
 				log("------- RESOLVE ADDRESS REPLY------");
 				float lat = Float.parseFloat(resultData.getString(OurLocation.LATITUDE, "-1"));
 				float lng = Float.parseFloat(resultData.getString(OurLocation.LONGITUDE, "-1"));
-//				log("latitude: " + resultData.getString(OurLocation.LATITUDE, ""));
-//				log("longitude: " + resultData.getString(OurLocation.LONGITUDE, ""));
+				log("latitude: " + resultData.getString(OurLocation.LATITUDE, ""));
+				log("longitude: " + resultData.getString(OurLocation.LONGITUDE, ""));
 				// stop service
 				Intent i = new Intent(mcs,LocationService.class);
 				mcs.stopService(i);

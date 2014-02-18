@@ -259,7 +259,7 @@ public class DebugFragment extends Fragment implements Receiver{
 			}
 			
 			// WEATHERFORECASTSERVICE FORECAST REPLY
-			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
+			if(resultData.getString(WeatherForecast.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
 				log("reply received...");
 				String s = resultData.getString("payload");
 				JSONParser parser = new JSONParser();
