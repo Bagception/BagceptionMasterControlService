@@ -633,9 +633,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						if(getTagId(item_id) != null){
 							
 							int size = getTagId(item_id).size();
+							tagIDs = new String[size];
 							
-							for(int j = 0; j < size; j ++){
-								tagIDs[j] = getTagId(item_id).get(j);
+							for(int j = 0; j < size; j++){
+									tagIDs[j] = getTagId(item_id).get(j);
 							}
 						}
 						

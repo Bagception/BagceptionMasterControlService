@@ -540,6 +540,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
+				log("current activity setted");
+				log("activity: " + a);
 
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
@@ -549,13 +551,16 @@ public class MasterControlServer extends ObservableService implements Runnable,
 					Log.w("TEST", "Location vorhanden");
 					
 					Location loc = a.getLocation();
-					
-					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
-					i.putExtra("receiverTag", resultReceiver);
-					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
-					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
-					startService(i);
-					
+					log("latitude: " + loc.getLat());
+					log("longitude: " + loc.getLng());
+//					
+//					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
+//					i.putExtra("receiverTag", resultReceiver);
+//					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
+//					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
+//					startService(i);
+//					log("########################## start intent");
+//					
 				}
 				
 			} catch (DatabaseException e) {
@@ -579,7 +584,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onReceiveResult(int resultCode, Bundle resultData) {
 
 			if(resultData.getString(WeatherForecast.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
-				
+				log("getting response...");
 				String s = resultData.getString("payload");
 				JSONParser parser = new JSONParser();
 				JSONObject object = null;
