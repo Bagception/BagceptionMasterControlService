@@ -1149,8 +1149,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void addActivity(Activity activity) throws DatabaseException {
 
-		Log.w("TEST", "Activity: " + activity);
-		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		long loc_id = -1;
@@ -1302,7 +1300,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					long loc_id = c.getLong(c.getColumnIndex(LOCATION_ID));
 					
 					Location location = null;
-					if(loc_id != -1){
+					if(loc_id > 0){
 						location = getLocation(loc_id);
 					}
 					
@@ -1347,6 +1345,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					activities.add(activity);
 			} while(c.moveToNext());
 		}
+		
 		return activities;
 	}
 	
@@ -1739,7 +1738,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		Location location = null;
 		SQLiteDatabase db = this.getReadableDatabase();
 		
-		String selectQuery = "SELECT * FROM " + TABLE_LOCATION + " WHERE " + _ID + " = '" + loc_id + "'";
+		String selectQuery = "SELECT * FROM " + TABLE_LOCATION + " WHERE " + _ID + " = " + loc_id;
 		
 		Cursor c = db.rawQuery(selectQuery, null);
 		
@@ -1762,7 +1761,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		location = new Location(id, locname, lat, lng, radius, mac);
-		
+
 		return location;
 	}
 
@@ -1801,6 +1800,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					
 			} while(c.moveToNext());
 		}
+		
 		return locations;
 	}
 
