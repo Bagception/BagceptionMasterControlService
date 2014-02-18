@@ -259,30 +259,39 @@ public class DebugFragment extends Fragment implements Receiver{
 			}
 			
 			// WEATHERFORECASTSERVICE FORECAST REPLY
-			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
+			if(resultData.getString(WeatherForecast.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
+				log("reply received...");
 				String s = resultData.getString("payload");
-//				try {
-//					JSONObject object = new JSONObject(s);
-//					String city = object.getString("city");
-//					float temp = Float.parseFloat(object.getString(WeatherForecast.TEMP));
-//					float wind = Float.parseFloat(object.getString(WeatherForecast.WIND));
-//					float clouds = Float.parseFloat(object.getString(WeatherForecast.CLOUDS));
-//					float temp_min = Float.parseFloat(object.getString(WeatherForecast.TEMP_MIN));
-//					float temp_max = Float.parseFloat(object.getString(WeatherForecast.TEMP_MAX));
-//					float rain = Float.parseFloat(object.getString(WeatherForecast.RAIN));
-//					// sending weatherforecast to client
-//					de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(city, temp, wind, clouds, temp_min, temp_max, rain);
-//					helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WEATHERFORECAST_REPLY, forecast));
-//					log("------- GET WEATHER FORECAST------");
-//					log(" city: " + forecast.getCity());
-//					log(" temp: " + forecast.getTemp());
-//					log(" wind: " + forecast.getWind()); 
-//					log(" clouds: " + forecast.getClouds());
-//					log(" tempMin: " + forecast.getTemp_min());
-//					log(" tempMax: " + forecast.getTemp_max()); 
-//					log(" rain: " + forecast.getRain());
-					//TODO: stop service
-//				}
+				JSONParser parser = new JSONParser();
+				JSONObject object = null;
+				de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = null;
+				try {
+					object = (JSONObject) parser.parse(s);
+					forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(
+						object.get("city").toString(), 
+						Float.parseFloat(object.get("temp").toString()),
+						Float.parseFloat(object.get("wind").toString()),
+						Float.parseFloat(object.get("clouds").toString()),
+						Float.parseFloat(object.get("temp_min").toString()),
+						Float.parseFloat(object.get("temp_max").toString()),
+						Float.parseFloat(object.get("rain").toString())
+					);
+					
+					log("------- GET WEATHER FORECAST------");
+					log(" city: " + forecast.getCity());
+					log(" temp: " + forecast.getTemp());
+					log(" wind: " + forecast.getWind()); 
+					log(" clouds: " + forecast.getClouds());
+					log(" tempMin: " + forecast.getTemp_min());
+					log(" tempMax: " + forecast.getTemp_max()); 
+					log(" rain: " + forecast.getRain());
+					// sending weatherforecast to client
+//				helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WEATHERFORECAST_REPLY, forecast));
+					
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				
 			}
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_NAMES)){
 				log("------- GET CALENDAR NAMES ------");
@@ -307,10 +316,8 @@ public class DebugFragment extends Fragment implements Receiver{
 							try {
 								obj = (JSONObject) parser.parse(st);
 								CalendarEvent event = CalendarEvent.fromJSON(obj);
-								log("IT WORKED!!!!");
 								log(event.getName() + " " + event.getLocation());
 							} catch (ParseException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 						}
@@ -323,8 +330,4 @@ public class DebugFragment extends Fragment implements Receiver{
 	private void log(String s){
 		Log.d("MCS", s);
 	}
-
-
-	
-
 }

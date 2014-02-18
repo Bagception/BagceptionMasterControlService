@@ -140,6 +140,7 @@ public class LocationService extends Service{
 			try {
 				addresses = coder.getFromLocationName(address, 1);
 				if(addresses != null){
+					log("coder resolved address");
 					Address foundAddress = addresses.get(0);
 					Bundle b = new Bundle();
 					b.putString(OurLocation.RESPONSE_TYPE, OurLocation.RESOLVEADDRESS);
