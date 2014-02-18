@@ -33,11 +33,11 @@ public class WeatherForecastService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		Log.d("WeatherForecastService", "intent received");
 		resultReceiver = intent.getParcelableExtra("receiverTag");
-		double lat = intent.getDoubleExtra(WeatherForecast.LATITUDE, 0);
-		double lng = intent.getDoubleExtra(WeatherForecast.LONGITUDE, 0);
-//		double lat = 48.38;
-//		lng = 11.00;
+		float lat = intent.getFloatExtra(WeatherForecast.LATITUDE, 0);
+		float lng = intent.getFloatExtra(WeatherForecast.LONGITUDE, 0);
+		
 		String unit = intent.getStringExtra(WeatherForecast.UNIT);
 		
 		if(unit!=null){
