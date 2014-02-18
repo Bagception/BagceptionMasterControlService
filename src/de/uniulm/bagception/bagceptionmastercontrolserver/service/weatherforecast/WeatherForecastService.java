@@ -3,13 +3,16 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforeca
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import de.uniulm.bagception.services.attributes.WeatherForecast;
 
@@ -34,7 +37,7 @@ public class WeatherForecastService extends IntentService {
 		double lat = intent.getDoubleExtra(WeatherForecast.LATITUDE, 0);
 		double lng = intent.getDoubleExtra(WeatherForecast.LONGITUDE, 0);
 //		double lat = 48.38;
-//		double lng = 10.00;
+//		lng = 11.00;
 		String unit = intent.getStringExtra(WeatherForecast.UNIT);
 		
 		if(unit!=null){
@@ -59,11 +62,11 @@ public class WeatherForecastService extends IntentService {
 			this.resultReceiver = resultReceiver;
 		}
 
+		@SuppressWarnings({ "unused", "unchecked" })
 		@Override
 		protected JSONObject doInBackground(String... urls) {
 			String response = "";
 			JSONObject jsonObject = null;
-			JSONObject answer = null;
 			for (String url : urls) {
 				DefaultHttpClient client = new DefaultHttpClient();
 				HttpGet httpGet = new HttpGet(url);
@@ -77,75 +80,77 @@ public class WeatherForecastService extends IntentService {
 					while ((s = buffer.readLine()) != null) {
 						response += s;
 					}
-					jsonObject = new JSONObject(response);
+					JSONParser parser = new JSONParser();
+					jsonObject = (JSONObject) parser.parse(response);
+					Log.d("complete json", jsonObject.toString());
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
-			try {
-				JSONObject list = null;
-				JSONObject main = null;
-				JSONObject wind = null;
-				JSONObject rain = null;
-				JSONObject clouds = null;
-				answer = new JSONObject();
-				if(jsonObject.has("list")) list = jsonObject.getJSONArray("list").getJSONObject(0);
-				if(list.has("main")) main = list.getJSONObject("main");
-				if(list.has("wind")) wind = list.getJSONObject("wind");
-				if(list.has("rain")) rain = list.getJSONObject("rain");
-				if(list.has("clouds")) clouds = list.getJSONObject("clouds");
-				
-//				if(list.has("name")) answer.put("city", list.getString("name"));
-//				if(main.has("temp")) answer.put("temp", main.getString("temp"));
-//				if(main.has("temp_min")) answer.put("tempMin", main.getString("temp_min"));
-//				if(main.has("temp_max")) answer.put("tempMax", main.getString("temp_max"));
-//				if(list.has("wind")) answer.put("wind", wind.getString("speed"));
-//				if(list.has("rain")) answer.put("rain", rain.getString("3h"));
-//				if(list.has("clouds")) answer.put("clouds", clouds.getString("all"));
-
-				if(list.has("name")){
-					answer.put(WeatherForecast.CITY, list.getString("name"));
-				}else{
-					answer.put(WeatherForecast.CITY, "");
-				}				
-				if(main.has("temp")){
-					answer.put(WeatherForecast.TEMP, main.getString("temp"));
-				}else{
-					answer.put(WeatherForecast.TEMP, -1f);
-				}
-				if(main.has("temp_min")){
-					answer.put(WeatherForecast.TEMP_MIN, main.getString("temp_min"));
-				}else{
-					answer.put(WeatherForecast.TEMP_MIN, -1f);
-				}
-				if(main.has("temp_max")){
-					answer.put(WeatherForecast.TEMP_MAX, main.getString("temp_max"));
-				}else{
-					answer.put(WeatherForecast.TEMP_MAX, -1f);
-				}
-				if(list.has("wind")){
-					answer.put(WeatherForecast.WIND, wind.getString("speed"));
-				}else{
-					answer.put(WeatherForecast.WIND, -1f);
-				}
-				if(rain!=null && rain.has("3h")){
-					answer.put(WeatherForecast.RAIN, Double.parseDouble(rain.getString("3h"))*100);
-				}else{
-					answer.put(WeatherForecast.RAIN, -1f);
-				}
-				if(list.has("clouds")){
-					answer.put(WeatherForecast.CLOUDS, clouds.getString("all"));
-				}else{
-					answer.put(WeatherForecast.CLOUDS, -1f);
-				}
-				
-//				Log.d("answer", answer.toString());
-			} catch (JSONException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			
+			JSONObject answer = new JSONObject();
+			
+				JSONArray array = null;
+				JSONObject mainObject = null;
+				JSONObject windObject = null;
+				JSONObject cloudObject = null;
+				JSONObject rainObject = null;
+				
+				JSONParser parser = new JSONParser();
+				
+				String city = "";
+				float temp = -99;
+				float tempMin = -99;
+				float tempMax = -99;
+				float wind = -99;
+				float clouds = -99;
+				float rain = -99f;
+				de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = 
+						new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(city, tempMax, wind, clouds, tempMin, tempMax, rain);
+				if(jsonObject.containsKey("list")){
+					log("has list element");
+					array = (JSONArray) jsonObject.get("list");
+					try {
+						JSONObject obj = (JSONObject) parser.parse(array.get(0).toString());
+//						if(obj.containsKey("name")) forecast.setCity(obj.get("name").toString());
+//						if(obj.containsKey("main")) mainObject = (JSONObject) parser.parse(obj.get("main").toString());
+//						if(mainObject.containsKey("temp")) forecast.setTemp(Float.parseFloat(mainObject.get("temp").toString()));
+//						if(mainObject.containsKey("temp_min")) forecast.setTemp_min(Float.parseFloat(mainObject.get("temp_min").toString()));
+//						if(mainObject.containsKey("temp_max")) forecast.setTemp_max(Float.parseFloat(mainObject.get("temp_max").toString()));
+//						if(obj.containsKey("wind")) windObject = (JSONObject) parser.parse(obj.get("wind").toString());
+//						if(windObject != null && windObject.containsKey("speed")) forecast.setWind(Float.parseFloat(windObject.get("speed").toString()));
+//						if(obj.containsKey("clouds")) cloudObject = (JSONObject) parser.parse(obj.get("clouds").toString());
+//						if(cloudObject != null && cloudObject.containsKey("all")) forecast.setClouds(Float.parseFloat(cloudObject.get("all").toString()));
+//						if(obj.containsKey("rain")) rainObject = (JSONObject) parser.parse(obj.get("rain").toString());
+//						if(rainObject != null && rainObject.containsKey("3h"))	forecast.setRain(Float.parseFloat(rainObject.get("3h").toString()));
+						if(obj.containsKey("name")) city =  obj.get("name").toString();
+						if(obj.containsKey("main")) mainObject = (JSONObject) parser.parse(obj.get("main").toString());
+						if(mainObject.containsKey("temp")) temp =  Float.parseFloat(mainObject.get("temp").toString());
+						if(mainObject.containsKey("temp_min")) tempMin = Float.parseFloat(mainObject.get("temp_min").toString());
+						if(mainObject.containsKey("temp_max")) tempMax = Float.parseFloat(mainObject.get("temp_max").toString());
+						if(obj.containsKey("wind")) windObject = (JSONObject) parser.parse(obj.get("wind").toString());
+						if(windObject != null && windObject.containsKey("speed")) wind = Float.parseFloat(windObject.get("speed").toString());
+						if(obj.containsKey("clouds")) cloudObject = (JSONObject) parser.parse(obj.get("clouds").toString());
+						if(cloudObject != null && cloudObject.containsKey("all")) clouds = Float.parseFloat(cloudObject.get("all").toString());
+						if(obj.containsKey("rain")) rainObject = (JSONObject) parser.parse(obj.get("rain").toString());
+						if(rainObject != null && rainObject.containsKey("3h"))	rain = Float.parseFloat(rainObject.get("3h").toString());
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				answer.put("city", city);
+				answer.put("temp", temp);
+				answer.put("wind", wind);
+				answer.put("clouds", clouds);
+				answer.put("temp_min", tempMin);
+				answer.put("temp_max", tempMax);
+				answer.put("rain", rain);
 			return answer;
+		}
+		
+		private void log(String string) {
+			Log.d("WeatherForecastService", string);
 		}
 
 		@Override
