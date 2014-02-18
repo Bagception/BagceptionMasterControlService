@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
@@ -182,7 +183,7 @@ public class DebugFragment extends Fragment implements Receiver{
 			
 			@Override
 			public void onClick(View arg0) {
-				MasterControlServer.DEBUG();
+					MasterControlServer.DEBUG();
 				
 			}
 		});
