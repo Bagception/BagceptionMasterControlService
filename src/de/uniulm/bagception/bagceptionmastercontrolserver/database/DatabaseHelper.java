@@ -1632,6 +1632,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
+//		Log.w("TEST", "Folgende Loc wird gespeichert: " + location);
+		
 		ContentValues values = new ContentValues();
 		values.put(NAME, location.getName());
 		values.put(LON, location.getLng());
@@ -1761,7 +1763,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		location = new Location(id, locname, lat, lng, radius, mac);
-
+		Log.w("TEST", "Folgende Location wird aus der Datenbank geholt: " + location);
+		
 		return location;
 	}
 

@@ -544,7 +544,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
 
-
+				Log.w("TEST", "Activtiy: " + a);
 				if(a.getLocation() != null){
 					Log.w("TEST", "Location vorhanden");
 					
