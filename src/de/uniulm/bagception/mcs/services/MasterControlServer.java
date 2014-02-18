@@ -81,7 +81,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
 	private ServiceSystem serviceSystem;
-
+	
+	
+	
 	private int batteryStatus = 0;
 
 	
@@ -417,6 +419,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		sendBroadcast(rfidScanBC);
 		LOG.out(this, "case closed");
 		LOGGER.C(this, "case closed");
+		itemIndexSystem.caseClosed();
 	}
 
 	// CaseOpenServiceBroadcastReactor\\
@@ -439,7 +442,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND
 					.equals(intent.getAction())) {
 				// tag found
-
+				
 				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
 
 				String id = intent
@@ -456,25 +459,25 @@ public class MasterControlServer extends ObservableService implements Runnable,
 					if (i != null) {
 						// tag exists in database
 						LOGGER.C(this, "TAG found: " + i.getName()+", hash: "+i.getImageHash());
-						if (itemIndexSystem.itemScanned(i)) {
+						if (itemIndexSystem.itemScanned(i,id)) {
 							// item put in
 							LOGGER.C(this, "Item in: " + i.getName());
 						} else {
 							// item taken out
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
-						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
-						Activity first = activityPriorityList.getActivities().get(0);
-						
-						if (first!=null){
-							if (!activitySystem.isManuallyDetermActivity())
-								activitySystem.setCurrentActivity(first);
-						}
-						if (!activityPriorityList.equals(lastActivityList)){
-							//priority list has changed
-							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
-						}
-						lastActivityList = activityPriorityList;
+//						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
+//						Activity first = activityPriorityList.getActivities().get(0);
+//						
+//						if (first!=null){
+//							if (!activitySystem.isManuallyDetermActivity())
+//								activitySystem.setCurrentActivity(first);
+//						}
+//						if (!activityPriorityList.equals(lastActivityList)){
+//							//priority list has changed
+//							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
+//						}
+//						lastActivityList = activityPriorityList;
 						setStatusChanged();
 					} else {
 						// tag not found in db
