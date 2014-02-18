@@ -87,7 +87,9 @@ public class ActivitySystem {
 			if (i.getIndependentItem()){
 				continue;
 			}
+			
 			List<Activity> as = db.getActivitesByItem(i.getId());
+
 			if (as!=null){
 				wl.put(as);
 			}
