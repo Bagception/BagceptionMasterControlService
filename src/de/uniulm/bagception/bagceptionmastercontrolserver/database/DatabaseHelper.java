@@ -443,29 +443,26 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 		// Get category
 		String getCategoryQuery = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + _ID + " = " + category_id;
-	
-		Cursor categoryName = null;
-		
-		if(category_id != -1){
-			categoryName = db.rawQuery(getCategoryQuery, null);
-		}
-		
+
 		int catID;
 		String catName;
 		Category cat = null;
 		
-		Log.w("TEST", "Category: " + categoryName.getCount());
-		
-		if(categoryName != null && categoryName.getCount() > 0){
+		if(category_id > 0){
+			Cursor categoryName = db.rawQuery(getCategoryQuery, null);
 			
-			categoryName.moveToFirst();
+			Log.w("TEST", "Category: " + categoryName.getCount());
 			
-			catID = categoryName.getInt(categoryName.getColumnIndex(CATEGORY_ID));
-			catName = categoryName.getString(categoryName.getColumnIndex(NAME));
-			
-			cat = new Category(catID, catName);
-		} 
-		
+			if(categoryName != null && categoryName.getCount() > 0){
+				
+				categoryName.moveToFirst();
+				
+				catID = categoryName.getInt(categoryName.getColumnIndex(_ID));
+				catName = categoryName.getString(categoryName.getColumnIndex(NAME));
+				
+				cat = new Category(catID, catName);
+			} 
+		}
 		
 		boolean isIndependent = getIndependentItem(id);
 		boolean isContextItem = getContextItem(id);
