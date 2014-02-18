@@ -157,6 +157,13 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		LOGGER.C(this,
 				"initiating bootstrap method, starting necessary services");
 		Intent i = new Intent();
+		
+//		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
+//			Intent i2 = new Intent();
+//			i2.setAction(serviceInfo.getServiceSystemName());
+//			stopService(i2);
+//		}
+		
 		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
 			if (!ServiceUtil.isServiceRunning(this,
 					serviceInfo.getServiceSystemName())) {
