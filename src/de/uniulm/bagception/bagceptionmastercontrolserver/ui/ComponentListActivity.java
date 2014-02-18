@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import de.uniulm.bagception.BootLoader;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 //import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseTest;
 import de.uniulm.bagception.bagceptionmastercontrolserver.listContent.ComponentFragmentsListContent;
@@ -98,6 +99,7 @@ public class ComponentListActivity extends FragmentActivity implements
 			detailIntent
 					.putExtra(FRAGMENT_CLASS, item.clazz.getCanonicalName());
 			startActivity(detailIntent);
+			BootLoader.start(this);
 		}
 	}
 }
