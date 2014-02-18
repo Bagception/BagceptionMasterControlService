@@ -88,7 +88,10 @@ public class ActivitySystem {
 				continue;
 			}
 			List<Activity> as = db.getActivitesByItem(i.getId());
-			wl.put(as);
+			if (as!=null){
+				wl.put(as);
+			}
+				
 		}
 		
 		return new ActivityPriorityList(wl.getSorted(),wl.getWeight());
