@@ -38,6 +38,7 @@ import de.uniulm.bagception.broadcastconstants.BagceptionBroadcastContants;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
+import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
@@ -76,6 +77,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 	private int batteryStatus = 0;
 
+	
+	
+	private ActivityPriorityList lastActivityList;
 	@Override
 	public void onCreate() {
 		debuginstance = this;
@@ -254,7 +258,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		case ADMINISTRATION_COMMAND: {
 			JSONObject json = BundleMessage.getInstance().extractObject(b);
-			Log.d("IMG",json+"");
 			AdministrationCommand<?> a_cmd = AdministrationCommand
 					.fromJSONObject(json);
 			a_cmd.accept(adminDBAdapter);
@@ -446,6 +449,18 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							// item taken out
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
+						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
+						Activity first = activityPriorityList.getActivities().get(0);
+						
+						if (first!=null){
+							if (!activitySystem.isManuallyDetermActivity())
+								activitySystem.setCurrentActivity(first);
+						}
+						if (!activityPriorityList.equals(lastActivityList)){
+							//priority list has changed
+							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
+						}
+						lastActivityList = activityPriorityList;
 						setStatusChanged();
 					} else {
 						// tag not found in db
@@ -515,9 +530,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
+				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
 			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 				setStatusChanged();
@@ -526,8 +541,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStop(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
+				activitySystem.setManuallyDetermActivity(false);
 			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 				setStatusChanged();
