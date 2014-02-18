@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
 
 
