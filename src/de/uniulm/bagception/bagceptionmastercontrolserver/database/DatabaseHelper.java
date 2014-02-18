@@ -115,8 +115,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String CREATE_TABLE_ACTIVITYITEM = 
 			"CREATE TABLE IF NOT EXISTS " + TABLE_ACTIVITYITEM
 			+ "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " 
-			+ ACTIVITY_ID + " INTEGER NOT NULL, "
-			+ ITEM_ID + " INTEGER NOT NULL, "
+			+ ACTIVITY_ID + " INTEGER, "
+			+ ITEM_ID + " INTEGER, "
 			+ CATEGORY_ID + " INTEGER," 
 			+ " FOREIGN KEY(" + ACTIVITY_ID + ") REFERENCES " + TABLE_ACTIVITY + "(" + _ID + ") ON UPDATE CASCADE,"
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE ON DELETE SET DEFAULT,"
@@ -292,6 +292,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
+		
 	}
 
 	@Override
@@ -359,7 +360,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
 		
-		db.close();
 	}
 	
 	
@@ -421,6 +421,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 				
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
+		
 	}
 	
 	
@@ -496,10 +497,13 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 								tagids);
 			
 			item.setImageString(bmp);
+			
 			return item;
+			
 		} else {
 			return item;
 		}
+		
 	}
 	
 	
@@ -563,7 +567,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		} else {
 			return item;
 		}
-		
 	}
 
 
@@ -661,6 +664,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			
 			
 		Log.w("TEST", "Die Items: " + items);
+		
 		return items;
 	}
 
@@ -680,7 +684,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(TAG_ID, tag_id);
 		
 		db.insert(TABLE_TAGID, null, values);
-		
 		//return id;
 	}
 	
@@ -693,6 +696,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			String tag_id = tag_ids.get(j);
 			addTagId(item_id, tag_id);
 		}
+		
 	}
 	
 	
@@ -701,7 +705,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		db.delete(TABLE_TAGID, TAG_ID + " = ?" , new String[] {tag_id});
-		
 	}
 	
 	
@@ -718,6 +721,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		if(c.getCount() > 0){
 			c.moveToFirst();
 			item_id = c.getLong(c.getColumnIndex(ITEM_ID));
+			
 			return item_id;
 		} else{
 			return item_id;
@@ -759,7 +763,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(ITEM_ID, item_id);
 		
 		db.insert(TABLE_INDEPENDENTITEM, null, values);
-		
 		//return id;
 	}
 	
@@ -823,7 +826,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(ITEM_ID, item_id);
 		
 		db.insert(TABLE_CONTEXTITEM, null, values);
-		
 		//return id;
 	}
 	
@@ -1023,6 +1025,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(LIGHTNESS, lightness);
 		
 		db.update(TABLE_ITEMATTRIBUTE, values, _ID + " = " + id, null);
+		
 	}
 	
 	
@@ -1040,7 +1043,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(IMAGE_HASH, image); 
 		
 		db.insert(TABLE_PHOTO, null, values);
-		
 		//return id;
 		
 	}
@@ -1355,57 +1357,58 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public List<Activity> getActivitesByItem(long item_id) throws DatabaseException {
 		
+		SQLiteDatabase db = getReadableDatabase();
+		
 		List<Activity> activites = new ArrayList<Activity>();
 		List<Item> items = new ArrayList<Item>();
 		Item item = null;
 		
-		Log.w("TEST", "GET ACTIVITIY - ItemID: " + item_id);
-		
-		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ITEM_ID + " = " + item_id;
-		
-		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM;
 		Cursor c = db.rawQuery(selectQuery, null);
 		
 		if(c.moveToFirst() && c.getCount() > 0) {
 
 			do{
-				long activity_id = c.getLong(c.getColumnIndex(ACTIVITY_ID));
-				Log.w("TEST", "GET ACTIVITIY - ActivityID: " + activity_id);
 				
-				String selectActivity = "SELECT * FROM " + TABLE_ACTIVITY + " WHERE " + ACTIVITY_ID + " = " + activity_id;
-				Cursor ac = db.rawQuery(selectActivity, null);
-				
-				if(ac.moveToFirst() && ac.getCount() > 0){
-					do{
-						long id = ac.getLong(ac.getColumnIndex(_ID));
-						String name = ac.getString(ac.getColumnIndex(NAME));
-						long loc_id = ac.getLong(ac.getColumnIndex(LOCATION_ID));
-						
-						
-						// Get item_ids which belong to the activity
-						String itemIdQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
-						Cursor iC = db.rawQuery(itemIdQuery, null);
-						
-						if(iC.moveToFirst() && iC.getCount() > 0){
+				if(item_id == c.getLong(c.getColumnIndex(ITEM_ID))){
+					
+					long activity_id = c.getLong(c.getColumnIndex(ACTIVITY_ID));
+					
+					String selectActivity = "SELECT * FROM " + TABLE_ACTIVITY + " WHERE " + ACTIVITY_ID + " = " + activity_id;
+					Cursor ac = db.rawQuery(selectActivity, null);
+					
+					if(ac.moveToFirst() && ac.getCount() > 0){
+						do{
+							long id = ac.getLong(ac.getColumnIndex(_ID));
+							String name = ac.getString(ac.getColumnIndex(NAME));
+							long loc_id = ac.getLong(ac.getColumnIndex(LOCATION_ID));
 							
-							do {
-								long itemID = iC.getLong(iC.getColumnIndex(ITEM_ID));
-
-								// Get items from TABLE_ITEM
-								item = getItem(itemID);
-								items.add(item);
+							
+							// Get item_ids which belong to the activity
+							String itemIdQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
+							Cursor iC = db.rawQuery(itemIdQuery, null);
+							
+							if(iC.moveToFirst() && iC.getCount() > 0){
 								
-							} while(iC.moveToNext());
-						}
-						
-						Location location = null;
-						if(loc_id > 0){
-							location = getLocation(loc_id);
-						}
-						
-						Activity activity = new Activity(id, name, items, location);
-						activites.add(activity);
-					} while(ac.moveToNext());
+								do {
+									long itemID = iC.getLong(iC.getColumnIndex(ITEM_ID));
+	
+									// Get items from TABLE_ITEM
+									item = getItem(itemID);
+									items.add(item);
+									
+								} while(iC.moveToNext());
+							}
+							
+							Location location = null;
+							if(loc_id > 0){
+								location = getLocation(loc_id);
+							}
+							
+							Activity activity = new Activity(id, name, items, location);
+							activites.add(activity);
+						} while(ac.moveToNext());
+					}
 				}
 			} while(c.moveToNext());
 		}
@@ -1472,7 +1475,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = ?", new String[] {String.valueOf(item_id)});
 	}
-	
+		
 	
 	public void deleteActivityCategory(long category_id) throws DatabaseException {
 		
@@ -1501,7 +1504,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			}
 			
 			return items;
-		} else {		
+		} else {	
 			return items;
 		}
 	}
@@ -1703,7 +1706,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(MAC, location.getMac());
 		
 		db.update(TABLE_LOCATION, values, _ID + " = ?", new String[] {String.valueOf(location.getId())});
-		
 	}
 	
 	public Location getLocation(String name) throws DatabaseException {
