@@ -459,18 +459,18 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							// item taken out
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
-//						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
-//						Activity first = activityPriorityList.getActivities().get(0);
-//						
-//						if (first!=null){
-//							if (!activitySystem.isManuallyDetermActivity())
-//								activitySystem.setCurrentActivity(first);
-//						}
-//						if (!activityPriorityList.equals(lastActivityList)){
-//							//priority list has changed
-//							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
-//						}
-//						lastActivityList = activityPriorityList;
+						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
+						Activity first = activityPriorityList.getActivities().get(0);
+						
+						if (first!=null){
+							if (!activitySystem.isManuallyDetermActivity())
+								activitySystem.setCurrentActivity(first);
+						}
+						if (!activityPriorityList.equals(lastActivityList)){
+							//priority list has changed
+							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
+						}
+						lastActivityList = activityPriorityList;
 						setStatusChanged();
 					} else {
 						// tag not found in db
