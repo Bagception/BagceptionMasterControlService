@@ -546,7 +546,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
 
-				Log.w("TEST", "Activtiy: " + a);
+					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
+					i.putExtra("receiverTag", resultReceiver);
+					i.putExtra(WeatherForecast.LATITUDE, 40f);
+					i.putExtra(WeatherForecast.LONGITUDE, 10f);
+					startService(i);
+					log("########################## start intent");
 				if(a.getLocation() != null){
 					Log.w("TEST", "Location vorhanden");
 					
@@ -554,12 +559,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 					log("latitude: " + loc.getLat());
 					log("longitude: " + loc.getLng());
 //					
-//					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
-//					i.putExtra("receiverTag", resultReceiver);
-//					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
-//					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
-//					startService(i);
-//					log("########################## start intent");
 //					
 				}
 				
