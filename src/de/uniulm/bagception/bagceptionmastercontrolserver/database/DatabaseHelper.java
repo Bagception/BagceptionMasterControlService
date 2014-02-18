@@ -358,6 +358,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 				
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
+		
+		db.close();
 	}
 	
 	
@@ -467,6 +469,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		boolean isIndependent = getIndependentItem(id);
 		boolean isContextItem = getContextItem(id);
 		ItemAttribute attributes = getItemAttribute(id);
+		
 		List<String> tids = getTagId(id);
 		String[] tagids = new String[tids.size()];
 		
