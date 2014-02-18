@@ -300,7 +300,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		long id = oldItem.getId();
-		List<String> tag_ids = oldItem.getIds();
+		List<String> tag_ids = item.getIds();
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, item.getName());
@@ -1435,8 +1435,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
-		Log.w("TEST", "ActivityItems Database: " + items);
-		
 		Item item = null;
 		Category category = null;
 		int itemsize = 0;
