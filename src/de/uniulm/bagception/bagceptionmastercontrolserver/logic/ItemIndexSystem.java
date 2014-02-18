@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseInterface;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
@@ -17,6 +18,7 @@ public class ItemIndexSystem {
 	public ItemIndexSystem(DatabaseInterface dbHelper){
 		this.dbHelper = dbHelper;
 	}
+	
 	
 	
 	/**
@@ -75,6 +77,7 @@ public class ItemIndexSystem {
 			
 			
 		}
+		
 		return ret;
 	}
 	

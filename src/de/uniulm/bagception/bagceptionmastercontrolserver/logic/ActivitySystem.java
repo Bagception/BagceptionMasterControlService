@@ -16,18 +16,14 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 public class ActivitySystem {
 
 	private Activity currentActivity;
-	private Context context;
-	private DatabaseHelper db = new DatabaseHelper(context);
+	private final DatabaseHelper db;
 	private boolean manuallyDetermActivity=false;
 	
-	public ActivitySystem() throws DatabaseException {
+	public ActivitySystem(DatabaseHelper db) throws DatabaseException {
+		this.db = db;
 		currentActivity = Activity.NO_ACTIVITY;
-		
 	}
 	
-	public ActivitySystem(Context context) {
-		this.context = context;
-	}
 	
 	public void setCurrentActivity(Activity activity) throws DatabaseException{
 		this.currentActivity = activity;
@@ -93,7 +89,7 @@ public class ActivitySystem {
 			if (as!=null){
 				wl.put(as);
 			}
-				
+			
 		}
 		
 		return new ActivityPriorityList(wl.getSorted(),wl.getWeight());

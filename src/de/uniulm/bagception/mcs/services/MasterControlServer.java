@@ -1,6 +1,7 @@
 package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -120,7 +121,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		itemIndexSystem = new ItemIndexSystem(dbHelper);
 		try {
-			activitySystem = new ActivitySystem();
+			activitySystem = new ActivitySystem(dbHelper);
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -466,8 +467,19 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							// item taken out
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
-						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
-						Activity first = activityPriorityList.getActivities().get(0);
+						
+						
+						
+						List<Item> items = itemIndexSystem.getCurrentItems();
+						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
+						
+						Log.w("TEST", "TESTTESTEST: " + activityPriorityList.getActivities());
+						
+						Activity first = null;
+						
+						if(activityPriorityList != null && activityPriorityList.getActivities().size() > 0){
+							first = activityPriorityList.getActivities().get(0);
+						}
 						
 						if (first!=null){
 							if (!activitySystem.isManuallyDetermActivity())
