@@ -358,6 +358,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 				
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
+		
+		db.close();
 	}
 	
 	
@@ -467,6 +469,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		boolean isIndependent = getIndependentItem(id);
 		boolean isContextItem = getContextItem(id);
 		ItemAttribute attributes = getItemAttribute(id);
+		
 		List<String> tids = getTagId(id);
 		String[] tagids = new String[tids.size()];
 		
@@ -1356,24 +1359,27 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		List<Item> items = new ArrayList<Item>();
 		Item item = null;
 		
+		Log.w("TEST", "GET ACTIVITIY - ItemID: " + item_id);
+		
 		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ITEM_ID + " = " + item_id;
 		
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor c = db.rawQuery(selectQuery, null);
 		
 		if(c.moveToFirst() && c.getCount() > 0) {
+
 			do{
 				long activity_id = c.getLong(c.getColumnIndex(ACTIVITY_ID));
+				Log.w("TEST", "GET ACTIVITIY - ActivityID: " + activity_id);
 				
 				String selectActivity = "SELECT * FROM " + TABLE_ACTIVITY + " WHERE " + ACTIVITY_ID + " = " + activity_id;
-				
 				Cursor ac = db.rawQuery(selectActivity, null);
 				
 				if(ac.moveToFirst() && ac.getCount() > 0){
 					do{
-						long id = c.getLong(c.getColumnIndex(_ID));
-						String name = c.getString(c.getColumnIndex(NAME));
-						long loc_id = c.getLong(c.getColumnIndex(LOCATION_ID));
+						long id = ac.getLong(ac.getColumnIndex(_ID));
+						String name = ac.getString(ac.getColumnIndex(NAME));
+						long loc_id = ac.getLong(ac.getColumnIndex(LOCATION_ID));
 						
 						
 						// Get item_ids which belong to the activity
