@@ -29,6 +29,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.database.Administratio
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ActivitySystem;
+import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ContextInterpreter;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ServiceSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
@@ -83,7 +84,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private ActivitySystem activitySystem;
 	private ServiceSystem serviceSystem;
 	
-	
+	private ContextInterpreter contextInterpreter;
 	
 	private int batteryStatus = 0;
 
@@ -111,6 +112,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		resultReceiver = new MyResultReceiver(new Handler());
 		resultReceiver.setReceiver(this);
 
+		contextInterpreter=new ContextInterpreter(this);
+		
 		IntentFilter f = new IntentFilter(
 				BagceptionBroadcastContants.BROADCAST_RFID_FINISHED);
 		f.addAction(BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND);
@@ -471,6 +474,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
+						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+						
 						Log.w("TEST", "TESTTESTEST: " + activityPriorityList.getActivities());
 						
 						Activity first = null;
@@ -525,8 +530,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
-				itemIndexSystem.getCurrentItems(), batteryStatus);
-
+				itemIndexSystem.getCurrentItems(),
+				contextInterpreter.getContextSuggetions(),
+				batteryStatus);
+				
 		Bundle toSend = BundleMessage.getInstance().createBundle(
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
 				statusUpdate.toString());
@@ -558,13 +565,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
-				log("current activity setted");
-				log("activity: " + a);
 
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
 				if(a.getLocation() != null){
-					
 					Location loc = a.getLocation();
 					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
 					i.putExtra("receiverTag", resultReceiver);

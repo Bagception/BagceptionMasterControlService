@@ -576,6 +576,101 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 
 
+	public List<Item> getItems(long cat_id) throws DatabaseException {
+		
+		SQLiteDatabase db = getReadableDatabase();
+		
+		List<Item> items = new ArrayList<Item>();
+		int imgHash = 0;
+		String imageString=null;
+		
+		String selectQuery = "SELECT * FROM " + TABLE_ITEM + " WHERE " + CATEGORY_ID + " = " + cat_id;
+		Cursor c = db.rawQuery(selectQuery, null);
+		
+		if(c.moveToFirst() && c.getCount() > 0) {
+			
+			do {
+				long item_id = c.getLong(c.getColumnIndex(_ID));
+				String name = c.getString(c.getColumnIndex(NAME));
+				long category_id = c.getLong(c.getColumnIndex(CATEGORY_ID));
+				
+				Category category = getCategory(category_id);
+				
+				String selectPhoto = "SELECT * FROM " + TABLE_PHOTO + " WHERE " + ITEM_ID + " = " + item_id;
+				Cursor p = db.rawQuery(selectPhoto, null);
+				
+				if(p.moveToFirst() && p.getCount() > 0){
+
+					byte[] b = p.getBlob(p.getColumnIndex(IMAGE));
+					imgHash = p.getInt(p.getColumnIndex(IMAGE_HASH));
+					
+					if(b != null){
+						imageString = new String(b);
+					}
+				}
+				p.close();
+				
+				
+				// Check if independent Item
+				String selectIndependent = "SELECT * FROM " + TABLE_INDEPENDENTITEM + " WHERE " + ITEM_ID + " = " + item_id;
+				Cursor independentItems = db.rawQuery(selectIndependent, null);
+				
+				boolean isIndependentItem = false;
+				if(independentItems.getCount() > 0){
+					isIndependentItem = true;
+				}
+				independentItems.close();
+				
+				
+				// Check if contextindependent Item
+				String selectContextIndependent = "SELECT * FROM " + TABLE_CONTEXTITEM + " WHERE " + ITEM_ID + " = " + item_id;
+				Cursor contextIndependent = db.rawQuery(selectContextIndependent, null);
+				
+				boolean isActivityIndependent = false;
+				if(contextIndependent.getCount() > 0){
+					isActivityIndependent = true;
+				}
+				contextIndependent.close();
+				
+				// Get ItemAttributes
+				ItemAttribute itemAttribute = null;
+				if(getItemAttribute(item_id) != null) {
+					itemAttribute = getItemAttribute(item_id);
+				}
+				
+				// Get TagIDs
+				String[] tagIDs = null;
+				if(getTagId(item_id) != null){
+					
+					int size = getTagId(item_id).size();
+					tagIDs = new String[size];
+					
+					for(int j = 0; j < size; j++){
+							tagIDs[j] = getTagId(item_id).get(j);
+					}
+				}
+				
+//				new Item(id, name, category, isActivityIndependent, isIndependentItem, attributes, tagIDs)
+				Item item; 
+				if(tagIDs != null){
+					item = new Item(item_id, name, category, isActivityIndependent, isIndependentItem, itemAttribute, tagIDs);
+				} else {
+					item = new Item(item_id, name, category, isActivityIndependent, isIndependentItem, itemAttribute);
+				}
+				
+				if(imageString != null){
+					item.setImageString(imageString);
+				}
+				
+				items.add(item);
+				
+			} while(c.moveToNext());
+		}
+		
+		
+		return items;
+	}
+	
 	@Override
 	public List<Item> getItems() throws DatabaseException {
 
@@ -1127,7 +1222,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public void addImage(long item_id, Item item) throws DatabaseException {
 		if (item.getImageString()==null) return;
 		SQLiteDatabase db = this.getWritableDatabase();
-		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
 		values.put(IMAGE, item.getImageString().getBytes());
