@@ -62,12 +62,13 @@ public class WeatherForecastService extends IntentService {
 			this.resultReceiver = resultReceiver;
 		}
 
-		@SuppressWarnings({ "unused", "unchecked" })
 		@Override
 		protected JSONObject doInBackground(String... urls) {
+			log("do in background");
 			String response = "";
 			JSONObject jsonObject = null;
 			for (String url : urls) {
+				log("url: " + url);
 				DefaultHttpClient client = new DefaultHttpClient();
 				HttpGet httpGet = new HttpGet(url);
 				try {
@@ -84,12 +85,13 @@ public class WeatherForecastService extends IntentService {
 					jsonObject = (JSONObject) parser.parse(response);
 					Log.d("complete json", jsonObject.toString());
 				} catch (Exception e) {
+					log("error");
 					e.printStackTrace();
 				}
 			}
 			
 			JSONObject answer = new JSONObject();
-			
+				log("building answer");
 				JSONArray array = null;
 				JSONObject mainObject = null;
 				JSONObject windObject = null;
