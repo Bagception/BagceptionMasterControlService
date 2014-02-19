@@ -473,8 +473,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
-						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
+						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
 						Log.w("TEST", "TESTTESTEST: " + activityPriorityList.getActivities());
 						
@@ -565,25 +565,16 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
-				log("current activity setted");
-				log("activity: " + a);
 
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
-				if(a.getLocation() != null){
-					Log.w("TEST", "Location vorhanden");
-					
-					Location loc = a.getLocation();
-					log("latitude: " + loc.getLat());
-					log("longitude: " + loc.getLng());
-					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
-					i.putExtra("receiverTag", resultReceiver);
-					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
-					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
-					startService(i);
-					log("########################## start intent");
-				}
-				
+
+				Location loc = a.getLocation();
+				Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
+				i.putExtra("receiverTag", resultReceiver);
+				i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
+				i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
+				startService(i);
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
