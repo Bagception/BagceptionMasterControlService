@@ -17,89 +17,108 @@ public class ContextInterpreter {
 	private List<Item> itemList;
 	private Set<CachedContextInfo> cache = new HashSet<CachedContextInfo>();
 	private WeatherForecast forecast;
-	
-	
-	public ContextInterpreter(MasterControlServer mcs){
+	private Object lock = new Object();
+
+	public ContextInterpreter(MasterControlServer mcs) {
 		this.mcs = mcs;
 	}
-	
+
 	/**
 	 * the logic
+	 * 
 	 * @param itemsIn
 	 */
-	public void updateList(List<Item> itemsIn){
-		itemList = itemsIn;
-		if (forecast == null) return;
-		if (itemList == null) return;
-		//TODO
-		//eval itemsIn with cached context data
-		//update suggestions
-		//use data from getContexts()
-		HashSet<CachedContextInfo> contexts = getContexts();
-		for (CachedContextInfo i:contexts){
-			if (i.getTimestamp()<System.currentTimeMillis()-(4*1000*60*60)){
-				//context too old
-				
-			}else{
-				//use context
-				switch (i.getContext()){
-				case BRIGHT:
-					break;
-				case COLD:
-					break;
-				case DARK:
-					break;
-				case RAIN:
-					break;
-				case SUNNY:
-					break;
-				case WARM:
-					break;
-				default:
-					break;
+	public void updateList(List<Item> itemsIn) {
+		synchronized (lock) {
+
+			// TODO make async forecast request
+			itemList = itemsIn;
+			if (forecast == null)
+				return;
+			if (itemList == null)
+				return;
+
+			// TODO
+			// eval itemsIn with cached context data
+			// update suggestions
+			// use data from getContexts()
+			if (cache == null) return;
+			for (CachedContextInfo i : cache) {
+				if (i.getTimestamp() < System.currentTimeMillis()
+						- (4 * 1000 * 60 * 60)) {
+					// context too old
+
+				} else {
+					// use context
+					//TODO set suggestions
+					switch (i.getContext()) {
+					case BRIGHT:
+						break;
+					case COLD:
+						break;
+					case DARK:
+						break;
+					case RAIN:
+						break;
+					case SUNNY:
+						break;
+					case WARM:
+						break;
+					default:
+						break;
+					}
 				}
 			}
+
 		}
-		
 	}
-	
+
 	/**
 	 * 
-	 * @param itemsIn the items in the bag
+	 * @param itemsIn
+	 *            the items in the bag
 	 * @return a list of suggestions
 	 */
-	public  List<ContextSuggestion> getContextSuggetions(){
-		return suggestions;
+	public synchronized List<ContextSuggestion> getContextSuggetions() {
+		synchronized (lock) {
+			return suggestions;
+		}
 	}
-	
-	//TODO methode aufrufen
-	private void onContextDataRecv(WeatherForecast forecast){
-		this.forecast = forecast;  
-		if (itemList != null){
-			updateList(itemList);
-		}		
+
+	// TODO methode aufrufen
+	private void onContextDataRecv(WeatherForecast forecast) {
+		synchronized (lock) {
+			cache.clear();
+			cache = getContexts(forecast);
+			if (itemList != null) {
+				updateList(itemList);
+			}
+		}
 	}
-	
-	private HashSet<CachedContextInfo> getContexts(){
-		//TODO calculates the current context
-		HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
-		//wenn es reget:
-			ret.add(new CachedContextInfo(CONTEXT.RAIN, "mehr text?, TODO REPLACE! vllt regenwahrscheinlichekit"));
-		//TODO usw
-		
-		return ret;
+
+	private HashSet<CachedContextInfo> getContexts(WeatherForecast forecast) {
+		synchronized (lock) {
+			// TODO calculates the current context
+			HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
+			// wenn es reget:#
+			//if ..
+			ret.add(new CachedContextInfo(CONTEXT.RAIN,
+					"mehr text?, TODO REPLACE! vllt regenwahrscheinlichekit"));
+			// TODO usw
+
+			return ret;
+		}
 	}
-	
-	
-	public class CachedContextInfo{
+
+	public class CachedContextInfo {
 		private final CONTEXT context;
 		private final long timestamp;
 		private final String data;
-		
-		public CachedContextInfo(CONTEXT c, String data){
-			this.context=c;
-			this.data=data;
-			this.timestamp=System.currentTimeMillis();
+
+		public CachedContextInfo(CONTEXT c, String data) {
+			this.context = c;
+			this.data = data;
+			this.timestamp = System.currentTimeMillis();
 		}
 
 		public CONTEXT getContext() {
@@ -113,9 +132,7 @@ public class ContextInterpreter {
 		public String getData() {
 			return data;
 		}
-		
-		
+
 	}
-	
-	
+
 }
