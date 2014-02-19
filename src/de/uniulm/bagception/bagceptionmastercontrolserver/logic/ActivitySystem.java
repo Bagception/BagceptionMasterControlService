@@ -3,8 +3,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
-import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
@@ -27,6 +25,16 @@ public class ActivitySystem {
 	
 	public void setCurrentActivity(Activity activity) throws DatabaseException{
 		this.currentActivity = activity;
+//		String d="activty changed: "+activity.getName()+"\n"+" items: ";
+//		Item last=null;
+//		for(Item i:activity.getItemsForActivity()){
+//			d+=i.getName()+"("+i.hashCode()+")";
+//			if (last!=null){
+//				d+=last.equals(i);
+//			}
+//			d+=", ";
+//		}
+//		LOGGER.C(this, d);
 //		location = activity.getLocation();
 
 	}
