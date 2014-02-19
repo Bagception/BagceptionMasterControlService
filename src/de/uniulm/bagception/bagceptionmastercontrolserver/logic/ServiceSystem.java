@@ -97,6 +97,7 @@ public class ServiceSystem implements Receiver{
 	
 	public void calendarNameRequest() {
 		// CALENDAR NAME
+		log("requesting calendar name");
 		Intent i = new Intent(mcs, CalendarService.class);
 		i.putExtra("receiverTag", mResultreceiver);
 		i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_NAMES);
@@ -225,6 +226,7 @@ public class ServiceSystem implements Receiver{
 					for(String st : calendarNames){
 						CalendarEvent name = new CalendarEvent("", st, "", "", -1, -1);
 						mcs.sendToRemote(BUNDLE_MESSAGE.CALENDAR_NAME_REPLY, name);
+						log("################ sending calendar name reply. " + name.getCalendarName());
 					}
 				}
 			}

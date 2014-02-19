@@ -564,17 +564,13 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
 				if(a.getLocation() != null){
-					Log.w("TEST", "Location vorhanden");
 					
 					Location loc = a.getLocation();
-					log("latitude: " + loc.getLat());
-					log("longitude: " + loc.getLng());
 					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
 					i.putExtra("receiverTag", resultReceiver);
 					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
 					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
 					startService(i);
-					log("########################## start intent");
 				}
 				
 			} catch (DatabaseException e) {
@@ -606,7 +602,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				try {
 					object = (JSONObject) parser.parse(s);
 					forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(
-						object.get("city").toString(), 
+										 object.get("city").toString(), 
 						Float.parseFloat(object.get("temp").toString()),
 						Float.parseFloat(object.get("wind").toString()),
 						Float.parseFloat(object.get("clouds").toString()),
@@ -614,15 +610,14 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						Float.parseFloat(object.get("temp_max").toString()),
 						Float.parseFloat(object.get("rain").toString())
 					);
-					
-					log("------- GET WEATHER FORECAST------");
-					log(" city: " + forecast.getCity());
-					log(" temp: " + forecast.getTemp());
-					log(" wind: " + forecast.getWind()); 
-					log(" clouds: " + forecast.getClouds());
-					log(" tempMin: " + forecast.getTemp_min());
-					log(" tempMax: " + forecast.getTemp_max()); 
-					log(" rain: " + forecast.getRain());
+//					log("------- GET WEATHER FORECAST------");
+//					log(" city: " + forecast.getCity());
+//					log(" temp: " + forecast.getTemp());
+//					log(" wind: " + forecast.getWind()); 
+//					log(" clouds: " + forecast.getClouds());
+//					log(" tempMin: " + forecast.getTemp_min());
+//					log(" tempMax: " + forecast.getTemp_max()); 
+//					log(" rain: " + forecast.getRain());
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
