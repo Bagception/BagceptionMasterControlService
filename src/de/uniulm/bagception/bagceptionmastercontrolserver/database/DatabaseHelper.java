@@ -1127,7 +1127,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	public void addImage(long item_id, Item item) throws DatabaseException {
 		if (item.getImageString()==null) return;
 		SQLiteDatabase db = this.getWritableDatabase();
-		
 		ContentValues values = new ContentValues();
 		values.put(ITEM_ID, item_id);
 		values.put(IMAGE, item.getImageString().getBytes());
