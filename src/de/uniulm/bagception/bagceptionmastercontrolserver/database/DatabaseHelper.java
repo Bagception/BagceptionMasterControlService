@@ -278,7 +278,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	//			addPhotoToItem(imageHash, item_id);
 	//		}
 
-		db.close();
 	}
 
 	/**
@@ -297,8 +296,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
 		db.delete(TABLE_ITEM, NAME + " = ?", new String[] {item.getName()});
-		
-		db.close();
 		
 	}
 
@@ -366,7 +363,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 				
 		db.update(TABLE_ITEM, values, _ID + " = " + id, null);
-		db.close();
 		
 	}
 	
@@ -507,12 +503,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			item.setImageString(bmp);
 			
 			itemData.close();
-			db.close();
 			return item;
 			
 		} else {
 			itemData.close();
-			db.close();
 			return item;
 		}
 		
@@ -699,7 +693,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(TAG_ID, tag_id);
 		
 		db.insert(TABLE_TAGID, null, values);
-		db.close();
 		//return id;
 	}
 	
@@ -721,7 +714,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		db.delete(TABLE_TAGID, TAG_ID + " = ?" , new String[] {tag_id});
-		db.close();
 	}
 	
 	
@@ -783,7 +775,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(ITEM_ID, item_id);
 		
 		db.insert(TABLE_INDEPENDENTITEM, null, values);
-		db.close();
 		//return id;
 	}
 	
@@ -792,7 +783,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		db.delete(TABLE_INDEPENDENTITEM, ITEM_ID + " = " + item_id, null);
-		db.close();
 	}
 	
 	public boolean getIndependentItem(long id) throws DatabaseException {
@@ -854,7 +844,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(ITEM_ID, item_id);
 		
 		db.insert(TABLE_CONTEXTITEM, null, values);
-		db.close();
 		//return id;
 	}
 	
@@ -864,7 +853,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		db.delete(TABLE_CONTEXTITEM, ITEM_ID + " = " + item_id, null);
-		db.close();
 	}
 	
 	
@@ -934,7 +922,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(LIGHTNESS, light);
 		
 		db.insert(TABLE_ITEMATTRIBUTE, null, values);
-		db.close();
 	}
 	
 	
@@ -943,7 +930,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		db.delete(TABLE_ITEMATTRIBUTE, ITEM_ID + " = " + item_id, null);
-		db.close();
 	}
 	
 	
@@ -1067,7 +1053,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(LIGHTNESS, lightness);
 		
 		db.update(TABLE_ITEMATTRIBUTE, values, _ID + " = " + id, null);
-		db.close();
 		
 	}
 	
@@ -1086,7 +1071,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(IMAGE_HASH, image); 
 		
 		db.insert(TABLE_PHOTO, null, values);
-		db.close();
 		//return id;
 		
 	}
@@ -1097,7 +1081,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		db.delete(TABLE_PHOTO, ITEM_ID + " = " + item_id, null);
-		db.close();
 	}
 	
 	
@@ -1108,8 +1091,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		ContentValues values = new ContentValues();
 		values.put(IMAGE_HASH, item.getImageHash());
 		values.put(IMAGE, item.getId());
-		
-		db.close();
 		
 		return db.update(TABLE_PHOTO, values, _ID + " = ?", new String[] {String.valueOf(item.getId())});
 	}
@@ -1153,7 +1134,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(IMAGE_HASH, item_id);
 		
 		db.insert(TABLE_PHOTO, null, values);
-		db.close();
 	}
 
 
@@ -1228,7 +1208,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			addActivityItems(id, iA, null);
 		}
 		
-		db.close();
 	}
 
 
@@ -1240,7 +1219,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String name = activity.getName();
 		
 		db.delete(TABLE_ACTIVITY, NAME + " = ?", new String[] {name});
-		db.close();
 	}
 
 
@@ -1260,7 +1238,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		db.update(TABLE_ACTIVITY, values, _ID + " = " + activity_id, null);
-		db.close();
 	}
 	
 	
@@ -1426,18 +1403,23 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		List<Item> items = new ArrayList<Item>();
 		Item item = null;
 		
-		String selectQuery = "SELECT " + ACTIVITY_ID + " FROM " + TABLE_ACTIVITYITEM;
+		String selectQuery = "SELECT * FROM " + TABLE_ACTIVITYITEM;
 		Cursor c = db.rawQuery(selectQuery, null);
-			
+//		int cursorsize = c.getColumnCount();
+//		for(int j = 0; j < cursorsize; j++){
+//			Log.w("TEST", "Spaltennummer" + j +", Cursorspaltenname: " + c.getColumnName(j));
+//		}
+		
 		if(c.moveToFirst() && c.getCount() > 0) {
 	
 			do{
-				
-				if(item_id == c.getLong(c.getColumnIndex(ITEM_ID))){
+
+				long get_id = c.getLong(c.getColumnIndex(ITEM_ID));
+				if(item_id == get_id){
 						
 					long activity_id = c.getLong(c.getColumnIndex(ACTIVITY_ID));
 						
-					String selectActivity = "SELECT * FROM " + TABLE_ACTIVITY + " WHERE " + ACTIVITY_ID + " = " + activity_id;
+					String selectActivity = "SELECT * FROM " + TABLE_ACTIVITY + " WHERE " + _ID + " = " + activity_id;
 					Cursor ac = db.rawQuery(selectActivity, null);
 						
 					if(ac.moveToFirst() && ac.getCount() > 0){
@@ -1479,7 +1461,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			c.close();
 		}
 		
-		db.close();
 		return activites;
 	}
 	
@@ -1503,7 +1484,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		db.insert(TABLE_ACTIVITYITEM, null, values);
-		db.close();
 
 	}
 	
@@ -1542,7 +1522,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		db.delete(TABLE_ACTIVITYITEM, ITEM_ID + " = ?", new String[] {String.valueOf(item_id)});
-		db.close();
 	}
 		
 	
@@ -1551,7 +1530,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		SQLiteDatabase db = this.getWritableDatabase();
 
 		db.delete(TABLE_ACTIVITYITEM, CATEGORY_ID + " = ?", new String[] {String.valueOf(category_id)});
-		db.close();
 	}
 	
 	
@@ -1594,7 +1572,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(NAME, category.getName());
 		
 		db.insert(TABLE_CATEGORY, null, values);
-		db.close();
 	}
 
 
@@ -1606,7 +1583,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String name = category.getName();
 		
 		db.delete(TABLE_CATEGORY, NAME + " = '" + name + "'", null);
-		db.close();
 	}
 
 
@@ -1624,7 +1600,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		db.update(TABLE_CATEGORY, values, _ID + " = " + cat_id, null);
-		db.close();
 	}
 	
 	
@@ -1722,7 +1697,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(MAC, location.getRadius());
 		
 		db.insert(TABLE_LOCATION, null, values);
-		db.close();
 	}
 
 
@@ -1734,7 +1708,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		String name = location.getName();
 		
 		db.delete(TABLE_LOCATION, NAME + " = '" + name + "'", null);
-		db.close();
 	}
 
 
@@ -1766,7 +1739,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		}
 		
 		db.update(TABLE_LOCATION, values, _ID + " = " + toEdit.getId(), null);
-		db.close();
 	}
 	
 	
@@ -1782,7 +1754,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(MAC, location.getMac());
 		
 		db.update(TABLE_LOCATION, values, _ID + " = ?", new String[] {String.valueOf(location.getId())});
-		db.close();
 	}
 	
 	public Location getLocation(String name) throws DatabaseException {
