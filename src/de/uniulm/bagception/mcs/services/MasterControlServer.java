@@ -1,6 +1,7 @@
 package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -81,7 +82,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
 	private ServiceSystem serviceSystem;
-
+	
+	
+	
 	private int batteryStatus = 0;
 
 	
@@ -120,7 +123,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		itemIndexSystem = new ItemIndexSystem(dbHelper);
 		try {
-			activitySystem = new ActivitySystem();
+			activitySystem = new ActivitySystem(dbHelper);
 		} catch (DatabaseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -132,8 +135,11 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		btHelper.unregister(this);
-		caseActor.unregister(this);
+		if (btHelper!=null)
+			btHelper.unregister(this);
+		
+		if (caseActor!=null)
+			caseActor.unregister(this);
 		unregisterReceiver(RFIDReceiver);
 		unregisterReceiver(mBatteryInfoReceiver);
 
@@ -157,6 +163,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		LOGGER.C(this,
 				"initiating bootstrap method, starting necessary services");
 		Intent i = new Intent();
+		
 		for (ServiceInfo serviceInfo : ServiceStatusFragment.bagceptionSystemServices) {
 			if (!ServiceUtil.isServiceRunning(this,
 					serviceInfo.getServiceSystemName())) {
@@ -413,6 +420,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		sendBroadcast(rfidScanBC);
 		LOG.out(this, "case closed");
 		LOGGER.C(this, "case closed");
+		itemIndexSystem.caseClosed();
 	}
 
 	// CaseOpenServiceBroadcastReactor\\
@@ -435,7 +443,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} else if (BagceptionBroadcastContants.BROADCAST_RFID_TAG_FOUND
 					.equals(intent.getAction())) {
 				// tag found
-
+				
 				toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP);
 
 				String id = intent
@@ -452,15 +460,24 @@ public class MasterControlServer extends ObservableService implements Runnable,
 					if (i != null) {
 						// tag exists in database
 						LOGGER.C(this, "TAG found: " + i.getName()+", hash: "+i.getImageHash());
-						if (itemIndexSystem.itemScanned(i)) {
+						if (itemIndexSystem.itemScanned(i,id)) {
 							// item put in
 							LOGGER.C(this, "Item in: " + i.getName());
 						} else {
 							// item taken out
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
-						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(itemIndexSystem.getCurrentItems());
-						Activity first = activityPriorityList.getActivities().get(0);
+						
+						List<Item> items = itemIndexSystem.getCurrentItems();
+						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
+						
+						Log.w("TEST", "TESTTESTEST: " + activityPriorityList.getActivities());
+						
+						Activity first = null;
+						
+						if(activityPriorityList != null && activityPriorityList.getActivities().size() > 0){
+							first = activityPriorityList.getActivities().get(0);
+						}
 						
 						if (first!=null){
 							if (!activitySystem.isManuallyDetermActivity())
@@ -471,6 +488,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 						}
 						lastActivityList = activityPriorityList;
+
 						setStatusChanged();
 					} else {
 						// tag not found in db

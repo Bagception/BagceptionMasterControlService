@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseInterface;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
@@ -12,10 +14,14 @@ public class ItemIndexSystem {
 
 	private final HashSet<String> itemsInContainer = new HashSet<String>();
 	private final DatabaseInterface dbHelper;
-	
+	private HashSet<String> scannedIds = new HashSet<String>();
 	
 	public ItemIndexSystem(DatabaseInterface dbHelper){
 		this.dbHelper = dbHelper;
+	}
+	
+	public void caseClosed(){
+		scannedIds.clear();
 	}
 	
 	
@@ -24,17 +30,30 @@ public class ItemIndexSystem {
 	 * @param item the scanned item
 	 * @return true if the item was not in the bag, that means we put the item in the bag
 	 * false when the item was removed from the container, that means the item was taken out
+	 * @throws Exception 
 	 */
-	public boolean itemScanned(Item item){
+	public boolean itemScanned(Item item,String id){
 		if (isItemInContainer(item)){
-			removeItem(item);
+			if(!scannedIds.contains(id)){
+				//take out
+				removeItem(item);
+			}else{
+				//ignore
+			}
+			idScanned(id);
 			return false;
 		}else{
-			addItem(item);
+			if(scannedIds.contains(id)){
+				//ignore
+			}else{
+				addItem(item);
+			}
+			idScanned(id);
 			return true;
 		}
-	}
-	
+		
+		
+	}	
 	private void addItem(Item item){
 		List<String> allIDsFromItem = item.getIds();
 		for (String id_:allIDsFromItem){
@@ -75,7 +94,19 @@ public class ItemIndexSystem {
 			
 			
 		}
+		
 		return ret;
+	}
+	
+	private void idScanned(String id){
+		Item i;
+		try {
+			i = dbHelper.getItem(dbHelper.getItemId(id));
+			scannedIds.addAll(i.getIds());
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public void clearAllItems(){
