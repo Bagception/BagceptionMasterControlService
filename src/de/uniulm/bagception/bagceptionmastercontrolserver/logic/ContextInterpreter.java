@@ -14,9 +14,9 @@ public class ContextInterpreter {
 
 	private final MasterControlServer mcs;
 	private List<ContextSuggestion> suggestions;
-	
+	private List<Item> itemList;
 	private Set<CachedContextInfo> cache = new HashSet<CachedContextInfo>();
-	
+	private WeatherForecast forecast;
 	
 	
 	public ContextInterpreter(MasterControlServer mcs){
@@ -28,8 +28,38 @@ public class ContextInterpreter {
 	 * @param itemsIn
 	 */
 	public void updateList(List<Item> itemsIn){
+		itemList = itemsIn;
+		if (forecast == null) return;
+		if (itemList == null) return;
 		//TODO
 		//eval itemsIn with cached context data
+		//update suggestions
+		//use data from getContexts()
+		HashSet<CachedContextInfo> contexts = getContexts();
+		for (CachedContextInfo i:contexts){
+			if (i.getTimestamp()<System.currentTimeMillis()-(4*1000*60*60)){
+				//context too old
+				
+			}else{
+				//use context
+				switch (i.getContext()){
+				case BRIGHT:
+					break;
+				case COLD:
+					break;
+				case DARK:
+					break;
+				case RAIN:
+					break;
+				case SUNNY:
+					break;
+				case WARM:
+					break;
+				default:
+					break;
+				}
+			}
+		}
 		
 	}
 	
@@ -42,19 +72,19 @@ public class ContextInterpreter {
 		return suggestions;
 	}
 	
-	
-	private void onContextDataRecv(){
-		//TODO update context data cache when new data is recv
-		//drop context if too old
-		//replace context
-		
+	//TODO methode aufrufen
+	private void onContextDataRecv(WeatherForecast forecast){
+		this.forecast = forecast;  
+		if (itemList != null){
+			updateList(itemList);
+		}		
 	}
 	
-	private HashSet<CachedContextInfo> getContexts(WeatherForecast forecast){
+	private HashSet<CachedContextInfo> getContexts(){
 		//TODO calculates the current context
 		HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
 		//wenn es reget:
-		//	ret.add(new CachedContextInfo(CONTEXT.RAIN, "mehr text?, TODO REPLACE! vllt regenwahrscheinlichekit"));
+			ret.add(new CachedContextInfo(CONTEXT.RAIN, "mehr text?, TODO REPLACE! vllt regenwahrscheinlichekit"));
 		//TODO usw
 		
 		return ret;
