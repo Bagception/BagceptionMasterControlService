@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
@@ -49,8 +51,6 @@ public class CalendarReader {
 		 
 		while (cursor.moveToNext()) {
 			idNameHashMap.put(cursor.getString(1), Integer.parseInt(cursor.getString(0)));
-//			log("id: " + cursor.getString(0));
-//			log("name: " + cursor.getString(1));
 		}
 		
 		uri = Uri.parse("content://com.android.calendar/events");
@@ -92,7 +92,6 @@ public class CalendarReader {
 				SELECTION, null, "dtstart"	
 				);
 		
-//		log("##################################");
 		
 		int number = 0;
 		while (cursor.moveToNext() && (number<numberOfEvents || numberOfEvents==-1)) {
@@ -139,6 +138,31 @@ public class CalendarReader {
 			calendarNames.add(cursor.getString(1));
 		}
 		return calendarNames;
+	}
+	
+	
+	public int getCalendarId(Context context, String calendarDisplayName){
+		cursor = null;
+		this.context = context;
+		uri = Calendars.CONTENT_URI;
+		
+		EVENT_PROJECTION = new String[] {			
+					Calendars._ID,
+					Calendars.NAME,
+		};
+		
+		// getting calendar names and ids
+		cursor = context.getContentResolver().query(
+					uri,
+					EVENT_PROJECTION, 
+					null, null, null);
+		 
+		while (cursor.moveToNext()) {
+			if(cursor.getString(1).equals(calendarDisplayName)){
+				return cursor.getInt(0);
+			}
+		}
+		return -1;
 	}
 	
 	

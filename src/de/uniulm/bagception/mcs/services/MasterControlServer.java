@@ -44,6 +44,7 @@ import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
+import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
@@ -342,6 +343,14 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		case CALENDAR_EVENT_REQUEST:{
 			LOGGER.C(this, "CALENDAR_NAME_REQUEST");
 			serviceSystem.calendarEventRequest();
+			break;
+		}
+		case CALENDAR_ADD_EVENT_REQUEST:{
+			LOGGER.C(this, "CALENDAR_ADD_EVENT_REQUEST");
+			log("IT FUCKING WOOOOOOORKS!!!!");
+			JSONObject o = BundleMessage.getInstance().extractObject(b);
+			CalendarEvent event = CalendarEvent.fromJSON(o);
+			serviceSystem.calendarAddEventRequest(event);
 			break;
 		}
 			

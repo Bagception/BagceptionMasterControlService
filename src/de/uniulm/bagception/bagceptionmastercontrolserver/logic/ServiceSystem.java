@@ -111,6 +111,15 @@ public class ServiceSystem implements Receiver{
 		mcs.startService(i);
 	}
 	
+	public void calendarAddEventRequest(CalendarEvent event) {
+		
+		Intent i = new Intent(mcs, CalendarService.class);
+		i.putExtra("receiverTag", mResultreceiver);
+		i.putExtra("payload", event.toJSONObject().toString());
+		i.putExtra(Calendar.REQUEST_TYPE, Calendar.ADD_EVENT);
+		mcs.startService(i);
+	}
+	
 	private void log(String s){
 		Log.d("MCS", s);
 	}
@@ -252,6 +261,10 @@ public class ServiceSystem implements Receiver{
 			}
 		}
 	}
+
+
+	
+
 
 
 }
