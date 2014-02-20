@@ -66,9 +66,11 @@ public class ContextInterpreter implements Receiver{
 			
 			List<Long> item_ids = db.getContextItems();
 			
-			for(long l:item_ids){
-				Item item = db.getItem(l);
-				itemList.add(item);
+			if(item_ids != null){
+				for(long l:item_ids){
+					Item item = db.getItem(l);
+					itemList.add(item);
+				}
 			}
 			
 			if (forecast == null)
