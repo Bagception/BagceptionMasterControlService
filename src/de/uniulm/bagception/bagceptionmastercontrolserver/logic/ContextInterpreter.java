@@ -1,35 +1,28 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
-import java.text.Format;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.format.DateFormat;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion.CONTEXT;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ItemAttribute;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
-//import de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast;
+import de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
-import de.uniulm.bagception.services.attributes.WeatherForecast;
+//import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 public class ContextInterpreter implements Receiver{
 
@@ -37,7 +30,7 @@ public class ContextInterpreter implements Receiver{
 	private List<ContextSuggestion> suggestions;
 	private List<Item> itemList;
 	private Set<CachedContextInfo> cache = new HashSet<CachedContextInfo>();
-	private de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast;
+	private WeatherForecast forecast;
 	private Object lock = new Object();
 	private MyResultReceiver resultReceiver;
 	private DatabaseHelper db;
@@ -66,15 +59,12 @@ public class ContextInterpreter implements Receiver{
 		synchronized (lock) {
 
 			//TODO
-			Location loc = new Location("Test", (float) 49.9, (float) 9.98, 5);
+			//Location loc = new Location("Test", (float) 49.9, (float) 9.98, 5);
+
+			Location loc = mcs.getLocation();
 			
-			Intent intent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
-			intent.putExtra("receiverTag", resultReceiver);
-			intent.putExtra(WeatherForecast.LATITUDE, loc.getLat());
-			intent.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
-			mcs.startService(intent);
-			
-			
+			if(loc == null) return;
+				
 			itemList = itemsIn;
 			
 			List<Long> item_ids = db.getContextItems();
@@ -92,15 +82,22 @@ public class ContextInterpreter implements Receiver{
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
 						- (4 * 1000 * 60 * 60)) {
-					// context too old
 
+					Intent intent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
+					intent.putExtra("receiverTag", resultReceiver);
+					intent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
+					intent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
+					mcs.startService(intent);
+					
+					onContextDataRecv(forecast);
+					
 				} else {
 
 					suggestedItems = new ArrayList<Item>();
 					for(Item item:itemList){
-						ContextSuggestion suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
 						
 						ItemAttribute iA = item.getAttribute();
+						
 						switch (i.getContext()) {
 						
 						case BRIGHT:
@@ -237,6 +234,9 @@ public class ContextInterpreter implements Receiver{
 						default:
 							break;
 						}
+						
+						ContextSuggestion suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+						suggestions.add(suggestion);
 					}
 				}
 			}
@@ -326,7 +326,8 @@ public class ContextInterpreter implements Receiver{
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 
-		if(resultData.getString(WeatherForecast.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
+		if(resultData.getString(de.uniulm.bagception.services.attributes.WeatherForecast.RESPONSE_TYPE)
+				.equals(de.uniulm.bagception.services.attributes.WeatherForecast.WEATHERFORECAST)){
 
 			String s = resultData.getString("payload");
 			
