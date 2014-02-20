@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -37,6 +35,7 @@ public class ContextInterpreter implements Receiver{
 	private MyResultReceiver resultReceiver;
 	private final DatabaseHelper db;
 	private List<Item> suggestedItems;
+	private List<Item> suggestedContextItems;
 
 	
 	private JSONParser parser = new JSONParser();
@@ -67,11 +66,12 @@ public class ContextInterpreter implements Receiver{
 			itemList = itemsIn;
 			
 			List<Long> item_ids = db.getContextItems();
+			List<Item> contextItems = new ArrayList<Item>();
 			
 			if(item_ids != null){
 				for(long l:item_ids){
 					Item item = db.getItem(l);
-					itemList.add(item);
+					contextItems.add(item);
 				}
 			}
 			
@@ -97,15 +97,17 @@ public class ContextInterpreter implements Receiver{
 					onContextDataRecv(forecast);
 					
 				} else {
-
-					suggestedItems = new ArrayList<Item>();
+					ContextSuggestion suggestion;
+					
 					for(Item item:itemList){
 						
 						ItemAttribute iA = item.getAttribute();
+						if(iA == null) return;
 						
 						switch (i.getContext()) {
 						
 						case BRIGHT:
+							suggestedItems = new ArrayList<Item>();
 							if(iA.getLightness().equals("light")){
 								return;
 							} else if(iA.getLightness().equals("dark")){
@@ -125,9 +127,12 @@ public class ContextInterpreter implements Receiver{
 									}
 								}
 							}
+							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
 							break;
 							
 						case COLD:
+							suggestedItems = new ArrayList<Item>();
 							if(iA.getTemperature().equals("cold")){
 								return;
 							} else if(iA.getTemperature().equals("warm")){
@@ -147,9 +152,12 @@ public class ContextInterpreter implements Receiver{
 									}
 								}
 							}
+							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
 							break;
 							
 						case DARK:
+							suggestedItems = new ArrayList<Item>();
 							if(iA.getLightness().equals("dark")){
 								return;
 							} else if(iA.getLightness().equals("light")){
@@ -169,9 +177,12 @@ public class ContextInterpreter implements Receiver{
 									}
 								}
 							}
+							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
 							break;
 							
 						case RAIN:
+							suggestedItems = new ArrayList<Item>();
 							if(iA.getWeather().equals("rainy")){
 								return;
 							} else if(iA.getWeather().equals("sunny")){
@@ -191,9 +202,12 @@ public class ContextInterpreter implements Receiver{
 									}
 								}
 							}
+							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
 							break;
 							
 						case SUNNY:
+							suggestedItems = new ArrayList<Item>();
 							if(iA.getWeather().equals("sunny")){
 								return;
 							} else if(iA.getWeather().equals("rainy")){
@@ -213,9 +227,12 @@ public class ContextInterpreter implements Receiver{
 									}
 								}
 							}
+							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
 							break;
 							
 						case WARM:
+							suggestedItems = new ArrayList<Item>();
 							if(iA.getTemperature().equals("warm")){
 								return;
 							} else if(iA.getTemperature().equals("cold")){
@@ -235,13 +252,74 @@ public class ContextInterpreter implements Receiver{
 									}
 								}
 							}
+							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
 							break;
 						default:
 							break;
 						}
 						
-						ContextSuggestion suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-						suggestions.add(suggestion);
+					}
+					
+					suggestedContextItems = new ArrayList<Item>();
+					for(Item ci:contextItems){
+						
+						ItemAttribute cia = ci.getAttribute();
+						if(cia == null) return;
+						
+						switch(i.getContext()){
+						case BRIGHT:
+							if(suggestedContextItems.contains(ci)) return;
+							if(cia.getLightness().equals("ligth")){
+								suggestedContextItems.add(ci);
+							}
+							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
+							break;
+						case COLD:
+							if(suggestedContextItems.contains(ci)) return;
+							if(cia.getTemperature().equals("cold")){
+								suggestedContextItems.add(ci);
+							}
+							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
+							break;
+						case DARK:
+							if(suggestedContextItems.contains(ci)) return;
+							if(cia.getLightness().equals("dark")){
+								suggestedContextItems.add(ci);
+							}
+							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
+							break;
+						case RAIN:
+							if(suggestedContextItems.contains(ci)) return;
+							if(cia.getWeather().equals("rainy")){
+								suggestedContextItems.add(ci);
+							}
+							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
+							break;
+						case SUNNY:
+							if(suggestedContextItems.contains(ci)) return;
+							if(cia.getWeather().equals("sunny")){
+								suggestedContextItems.add(ci);
+							}
+							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
+							break;
+						case WARM:
+							if(suggestedContextItems.contains(ci)) return;
+							if(cia.getTemperature().equals("warm")){
+								suggestedContextItems.add(ci);
+							}
+							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+							suggestions.add(suggestion);
+							break;
+						default:
+							break;
+						
+						}
 					}
 				}
 			}
