@@ -566,6 +566,17 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 	  
 	private final AdministrationCommandProcessor activityProcessor = new AdministrationCommandProcessor(){
+		
+		public void onActivityStop(Activity a, de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand<Activity> cmd) {
+			try {
+				activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
+				activitySystem.setManuallyDetermActivity(false);
+			} catch (DatabaseException e) {
+				e.printStackTrace();
+			}
+			setStatusChanged();
+
+		};
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
@@ -587,16 +598,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				setStatusChanged();
 		}
 	};
-		public void onActivityStop(Activity a, AdministrationCommand<Activity> cmd) {
-			try {
-				activitySystem.setCurrentActivity(Activity.NO_ACTIVITY);
-				activitySystem.setManuallyDetermActivity(false);
-			} catch (DatabaseException e) {
-				e.printStackTrace();
-			}
-				setStatusChanged();
-		}
-
+		
 		
 		@Override
 		public void onReceiveResult(int resultCode, Bundle resultData) {
