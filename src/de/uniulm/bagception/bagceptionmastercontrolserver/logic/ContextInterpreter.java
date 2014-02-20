@@ -58,9 +58,6 @@ public class ContextInterpreter implements Receiver{
 	public void updateList(List<Item> itemsIn) throws DatabaseException {
 		synchronized (lock) {
 
-			//TODO
-			//Location loc = new Location("Test", (float) 49.9, (float) 9.98, 5);
-
 			Location loc = mcs.getLocation();
 			
 			if(loc == null) return;
@@ -78,6 +75,10 @@ public class ContextInterpreter implements Receiver{
 				return;
 			if (itemList == null)
 				return;
+			
+			if(cache == null){
+				onContextDataRecv(forecast);
+			}
 
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
