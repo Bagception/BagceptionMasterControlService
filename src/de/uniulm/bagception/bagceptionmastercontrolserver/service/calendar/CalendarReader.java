@@ -4,23 +4,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-
-<<<<<<< HEAD
-import org.json.simple.JSONObject;
-
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
-
-import android.content.ContentResolver;
-import android.content.ContentValues;
-=======
->>>>>>> 37a65271fbcbf8e69c5ea680df35bb358d7c922a
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
-import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 
 public class CalendarReader {
 	
