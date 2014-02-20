@@ -33,7 +33,7 @@ public class ContextInterpreter implements Receiver{
 	private WeatherForecast forecast;
 	private Object lock = new Object();
 	private MyResultReceiver resultReceiver;
-	private DatabaseHelper db;
+	private final DatabaseHelper db;
 	private List<Item> suggestedItems;
 
 	
@@ -46,7 +46,7 @@ public class ContextInterpreter implements Receiver{
 		
 		resultReceiver = new MyResultReceiver(new Handler());
 		resultReceiver.setReceiver(mcs);
-		new DatabaseHelper(mcs.getApplicationContext());
+		db=mcs.getDB();
 	}
 
 	/**

@@ -92,6 +92,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	
 	private int batteryStatus = 0;
 
+	public DatabaseHelper getDB(){
+		return dbHelper;
+	}
 	
 	
 	private ActivityPriorityList lastActivityList;
