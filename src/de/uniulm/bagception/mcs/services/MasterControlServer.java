@@ -541,6 +541,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
 				statusUpdate.toString());
 		btHelper.sendMessageBundle(toSend);
+		LOGGER.C(this, "status update send");
 		
 	}
 
