@@ -1,12 +1,10 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.services.attributes.Calendar;
@@ -14,12 +12,15 @@ import android.app.IntentService;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.net.ParseException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
 import android.util.Log;
+import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
+import de.uniulm.bagception.services.attributes.Calendar;
 
 public class CalendarService extends IntentService {
 
@@ -77,6 +78,9 @@ public class CalendarService extends IntentService {
 					obj = (JSONObject) parser.parse(s);
 					event = CalendarEvent.fromJSON(obj);
 				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (org.json.simple.parser.ParseException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				log("name: " + event.getName());

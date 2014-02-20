@@ -1,6 +1,7 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import java.io.ByteArrayOutputStream;
+
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;

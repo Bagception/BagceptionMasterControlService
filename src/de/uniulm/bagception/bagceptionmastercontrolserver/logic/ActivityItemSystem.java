@@ -1,10 +1,11 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.List;
+
+import android.content.Context;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
-import android.content.Context;
 
 public class ActivityItemSystem {
 	

@@ -5,6 +5,7 @@ import java.util.List;
 
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -25,6 +26,7 @@ public class ActivitySystem {
 	
 	public void setCurrentActivity(Activity activity) throws DatabaseException{
 		this.currentActivity = activity;
+		LOGGER.C(this, "activity changed: "+activity.getName());
 //		String d="activty changed: "+activity.getName()+"\n"+" items: ";
 //		Item last=null;
 //		for(Item i:activity.getItemsForActivity()){

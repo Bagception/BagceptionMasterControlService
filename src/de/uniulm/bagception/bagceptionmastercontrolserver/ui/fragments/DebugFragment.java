@@ -2,7 +2,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
 import java.util.ArrayList;
 
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -10,7 +9,6 @@ import org.json.simple.parser.ParseException;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
-import android.hardware.Camera.Area;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,10 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
@@ -31,7 +26,6 @@ import de.uniulm.bagception.bluetoothclientmessengercommunication.service.Bundle
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Position;
 import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;

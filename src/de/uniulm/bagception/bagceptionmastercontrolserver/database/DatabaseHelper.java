@@ -2,8 +2,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import android.content.ContentValues;
 import android.content.Context;
