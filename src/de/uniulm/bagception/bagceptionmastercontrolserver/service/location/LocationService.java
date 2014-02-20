@@ -6,11 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
-import de.uniulm.bagception.bundlemessageprotocol.entities.WifiBTDevice;
-import de.uniulm.bagception.services.attributes.OurLocation;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -28,6 +23,10 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.ResultReceiver;
 import android.util.Log;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
+import de.uniulm.bagception.services.attributes.OurLocation;
 
 public class LocationService extends Service{
 	

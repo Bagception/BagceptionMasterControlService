@@ -2,7 +2,6 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
 import java.util.List;
 
-import android.graphics.BitmapFactory;
 import android.util.Log;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;

@@ -2,15 +2,13 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar;
 
 import java.util.ArrayList;
 
-import org.json.simple.JSONObject;
-
-import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
-import de.uniulm.bagception.services.attributes.Calendar;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.util.Log;
+import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
+import de.uniulm.bagception.services.attributes.Calendar;
 
 public class CalendarService extends IntentService {
 
