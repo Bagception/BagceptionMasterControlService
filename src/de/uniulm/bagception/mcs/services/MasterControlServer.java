@@ -557,6 +557,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 	private void setStatusChanged() throws DatabaseException {
 
+		Log.w("TEST", "statusChanged: " + contextInterpreter.getContextSuggetions());
+		
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
 				itemIndexSystem.getCurrentItems(),
@@ -638,6 +640,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		
 		@Override
 		public void onReceiveResult(int resultCode, Bundle resultData) {
+			
+			Log.w("TEST", "Empfange Wetterdaten in der falschen Methode");
 			
 			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.LOCATION)){
 //				log("------- LOCATION REPLY------");
