@@ -97,6 +97,7 @@ public class CalendarReader {
 			
 			int number = 0;
 			while (cursor.moveToNext() && (number<numberOfEvents || numberOfEvents==-1)) {
+
 				String name = "";
 				String calendarName = "";
 				String description = "";
@@ -106,7 +107,7 @@ public class CalendarReader {
 				if(!cursor.getString(0).isEmpty()) name = cursor.getString(0);
 				if(!cursor.getString(1).isEmpty()) calendarName = cursor.getString(1);
 				if(!cursor.getString(2).isEmpty()) description = cursor.getString(2);
-				if(!cursor.getString(3).isEmpty()) location = cursor.getString(3);
+//				if(!cursor.getString(3).isEmpty()) location = cursor.getString(3);
 				if(!cursor.getString(4).isEmpty()) startDate = Long.parseLong(cursor.getString(4));
 				if(!cursor.getString(5).isEmpty()) endDate = Long.parseLong(cursor.getString(5));
 				
