@@ -603,7 +603,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				activitySystem.setCurrentActivity(a);
 
 				activitySystem.setManuallyDetermActivity(true);
-//				activitySystem.getIndependentItems();
 				if(a.getLocation() != null){
 					loc = a.getLocation();
 					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
