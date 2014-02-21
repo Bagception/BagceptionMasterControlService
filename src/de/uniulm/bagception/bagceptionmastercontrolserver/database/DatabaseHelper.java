@@ -776,7 +776,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						if(imageString != null){
 							item.setImageString(imageString);
 						}
-						
 						items.add(item);
 				} while(c.moveToNext());
 				c.close();
