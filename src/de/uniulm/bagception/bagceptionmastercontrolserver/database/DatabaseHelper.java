@@ -574,6 +574,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	}
 
 
+	@SuppressWarnings("unused")
 	public List<Item> getItems(long cat_id) throws DatabaseException {
 		
 		SQLiteDatabase db = getReadableDatabase();
@@ -669,6 +670,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		return items;
 	}
 	
+	@SuppressWarnings("unused")
 	@Override
 	public List<Item> getItems() throws DatabaseException {
 
