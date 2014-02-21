@@ -18,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
+import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.CalendarService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
@@ -177,7 +178,12 @@ public class DebugFragment extends Fragment implements Receiver{
 			
 			@Override
 			public void onClick(View arg0) {
-					MasterControlServer.DEBUG();
+					try {
+						MasterControlServer.DEBUG();
+					} catch (DatabaseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				
 			}
 		});

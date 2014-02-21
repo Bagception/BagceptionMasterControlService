@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -339,7 +341,6 @@ public class ContextInterpreter implements Receiver{
 		}
 	}
 
-	// TODO methode aufrufen
 	private void onContextDataRecv(WeatherForecast forecast) throws DatabaseException {
 		synchronized (lock) {
 			cache.clear();
@@ -357,7 +358,7 @@ public class ContextInterpreter implements Receiver{
 			float weather = Float.parseFloat(object.get("rain").toString());
 			float temp = Float.parseFloat(object.get("temp").toString());
 			long time = System.currentTimeMillis();
-			long sunset = 64800000; // 18:00 Uhr = 64 800 000 Milliseconds
+			long sunset = 64800000; // 18:00 pm = 64 800 000 Milliseconds
 			
 			if(weather > 50){
 			ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
