@@ -74,7 +74,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private DatabaseHelper dbHelper;
 	private MyResultReceiver resultReceiver;
 	private Location loc;
-
+	private Activity tmp;
+	
 	// bt
 	private MessengerHelper btHelper;
 
@@ -495,7 +496,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
-						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+//						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
 						Activity first = null;
 						
@@ -506,6 +507,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						if (first!=null){
 							if (!activitySystem.isManuallyDetermActivity())
 								activitySystem.setCurrentActivity(first);
+								tmp = first;
 						}
 						if (!activityPriorityList.equals(lastActivityList)){
 							//priority list has changed
@@ -514,7 +516,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 						}
 						lastActivityList = activityPriorityList;
-
+						
+						Log.w("TEST", "Activity: " + tmp);
+						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+						
 						setStatusChanged();
 					} else {
 						// tag not found in db
@@ -684,13 +689,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			
 			Log.w("TEST", "Location in der getLocation-Methode: " + loc);
 			
-			if(loc == null){
+			if(tmp == null){
 				Intent i = new Intent(this, LocationService.class);
 				i.putExtra("receiverTag", resultReceiver);
 				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
 				startService(i);
 				
 				Log.w("TEST", "Location nach Location-Intent: " + loc);
+			} else{
+				loc = tmp.getLocation();
 			}
 			
 			Log.w("TEST", "Location die übertragen wird: " + loc);

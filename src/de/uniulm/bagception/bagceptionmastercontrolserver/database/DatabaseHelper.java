@@ -1475,6 +1475,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					indC.close();
 						
 					Activity activity = new Activity(id, name, items, location);
+					Log.w("TEST", "ActivityLocation bei Datenbank abfrage (Server/DatabaseHelper): " + location);
 					activities.add(activity);
 			} while(c.moveToNext());
 			c.close();
@@ -1777,7 +1778,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
-//		Log.w("TEST", "Folgende Loc wird gespeichert: " + location);
+		Log.w("TEST", "Folgende Loc wird gespeichert: " + location);
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, location.getName());
