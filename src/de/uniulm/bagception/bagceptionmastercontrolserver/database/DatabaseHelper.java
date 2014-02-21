@@ -1,21 +1,32 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Bitmap;
+import android.os.Environment;
 import android.util.Log;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Category;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ItemAttribute;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
+@SuppressLint("SdCardPath")
 public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterface{
 	
 	
@@ -76,6 +87,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String IMAGE = "_data";
 	private static final String IMAGE_HASH = "imgHash";
 	
+	private final String DB_FILEPATH;
+	private final String DB_BACKUP_PATH;
 	
 	// Table create statements
 	private static final String CREATE_TABLE_ITEM = 
@@ -162,12 +175,18 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			+ " FOREIGN KEY(" + ITEM_ID + ") REFERENCES " + TABLE_ITEM + "(" + _ID + ") ON UPDATE CASCADE);";
 	
     
-    @SuppressWarnings("unused")
 	private final Context context;
     
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		this.context = context;
+		//DB_FILEPATH = "/data/data/de.uniulm.bagception.bagceptionmastercontrolserver/databases/"+DATABASE_NAME;//context.getFilesDir().getPath()+"/data/de.uniulm.bagception.bagceptionmastercontrolserver/databases/BagceptionDatabase";
+		//ContextWrapper cw =new ContextWrapper(context.getApplicationContext());
+		//DB_FILEPATH = cw.getFilesDir().getAbsolutePath()+ "/Database/"+DATABASE_NAME;
+		DB_FILEPATH = "/data/data/de.uniulm.bagception.bagceptionmastercontrolserver/databases/"+DATABASE_NAME;
+		File sdCard = Environment.getExternalStorageDirectory();
+		File file = new File (sdCard.getAbsolutePath() + "/bagception/db/sqlite.db");
+		DB_BACKUP_PATH = file.getAbsolutePath();
 		
 	}
 	
@@ -1966,6 +1985,77 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 	}
 	
+	
+
+	public void exportDatabase(){
+		
+		
+		File sdCard = Environment.getExternalStorageDirectory();
+		File dir = new File (sdCard.getAbsolutePath() + "/bagception/db/");
+		dir.mkdirs();
+		File file = new File(dir, "sqlite.db");
+		
+		try {
+			if(copyDatabase(DB_FILEPATH,file.getAbsolutePath())){
+				LOGGER.C(this, "Database exported");
+			}else{
+				LOGGER.C(this, "Database not exported");
+			}
+		} catch (IOException e) {
+			LOGGER.C(this, "error: "+e.getMessage());
+			e.printStackTrace();
+		}	
+
+		
+	}
+
+	public  void importDatabase(){
+		
+		File file = new File(DB_BACKUP_PATH);
+		if (file.exists()){
+			LOGGER.C(this, "Database to import found");
+			try {
+				if(copyDatabase(DB_BACKUP_PATH,DB_FILEPATH)){
+					LOGGER.C(this, "Database imported");
+				}else{
+					LOGGER.C(this, "Database not imported");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
+		}else{
+			LOGGER.C(this, "no Database to import: "+file.getAbsolutePath());
+		}
+		
+	}
+	
+	 /**
+	  * Copies the database file at the specified location over the current
+	  * internal application database.
+	  * */
+	 private boolean copyDatabase(String from, String to) throws IOException {
+		 
+	     // Close the SQLiteOpenHelper so it will commit the created empty
+	     // database to internal storage.
+		 LOGGER.C(this,"try to copy: "+from+" -> "+to);
+	     close();
+	     File fromFile = new File(from);
+	     File toFile = new File(to);
+	     if (fromFile.exists()) {
+	         Utility.copyFile(new FileInputStream(fromFile), new FileOutputStream(toFile));
+	         // Access the copied database so SQLiteHelper will cache it and mark
+	         // it as created.
+	         getWritableDatabase().close();
+	         
+	         return true;
+	     }else{
+	    	 LOGGER.C(this,"error: file to copy does not exist");
+	     }
+	     return false;
+	 }
+
+	
+		 
 }
 
 
