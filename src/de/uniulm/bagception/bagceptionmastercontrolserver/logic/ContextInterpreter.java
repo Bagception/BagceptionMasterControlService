@@ -88,10 +88,13 @@ public class ContextInterpreter implements Receiver{
 				}
 			}
 			
-			Log.w("TEST", "Überprüfe Wetter (Server/ContextInterpreter): " + forecast);
-			Log.w("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
+			Log.d("TEST", "Überprüfe Wetter (Server/ContextInterpreter): " + forecast);
+			Log.d("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
+			Log.d("TEST", "Forecast: " + forecast);
 			
 			if (forecast == null)
+				Log.w("TEST", "Überprüfe Wetterkoordinaten (Server/ContextInterpreter): " + loc);
+			
 				weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
 				weatherIntent.putExtra("receiverTag", resultReceiver);
 				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());

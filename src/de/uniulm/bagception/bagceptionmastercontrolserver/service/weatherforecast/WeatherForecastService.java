@@ -43,7 +43,7 @@ public class WeatherForecastService extends IntentService {
 			unit = "&units=metric";
 		}
 		
-		String address = "http://api.openweathermap.org/data/2.5/find?";
+		String address = "http://api.openweathermap.org/data/2.5/forecast?";
 		String uri = address+"lat="+lat+"&lon="+lng+unit;
 		DownloadJSONWeatherForecast task = new DownloadJSONWeatherForecast(resultReceiver);
 		task.execute(uri);
