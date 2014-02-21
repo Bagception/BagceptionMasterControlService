@@ -77,7 +77,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private DatabaseHelper dbHelper;
 	private MyResultReceiver resultReceiver;
 	private Location loc;
-
+	private Activity tmp;
+	
 	// bt
 	private MessengerHelper btHelper;
 
@@ -135,7 +136,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		try {
 			activitySystem = new ActivitySystem(dbHelper);
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		serviceSystem = new ServiceSystem(this);
@@ -279,7 +279,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 		case CONTAINER_STATUS_UPDATE_REQUEST:{
 			LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
-				setStatusChanged();
+				try {
+					setStatusChanged();
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			break;
 		}
 
@@ -347,13 +352,19 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			break;
 		}
 		case CALENDAR_EVENT_REQUEST:{
-			LOGGER.C(this, "CALENDAR_NAME_REQUEST");
-			serviceSystem.calendarEventRequest();
+				try {
+					List<Activity> activityList = dbHelper.getActivities();
+					LOGGER.C(this, "CALENDAR_NAME_REQUEST");
+					serviceSystem.calendarEventRequest(activityList);
+					break;
+					
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+				}
 			break;
 		}
 		case CALENDAR_ADD_EVENT_REQUEST:{
 			LOGGER.C(this, "CALENDAR_ADD_EVENT_REQUEST");
-			log("IT FUCKING WOOOOOOORKS!!!!");
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			CalendarEvent event = CalendarEvent.fromJSON(o);
 			serviceSystem.calendarAddEventRequest(event);
@@ -380,7 +391,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		StatusCode status = StatusCode.getStatusCode(b);
 		switch (status) {
 		case DISCONNECTED:
-			// TODO?
 			break;
 		default:
 			break;
@@ -489,9 +499,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
-						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
-						
-						Log.w("TEST", "TESTTESTEST: " + activityPriorityList.getActivities());
+//						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
 						Activity first = null;
 						
@@ -502,13 +510,19 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						if (first!=null){
 							if (!activitySystem.isManuallyDetermActivity())
 								activitySystem.setCurrentActivity(first);
+								tmp = first;
 						}
 						if (!activityPriorityList.equals(lastActivityList)){
 							//priority list has changed
+							LOGGER.C(this,"PRIORITY list has changed");
+							
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 						}
 						lastActivityList = activityPriorityList;
-
+						
+						Log.w("TEST", "Activity: " + tmp);
+						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+						
 						setStatusChanged();
 					} else {
 						// tag not found in db
@@ -541,7 +555,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 	};
 
-	private void setStatusChanged() {
+	private void setStatusChanged() throws DatabaseException {
 
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
@@ -563,7 +577,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		btHelper.sendMessageBundle(toSendBun);
 	}
 
-	public static void DEBUG() {
+	public static void DEBUG() throws DatabaseException {
 		debuginstance.setStatusChanged();
 	}
 
@@ -586,15 +600,20 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
-			setStatusChanged();
+			try {
+				setStatusChanged();
+			} catch (DatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		};
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
-
+				Log.w("TEST", "Activity (Server/MasterControlServer): " + a);
+				Log.w("TEST", "Location bei ActivityStart (Server/MasterControlServer): " + a.getLocation());
 				activitySystem.setManuallyDetermActivity(true);
-//				activitySystem.getIndependentItems();
 				if(a.getLocation() != null){
 					loc = a.getLocation();
 					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
@@ -607,7 +626,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
-				setStatusChanged();
+				try {
+					setStatusChanged();
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 	};
 		
@@ -668,13 +692,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			
 			Log.w("TEST", "Location in der getLocation-Methode: " + loc);
 			
-			if(loc == null){
+			if(tmp == null){
 				Intent i = new Intent(this, LocationService.class);
 				i.putExtra("receiverTag", resultReceiver);
 				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
 				startService(i);
 				
 				Log.w("TEST", "Location nach Location-Intent: " + loc);
+			} else{
+				loc = tmp.getLocation();
 			}
 			
 			Log.w("TEST", "Location die übertragen wird: " + loc);

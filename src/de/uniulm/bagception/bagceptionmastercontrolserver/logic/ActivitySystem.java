@@ -1,7 +1,10 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+
+import android.util.Log;
 
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
@@ -9,6 +12,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 
 
 
@@ -68,14 +72,38 @@ public class ActivitySystem {
 	}
 	
 	/**
+	 * @throws DatabaseException 
 	 * Return the current activitiy
 	 * @return Activity
 	 * @throws  
 	 */
-	public Activity getCurrentActivity() {
+	public Activity getCurrentActivity() throws DatabaseException {
 		
 		//TODO 
 		// Add independent items
+//		currentActivity.getItemsForActivity().addAll(INDEPENDENTITEMS);
+//		
+//		
+//		currentActivity.getItemsForActivity().
+		
+		long id = currentActivity.getId();
+		String name = currentActivity.getName();
+		List<Item> ac_items = currentActivity.getItemsForActivity();
+		Location loc = currentActivity.getLocation();
+		
+		List<Long> item_ids = db.getIndependentItems();
+		List<Item> items = new ArrayList<Item>();
+		
+		if(item_ids != null){
+			
+			for(int j = 0; j < item_ids.size(); j++){
+				Item item = db.getItem(item_ids.get(j));
+				items.add(item);
+			}
+			
+			ac_items.addAll(items);
+			currentActivity = new Activity(id, name, ac_items, loc);
+		}
 		
 		return currentActivity;
 	}

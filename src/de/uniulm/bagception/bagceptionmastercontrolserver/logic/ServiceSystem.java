@@ -2,6 +2,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -15,6 +16,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar.Calen
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
+import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Position;
@@ -100,7 +102,7 @@ public class ServiceSystem implements Receiver{
 		mcs.startService(i);
 	}
 	
-	public void calendarEventRequest() {
+	public void calendarEventRequest(List<Activity> activityList) {
 		Intent i = new Intent(mcs, CalendarService.class);
 		i.putExtra("receiverTag", mResultreceiver);
 		i.putExtra(Calendar.REQUEST_TYPE, Calendar.CALENDAR_EVENTS);
@@ -194,42 +196,13 @@ public class ServiceSystem implements Receiver{
 				mcs.sendToRemote(BUNDLE_MESSAGE.BLUETOOTH_SEARCH_REPLY, dev);
 			}
 			
-			// WEATHERFORECASTSERVICE FORECAST REPLY
-			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
-//				String s = resultData.getString("payload");
-//				try {
-//					JSONObject object = new JSONObject(s);
-//					String city = object.getString("city");
-//					float temp = Float.parseFloat(object.getString(WeatherForecast.TEMP));
-//					float wind = Float.parseFloat(object.getString(WeatherForecast.WIND));
-//					float clouds = Float.parseFloat(object.getString(WeatherForecast.CLOUDS));
-//					float temp_min = Float.parseFloat(object.getString(WeatherForecast.TEMP_MIN));
-//					float temp_max = Float.parseFloat(object.getString(WeatherForecast.TEMP_MAX));
-//					float rain = Float.parseFloat(object.getString(WeatherForecast.RAIN));
-//					// sending weatherforecast to client
-//					de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(city, temp, wind, clouds, temp_min, temp_max, rain);
-//					helper.sendMessageSendBundle(BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.WEATHERFORECAST_REPLY, forecast));
-//					log("------- GET WEATHER FORECAST------");
-//					log(" city: " + forecast.getCity());
-//					log(" temp: " + forecast.getTemp());
-//					log(" wind: " + forecast.getWind()); 
-//					log(" clouds: " + forecast.getClouds());
-//					log(" tempMin: " + forecast.getTemp_min());
-//					log(" tempMax: " + forecast.getTemp_max()); 
-//					log(" rain: " + forecast.getRain());
-//					//TODO: stop service
-//				} catch (JSONException e) {
-//					e.printStackTrace();
-//				}
-			}
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_NAMES)){
 				log("------- GET CALENDAR NAMES ------");
 				ArrayList<String> calendarNames = new ArrayList<String>();
-				String s = resultData.getString("payload");
 				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
 					calendarNames = resultData.getStringArrayList("calendarNames");
 					for(String st : calendarNames){
-						CalendarEvent name = new CalendarEvent("", st, "", "", -1, -1);
+						CalendarEvent name = new CalendarEvent(st, "", "", "", -1, -1);
 						mcs.sendToRemote(BUNDLE_MESSAGE.CALENDAR_NAME_REPLY, name);
 						log("################ sending calendar name reply. " + name.getCalendarName());
 					}
@@ -237,7 +210,7 @@ public class ServiceSystem implements Receiver{
 			}
 			
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_EVENTS)){
-//				log("------- GET CALENDAR EVENTS ------");
+				
 				if(resultData.containsKey(Calendar.CALENDAR_EVENTS)){
 					ArrayList<String> calendarEvents = resultData.getStringArrayList("calendarEvents");
 					JSONParser parser = new JSONParser();

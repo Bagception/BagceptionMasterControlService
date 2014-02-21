@@ -4,15 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -784,10 +781,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				c.close();
 			}
 			
-			
-			
-		Log.w("TEST", "Die Items: " + items);
-		
 		return items;
 	}
 
@@ -1498,6 +1491,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					indC.close();
 						
 					Activity activity = new Activity(id, name, items, location);
+					Log.w("TEST", "ActivityLocation bei Datenbank abfrage (Server/DatabaseHelper): " + location);
 					activities.add(activity);
 			} while(c.moveToNext());
 			c.close();
@@ -1800,10 +1794,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
-//		Log.w("TEST", "Folgende Loc wird gespeichert: " + location);
-		
-		Log.w("TEST", "LAT: " + location.getLat());
-		Log.w("TEST", "LON: " + location.getLng());
+		Log.w("TEST", "Folgende Loc wird gespeichert: " + location);
 		
 		ContentValues values = new ContentValues();
 		values.put(NAME, location.getName());
@@ -1975,7 +1966,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			c.close();
 		}
 		
-		Log.w("TEST", "getLocations: " + locations);
 		return locations;
 	}
 

@@ -52,6 +52,7 @@ public class DebugFragment extends Fragment{
 			@Override
 			public void onClick(View arg0) {
 				MasterControlServer.debuginstance.getDB().importDatabase();
+	
 			}
 		});
 		exportDB.setOnClickListener(new OnClickListener() {
