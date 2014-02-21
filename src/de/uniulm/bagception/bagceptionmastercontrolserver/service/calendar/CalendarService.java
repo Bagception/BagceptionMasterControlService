@@ -1,6 +1,8 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.service.calendar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TimeZone;
 
 import org.json.simple.JSONObject;
@@ -35,7 +37,6 @@ public class CalendarService extends IntentService {
 		resultReceiver = intent.getParcelableExtra("receiverTag");
 		log("calendar request received!");
 		
-		//TODO: get calendarnames from db
 		if(intent.hasExtra(Calendar.REQUEST_TYPE)){
 			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.CALENDAR_EVENTS)){
 				log("requesting calendar events");
@@ -54,7 +55,7 @@ public class CalendarService extends IntentService {
 				b.putString(Calendar.RESPONSE_TYPE, Calendar.CALENDAR_EVENTS);
 				b.putStringArrayList(Calendar.CALENDAR_EVENTS, stringEvents);
 				resultReceiver.send(0, b);
-//				log("sending calendar events...");
+				log("sending response");
 			}
 			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.CALENDAR_NAMES)){
 				Bundle b = new Bundle();
@@ -65,7 +66,7 @@ public class CalendarService extends IntentService {
 			}
 			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.ADD_EVENT)){
 				log("request wird bearbeitet...");
-				Bundle b = new Bundle();
+//				Bundle b = new Bundle();
 				String s = intent.getStringExtra("payload");
 				log(s);
 				JSONParser parser = new JSONParser();
@@ -77,16 +78,14 @@ public class CalendarService extends IntentService {
 				} catch (ParseException e) {
 					e.printStackTrace();
 				} catch (org.json.simple.parser.ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				log("name: " + event.getName());
 				log("description: " + event.getDescription());
 				log("calendar: " + event.getCalendarName());
-				log("start: " + event.getStartDate());
-				log("end: " + event.getEndDate());
+				log("start: " + getDate(event.getStartDate()));
+				log("end: " + getDate(event.getEndDate()));
 				TimeZone tz = TimeZone.getDefault();
-//				intent.putExtra(Events.EVENT_TIMEZONE, tz.getID());
 				intent.putExtra(Events.EVENT_TIMEZONE, "Germany");
 				ContentResolver cr = getContentResolver();
 				ContentValues values = new ContentValues();
@@ -100,6 +99,13 @@ public class CalendarService extends IntentService {
 			}
 		}
 		
+	}
+	public String getDate(long milliSeconds) {
+	    SimpleDateFormat formatter = new SimpleDateFormat(
+	            "dd/MM/yyyy hh:mm:ss a");
+	    java.util.Calendar calendar = java.util.Calendar.getInstance();
+	    calendar.setTimeInMillis(milliSeconds);
+	    return formatter.format(calendar.getTime());
 	}
 
 	private void log(String s){

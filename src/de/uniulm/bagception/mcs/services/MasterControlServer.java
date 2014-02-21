@@ -348,13 +348,19 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			break;
 		}
 		case CALENDAR_EVENT_REQUEST:{
-			LOGGER.C(this, "CALENDAR_NAME_REQUEST");
-			serviceSystem.calendarEventRequest();
+				try {
+					List<Activity> activityList = dbHelper.getActivities();
+					LOGGER.C(this, "CALENDAR_NAME_REQUEST");
+					serviceSystem.calendarEventRequest(activityList);
+					break;
+					
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+				}
 			break;
 		}
 		case CALENDAR_ADD_EVENT_REQUEST:{
 			LOGGER.C(this, "CALENDAR_ADD_EVENT_REQUEST");
-			log("IT FUCKING WOOOOOOORKS!!!!");
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			CalendarEvent event = CalendarEvent.fromJSON(o);
 			serviceSystem.calendarAddEventRequest(event);
