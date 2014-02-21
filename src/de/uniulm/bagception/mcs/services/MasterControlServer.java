@@ -512,12 +512,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 								activitySystem.setCurrentActivity(first);
 								tmp = first;
 						}
-						if (!activityPriorityList.equals(lastActivityList)){
-							//priority list has changed
-							LOGGER.C(this,"PRIORITY list has changed");
+//						if (!activityPriorityList.equals(lastActivityList)){
+//							//priority list has changed
+//							LOGGER.C(this,"PRIORITY list has changed");
 							
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
-						}
+//						}
 						lastActivityList = activityPriorityList;
 						
 						Log.w("TEST", "Activity: " + tmp);

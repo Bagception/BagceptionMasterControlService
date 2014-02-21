@@ -210,7 +210,7 @@ public class ServiceSystem implements Receiver{
 			}
 			
 			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.CALENDAR_EVENTS)){
-				
+				log("has events...");
 				if(resultData.containsKey(Calendar.CALENDAR_EVENTS)){
 					ArrayList<String> calendarEvents = resultData.getStringArrayList("calendarEvents");
 					JSONParser parser = new JSONParser();
