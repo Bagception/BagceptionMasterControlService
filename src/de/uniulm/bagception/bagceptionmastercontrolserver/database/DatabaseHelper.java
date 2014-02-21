@@ -765,10 +765,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				c.close();
 			}
 			
-			
-			
-		Log.w("TEST", "Die Items: " + items);
-		
 		return items;
 	}
 
@@ -1783,9 +1779,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		
 //		Log.w("TEST", "Folgende Loc wird gespeichert: " + location);
 		
-		Log.w("TEST", "LAT: " + location.getLat());
-		Log.w("TEST", "LON: " + location.getLng());
-		
 		ContentValues values = new ContentValues();
 		values.put(NAME, location.getName());
 		values.put(LON, location.getLng());
@@ -1956,7 +1949,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			c.close();
 		}
 		
-		Log.w("TEST", "getLocations: " + locations);
 		return locations;
 	}
 

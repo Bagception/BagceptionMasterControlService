@@ -595,7 +595,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
-
+				Log.w("TEST", "Activity (Server/MasterControlServer): " + a);
+				Log.w("TEST", "Location bei ActivityStart (Server/MasterControlServer): " + a.getLocation());
 				activitySystem.setManuallyDetermActivity(true);
 //				activitySystem.getIndependentItems();
 				if(a.getLocation() != null){

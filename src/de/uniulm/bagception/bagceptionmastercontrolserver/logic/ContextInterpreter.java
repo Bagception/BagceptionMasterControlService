@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
@@ -61,21 +62,32 @@ public class ContextInterpreter implements Receiver{
 	public void updateList(List<Item> itemsIn) throws DatabaseException {
 		synchronized (lock) {
 
+			Log.w("TEST", "updateList gestartet (Server/ContextInterpreter)");
 			Location loc = mcs.getLocation();
+			Log.w("TEST", "Location der Aktivität (Server/ContextInterpreter): " + loc);
 			
 			if(loc == null) return;
 				
 			itemList = itemsIn;
 			
+			Log.w("TEST", "List<Item> itemsIn (Server/ContextInterpreter): " + itemsIn);
+			
 			List<Long> item_ids = db.getContextItems();
+			Log.w("TEST", "ContextItems (Server/ContextInterpreter): " + item_ids);			
+			
 			List<Item> contextItems = new ArrayList<Item>();
 			
 			if(item_ids != null){
 				for(long l:item_ids){
+					Log.w("TEST", "ContextItemId in Item umwandeln (Server/ContextInterpreter)");
 					Item item = db.getItem(l);
 					contextItems.add(item);
+					Log.w("TEST", "ContextItems (Server/ContextInterpreter): " + contextItems);
 				}
 			}
+			
+			Log.w("TEST", "Überprüfe Wetter (Server/ContextInterpreter): " + forecast);
+			Log.w("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
 			
 			if (forecast == null)
 				return;
@@ -83,6 +95,7 @@ public class ContextInterpreter implements Receiver{
 				return;
 			
 			if(cache == null){
+				Log.w("TEST", "Wettercache gleich null (Server/ContextInterpreter)");
 				onContextDataRecv(forecast);
 			}
 
@@ -90,6 +103,8 @@ public class ContextInterpreter implements Receiver{
 				if (i.getTimestamp() < System.currentTimeMillis()
 						- (4 * 1000 * 60 * 60)) {
 
+					Log.w("TEST", "Cache veraltet (Server/ContextInterpreter)");
+					
 					Intent intent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
 					intent.putExtra("receiverTag", resultReceiver);
 					intent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
@@ -101,9 +116,11 @@ public class ContextInterpreter implements Receiver{
 				} else {
 					ContextSuggestion suggestion;
 					
+					Log.w("TEST", "Cache nicht veraltet, überprüfe Items (Server/ContextInterpreter): " + itemList);
 					for(Item item:itemList){
 						
 						ItemAttribute iA = item.getAttribute();
+						Log.w("TEST", "ItemAttribute (Server/ContextInterpreter): " + iA);
 						if(iA == null) return;
 						
 						switch (i.getContext()) {
@@ -337,6 +354,7 @@ public class ContextInterpreter implements Receiver{
 	 */
 	public synchronized List<ContextSuggestion> getContextSuggetions() {
 		synchronized (lock) {
+			Log.w("TEST", "getContextSuggestions (Server/ContextInterpreter)");
 			return suggestions;
 		}
 	}
@@ -345,6 +363,8 @@ public class ContextInterpreter implements Receiver{
 		synchronized (lock) {
 			cache.clear();
 			cache = getContexts(forecast);
+			Log.w("TEST", "Wettervorhersage (Server/ContextInterpreter): " + forecast);
+			
 			if (itemList != null) {
 				updateList(itemList);
 			}
@@ -354,6 +374,8 @@ public class ContextInterpreter implements Receiver{
 	private HashSet<CachedContextInfo> getContexts(WeatherForecast forecast) {
 		synchronized (lock) {
 
+			Log.w("TEST", "getContexts (Server/ContextInterpreter)");
+			
 			HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
 			float weather = Float.parseFloat(object.get("rain").toString());
 			float temp = Float.parseFloat(object.get("temp").toString());
@@ -383,6 +405,7 @@ public class ContextInterpreter implements Receiver{
 	}
 
 	public class CachedContextInfo {
+		
 		private final CONTEXT context;
 		private final long timestamp;
 		private final String data;
@@ -409,11 +432,16 @@ public class ContextInterpreter implements Receiver{
 
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
+		
+		
+		Log.w("TEST", "onReceiveResult (Server/ContextInterpreter)");
 
 		if(resultData.getString(de.uniulm.bagception.services.attributes.WeatherForecast.RESPONSE_TYPE)
 				.equals(de.uniulm.bagception.services.attributes.WeatherForecast.WEATHERFORECAST)){
 
 			String s = resultData.getString("payload");
+			
+			Log.w("TEST", "p (Server/ContextInterpreter): " + s);
 			
 			try {
 				object = (JSONObject) parser.parse(s);
@@ -426,6 +454,8 @@ public class ContextInterpreter implements Receiver{
 					Float.parseFloat(object.get("temp_max").toString()),
 					Float.parseFloat(object.get("rain").toString())
 				);
+				
+				Log.w("TEST", "Wetter nach Abruf (Server/ContextInterpreter): " + forecast);
 				
 //				log("------- GET WEATHER FORECAST------");
 //				log(" city: " + forecast.getCity());
