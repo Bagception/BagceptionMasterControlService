@@ -132,7 +132,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		try {
 			activitySystem = new ActivitySystem(dbHelper);
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		serviceSystem = new ServiceSystem(this);
@@ -276,7 +275,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 		case CONTAINER_STATUS_UPDATE_REQUEST:{
 			LOGGER.C(this, "CONTAINER_STATUS_UPDATE_REQUEST");
-				setStatusChanged();
+				try {
+					setStatusChanged();
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			break;
 		}
 
@@ -377,7 +381,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		StatusCode status = StatusCode.getStatusCode(b);
 		switch (status) {
 		case DISCONNECTED:
-			// TODO?
 			break;
 		default:
 			break;
@@ -488,8 +491,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						
 						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
-						Log.w("TEST", "TESTTESTEST: " + activityPriorityList.getActivities());
-						
 						Activity first = null;
 						
 						if(activityPriorityList != null && activityPriorityList.getActivities().size() > 0){
@@ -538,7 +539,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 	};
 
-	private void setStatusChanged() {
+	private void setStatusChanged() throws DatabaseException {
 
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
@@ -560,7 +561,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		btHelper.sendMessageBundle(toSendBun);
 	}
 
-	public static void DEBUG() {
+	public static void DEBUG() throws DatabaseException {
 		debuginstance.setStatusChanged();
 	}
 
@@ -583,7 +584,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
-			setStatusChanged();
+			try {
+				setStatusChanged();
+			} catch (DatabaseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
 		};
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
@@ -604,7 +610,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
-				setStatusChanged();
+				try {
+					setStatusChanged();
+				} catch (DatabaseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 	};
 		

@@ -339,7 +339,6 @@ public class ContextInterpreter implements Receiver{
 		}
 	}
 
-	// TODO methode aufrufen
 	private void onContextDataRecv(WeatherForecast forecast) throws DatabaseException {
 		synchronized (lock) {
 			cache.clear();
@@ -357,7 +356,7 @@ public class ContextInterpreter implements Receiver{
 			float weather = Float.parseFloat(object.get("rain").toString());
 			float temp = Float.parseFloat(object.get("temp").toString());
 			long time = System.currentTimeMillis();
-			long sunset = 64800000; // 18:00 Uhr = 64 800 000 Milliseconds
+			long sunset = 64800000; // 18:00 pm = 64 800 000 Milliseconds
 			
 			if(weather > 50){
 			ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
