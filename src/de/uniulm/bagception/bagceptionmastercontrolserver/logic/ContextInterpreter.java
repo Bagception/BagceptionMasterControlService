@@ -39,6 +39,7 @@ public class ContextInterpreter implements Receiver{
 	private final DatabaseHelper db;
 	private List<Item> suggestedItems;
 	private List<Item> suggestedContextItems;
+	private Intent weatherIntent;
 
 	
 	private JSONParser parser = new JSONParser();
@@ -63,6 +64,7 @@ public class ContextInterpreter implements Receiver{
 		synchronized (lock) {
 
 			Log.w("TEST", "updateList gestartet (Server/ContextInterpreter)");
+			
 			Location loc = mcs.getLocation();
 			Log.w("TEST", "Location der Aktivität (Server/ContextInterpreter): " + loc);
 			
@@ -90,7 +92,12 @@ public class ContextInterpreter implements Receiver{
 			Log.w("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
 			
 			if (forecast == null)
-				return;
+				weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
+				weatherIntent.putExtra("receiverTag", resultReceiver);
+				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
+				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
+				mcs.startService(weatherIntent);
+				
 			if (itemList == null)
 				return;
 			
@@ -354,7 +361,7 @@ public class ContextInterpreter implements Receiver{
 	 */
 	public synchronized List<ContextSuggestion> getContextSuggetions() {
 		synchronized (lock) {
-			Log.w("TEST", "getContextSuggestions (Server/ContextInterpreter)");
+			Log.w("TEST", "getContextSuggestions (Server/ContextInterpreter): " + suggestions);
 			return suggestions;
 		}
 	}
