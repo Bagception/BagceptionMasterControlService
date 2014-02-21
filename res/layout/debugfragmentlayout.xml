@@ -6,141 +6,20 @@
     android:orientation="vertical" >
 
     <Button
-        android:id="@+id/sendupdate"
+        android:id="@+id/importDB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="sendUpdate" />
+        android:text="import DB" />
 
     <Button
-        android:id="@+id/getLocationBtn"
+        android:id="@+id/exportDB"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/sendupdate"
-        android:text="get Location" />
-
-    <Button
-        android:id="@+id/resolveAddressBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/getLocationBtn"
-        android:layout_marginTop="44dp"
-        android:text="resolve Address" />
-
-    <EditText
-        android:id="@+id/resolveAddressEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/getLocationBtn"
-        android:layout_marginTop="16dp"
-        android:ems="10" />
-
-    <TextView
-        android:id="@+id/resolveAddressTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/resolveAddressEditText"
-        android:layout_alignBottom="@+id/resolveAddressEditText"
-        android:layout_alignParentRight="true"
-        android:text="TextView" />
-
-    <EditText
-        android:id="@+id/resolveCoordsLatEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/resolveAddressBtn"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
-
-    <EditText
-        android:id="@+id/resolveCoordsLngEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/resolveCoordsLatEditText"
-        android:layout_alignBottom="@+id/resolveCoordsLatEditText"
-        android:layout_alignParentRight="true"
-        android:ems="10" />
-
-    <TextView
-        android:id="@+id/resolveCoordsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/resolveCoordsLatEditText"
-        android:text="TextView" />
-
-    <Button
-        android:id="@+id/resolveCoordsBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/resolveCoordsTextView"
-        android:text="resolve Coords" />
-
-    <Button
-        android:id="@+id/getWifiAPBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/resolveCoordsBtn"
-        android:text="get WIFI APS" />
-
-    <Button
-        android:id="@+id/getBTDevicesBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/getWifiAPBtn"
-        android:text="get Bluetooth Devices" />
-
-    <Button
-        android:id="@+id/weatherBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:text="get Weather Forecast" />
-
-    <EditText
-        android:id="@+id/weatherLatEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/getBTDevicesBtn"
-        android:layout_toLeftOf="@+id/resolveCoordsLngEditText"
-        android:ems="10" />
-
-    <EditText
-        android:id="@+id/weatherLngEditText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/weatherBtn"
-        android:layout_toRightOf="@+id/resolveCoordsLatEditText"
-        android:ems="10" />
-
-    <Button
-        android:id="@+id/calendarNamesBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_toLeftOf="@+id/resolveAddressTextView"
-        android:layout_toRightOf="@+id/weatherBtn"
-        android:text="CN" />
-
-    <Button
-        android:id="@+id/calendarEventsBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text="CE" />
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="48dp"
+        android:text="export DB" />
 
 </RelativeLayout>

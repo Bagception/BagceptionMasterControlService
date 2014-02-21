@@ -67,8 +67,11 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	 * 
 	 */
 
-	private static MasterControlServer debuginstance;
-
+	public static MasterControlServer debuginstance;
+	public MasterControlServer() {
+		debuginstance = this;
+	}
+	
 	private Thread mainThread;
 	private AdministrationDatabaseAdapter adminDBAdapter;
 	private DatabaseHelper dbHelper;
