@@ -67,14 +67,18 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	 * 
 	 */
 
-	private static MasterControlServer debuginstance;
-
+	public static MasterControlServer debuginstance;
+	public MasterControlServer() {
+		debuginstance = this;
+	}
+	
 	private Thread mainThread;
 	private AdministrationDatabaseAdapter adminDBAdapter;
 	private DatabaseHelper dbHelper;
 	private MyResultReceiver resultReceiver;
 	private Location loc;
-
+	private Activity tmp;
+	
 	// bt
 	private MessengerHelper btHelper;
 
@@ -495,7 +499,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
-						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+//						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
 						Activity first = null;
 						
@@ -506,13 +510,19 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						if (first!=null){
 							if (!activitySystem.isManuallyDetermActivity())
 								activitySystem.setCurrentActivity(first);
+								tmp = first;
 						}
-						if (!activityPriorityList.equals(lastActivityList)){
-							//priority list has changed
+//						if (!activityPriorityList.equals(lastActivityList)){
+//							//priority list has changed
+//							LOGGER.C(this,"PRIORITY list has changed");
+							
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
-						}
+//						}
 						lastActivityList = activityPriorityList;
-
+						
+						Log.w("TEST", "Activity: " + tmp);
+						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+						
 						setStatusChanged();
 					} else {
 						// tag not found in db
@@ -601,9 +611,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				activitySystem.setCurrentActivity(a);
-
+				Log.w("TEST", "Activity (Server/MasterControlServer): " + a);
+				Log.w("TEST", "Location bei ActivityStart (Server/MasterControlServer): " + a.getLocation());
 				activitySystem.setManuallyDetermActivity(true);
-//				activitySystem.getIndependentItems();
 				if(a.getLocation() != null){
 					loc = a.getLocation();
 					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
@@ -682,13 +692,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			
 			Log.w("TEST", "Location in der getLocation-Methode: " + loc);
 			
-			if(loc == null){
+			if(tmp == null){
 				Intent i = new Intent(this, LocationService.class);
 				i.putExtra("receiverTag", resultReceiver);
 				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
 				startService(i);
 				
 				Log.w("TEST", "Location nach Location-Intent: " + loc);
+			} else{
+				loc = tmp.getLocation();
 			}
 			
 			Log.w("TEST", "Location die übertragen wird: " + loc);
