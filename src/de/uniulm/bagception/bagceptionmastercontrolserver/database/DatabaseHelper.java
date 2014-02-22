@@ -1340,11 +1340,23 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		if(toEdit.getName() != after.getName()) {
 			values.put(NAME, after.getName());
 		}
-		if(toEdit.getLocation() != after.getLocation()) {
+		
+		if(toEdit.getLocation() != after.getLocation() && after.getLocation() != null) {
 			values.put(LOCATION_ID, after.getLocation().getId());
 		}
 		
-		db.update(TABLE_ACTIVITY, values, _ID + " = " + activity_id, null);
+//		for(int i = 0; i < toEdit.getItemsForActivity().size(); i++){
+//			deleteActivityItem(toEdit.getItemsForActivity().get(i).getId());
+//		}
+		
+		long id = db.update(TABLE_ACTIVITY, values, _ID + " = " + activity_id, null);
+		
+		if(after.getItemsForActivity() != null){
+			List<Item> iA = after.getItemsForActivity();
+			updateActivityItems(activity_id, iA);
+//			addActivityItems(id, iA, null);
+			
+		}
 	}
 	
 	
@@ -1459,11 +1471,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					Cursor iC = db.rawQuery(itemIdQuery, null);
 					
 					if(iC.moveToFirst() && iC.getCount() > 0){
+						
+						Log.w("DEBUG", "Cursorgröße: " + iC.getCount());
 						do {
 							long item_id = iC.getLong(iC.getColumnIndex(ITEM_ID));
 
 							// Get items from TABLE_ITEM
 							item = getItem(item_id);
+							Log.w("DEBUG", "Items aus der Datenbank: " + item);
 							items.add(item);
 							
 						} while(iC.moveToNext());
@@ -1471,6 +1486,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					iC.close();
 					
 					Activity activity = new Activity(id, name, items, location);
+					Log.w("DEBUG", "Activity: " + activity);
+					
 					activities.add(activity);
 			} while(c.moveToNext());
 			c.close();
@@ -1556,12 +1573,15 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void addActivityItem(long activity_id, Item item, Category category) throws DatabaseException {
 		
+		Log.w("TEST", "Speicher folgendes Item: " + item);
+		
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		ContentValues values = new ContentValues();
 		values.put(ACTIVITY_ID, activity_id);
 		
 		if(item != null){
+			Log.w("TEST", "ItemID is not null");
 			values.put(ITEM_ID, item.getId());
 		}
 		
@@ -1602,6 +1622,29 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			category = categoriesForActivity.get(c);
 			addActivityItem(activity_id, null, category);
 		}
+		
+	}
+	
+	
+	public void updateActivityItems(long activity_id, List<Item> items) throws DatabaseException {
+		
+		int size = items.size();
+		
+		for(int i = 0; i < size; i++){
+			long item_id = items.get(i).getId();
+			updateActivityItem(activity_id, item_id);
+		}
+	}
+	
+	public void updateActivityItem(long activity_id, long item_id) throws DatabaseException {
+		
+		SQLiteDatabase db = getWritableDatabase();
+		
+		ContentValues values = new ContentValues();
+		values.put(ACTIVITY_ID, activity_id);
+		values.put(ITEM_ID, item_id);
+
+		db.update(TABLE_ACTIVITYITEM, values, ACTIVITY_ID + " = ?", new String[] {String.valueOf(activity_id)});
 		
 	}
 	
