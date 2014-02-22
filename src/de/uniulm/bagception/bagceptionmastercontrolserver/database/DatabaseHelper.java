@@ -1470,27 +1470,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					}
 					iC.close();
 					
-					
-					// Get independent_items
-					String indItemsQuery = "SELECT * FROM " + TABLE_INDEPENDENTITEM;
-					Cursor indC = db.rawQuery(indItemsQuery, null);
-					
-					if(indC.moveToFirst() && indC.getCount() > 0){
-						
-						do {
-							long item_id = indC.getLong(indC.getColumnIndex(ITEM_ID));
-
-							item = getItem(item_id);
-							
-							if(items.contains(item) == false){
-								items.add(item);
-							}
-								
-							
-						} while(indC.moveToNext());
-					}
-					indC.close();
-						
 					Activity activity = new Activity(id, name, items, location);
 					activities.add(activity);
 			} while(c.moveToNext());
