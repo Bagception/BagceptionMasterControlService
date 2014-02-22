@@ -187,10 +187,6 @@ public class ContextInterpreter implements Receiver{
 								}
 							}
 							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-							
-							Log.w("TEST", "Suggestion: " + suggestion);
-							Log.w("TEST", "Suggestions: " + suggestions);
-							
 							suggestions.add(suggestion);
 							break;
 							
@@ -216,10 +212,6 @@ public class ContextInterpreter implements Receiver{
 								}
 							}
 							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-							
-							Log.w("TEST", "SuggestionItem: " + suggestion);
-							Log.w("TEST", "SuggestionItemS: " + suggestions);
-							
 							suggestions.add(suggestion);
 							break;
 							
@@ -299,11 +291,14 @@ public class ContextInterpreter implements Receiver{
 								}
 							}
 							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							
 							suggestions.add(suggestion);
 							break;
 						default:
 							break;
 						}
+						
+						Log.w("DEBUG", "Suggestions: " + suggestions);
 						
 					}
 					
