@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import android.os.Bundle;
 import android.util.Log;
 
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
@@ -13,6 +18,7 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
+import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 
 
 

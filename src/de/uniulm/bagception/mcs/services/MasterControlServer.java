@@ -2,9 +2,7 @@ package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.json.simple.JSONObject;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +14,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.ServiceUtil;
@@ -97,8 +94,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		return dbHelper;
 	}
 	
-	
 	private ActivityPriorityList lastActivityList;
+
 	@Override
 	public void onCreate() {
 		debuginstance = this;
@@ -118,7 +115,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		caseActor.register(this);
 		
 		resultReceiver = new MyResultReceiver(new Handler());
-		resultReceiver.setReceiver(this);
+		resultReceiver.setReceiver(contextInterpreter);
 
 		contextInterpreter=new ContextInterpreter(this);
 		
@@ -254,7 +251,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			try {
 
 				if (dbHelper.getImageString(imageIDInt) == null) {
-					Log.w("TEST", "ImageString is null");
 				} else {
 					bmp = Item.deserialize(dbHelper.getImageString(imageIDInt));
 					if (bmp == null){
@@ -282,7 +278,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				try {
 					setStatusChanged();
 				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			break;
@@ -318,10 +313,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		
 		case RESOLVE_COORDS_REQUEST:{
 			LOGGER.C(this, "RESOLVE_COORDS_REQUEST");
-			Log.d("TEST", "resolve coords request arrived!");
+
 			JSONObject o = BundleMessage.getInstance().extractObject(b);
 			Location coordsLocation = Location.fromJSON(o);
-			Log.d("TEST", "lat: " + coordsLocation.getLat() + " lng: " + coordsLocation.getLng());
 			serviceSystem.resolveCoordsRequest(coordsLocation.getLat(), coordsLocation.getLng());
 			break;
 		}
@@ -499,8 +493,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
-//						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
-						
 						Activity first = null;
 						
 						if(activityPriorityList != null && activityPriorityList.getActivities().size() > 0){
@@ -512,15 +504,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 								activitySystem.setCurrentActivity(first);
 								tmp = first;
 						}
-//						if (!activityPriorityList.equals(lastActivityList)){
-//							//priority list has changed
-//							LOGGER.C(this,"PRIORITY list has changed");
 							
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
-//						}
+
 						lastActivityList = activityPriorityList;
-						
-						Log.w("TEST", "Activity: " + tmp);
 						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
 						setStatusChanged();
@@ -557,8 +544,6 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 	private void setStatusChanged() throws DatabaseException {
 
-		Log.w("TEST", "statusChanged: " + contextInterpreter.getContextSuggetions());
-		
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
 				itemIndexSystem.getCurrentItems(),
@@ -605,16 +590,21 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			try {
 				setStatusChanged();
 			} catch (DatabaseException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 		};
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
+				
+				Intent weatherIntent;
+				weatherIntent = new Intent(getBaseContext(), WeatherForecastService.class);
+				weatherIntent.putExtra("receiverTag", resultReceiver);
+				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
+				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
+				startService(weatherIntent);
+				
 				activitySystem.setCurrentActivity(a);
-				Log.w("TEST", "Activity (Server/MasterControlServer): " + a);
-				Log.w("TEST", "Location bei ActivityStart (Server/MasterControlServer): " + a.getLocation());
 				activitySystem.setManuallyDetermActivity(true);
 				if(a.getLocation() != null){
 					loc = a.getLocation();
@@ -641,14 +631,8 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		@Override
 		public void onReceiveResult(int resultCode, Bundle resultData) {
 			
-			Log.w("TEST", "Empfange Wetterdaten in der falschen Methode");
-			
 			if(resultData.getString(OurLocation.RESPONSE_TYPE).equals(OurLocation.LOCATION)){
-//				log("------- LOCATION REPLY------");
-//				log("provider: " + resultData.getString(OurLocation.PROVIDER, ""));
-//				log("accuracy: " +resultData.getFloat(OurLocation.ACCURACY, 0));
-//				log("latitude: " +resultData.getDouble(OurLocation.LATITUDE, 0));
-//				log("longitude: " +resultData.getDouble(OurLocation.LONGITUDE, 0));
+
 				// stop service
 				Intent i = new Intent(this, LocationService.class);
 				stopService(i);
@@ -656,45 +640,9 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				// sending current position to client
 				loc = new Location("", resultData.getFloat(OurLocation.LATITUDE, 0), resultData.getFloat(OurLocation.LONGITUDE, 0), 0);
 			}
-
-//			if(resultData.getString(WeatherForecast.RESPONSE_TYPE).equals(WeatherForecast.WEATHERFORECAST)){
-//				log("getting response...");
-//				String s = resultData.getString("payload");
-//				JSONParser parser = new JSONParser();
-//				JSONObject object = null;
-//				de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast forecast = null;
-//				try {
-//					object = (JSONObject) parser.parse(s);
-//					forecast = new de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast(
-//										 object.get("city").toString(), 
-//						Float.parseFloat(object.get("temp").toString()),
-//						Float.parseFloat(object.get("wind").toString()),
-//						Float.parseFloat(object.get("clouds").toString()),
-//						Float.parseFloat(object.get("temp_min").toString()),
-//						Float.parseFloat(object.get("temp_max").toString()),
-//						Float.parseFloat(object.get("rain").toString())
-//					);
-//					log("------- GET WEATHER FORECAST------");
-//					log(" city: " + forecast.getCity());
-//					log(" temp: " + forecast.getTemp());
-//					log(" wind: " + forecast.getWind()); 
-//					log(" clouds: " + forecast.getClouds());
-//					log(" tempMin: " + forecast.getTemp_min());
-//					log(" tempMax: " + forecast.getTemp_max()); 
-//					log(" rain: " + forecast.getRain());
-//				} catch (ParseException e) {
-//					e.printStackTrace();
-//				}
-//			}
-		}
-		
-		private void log(String s){
-			Log.d("MCS", s);
 		}
 		
 		public Location getLocation(){
-			
-			Log.w("TEST", "Location in der getLocation-Methode: " + loc);
 			
 			if(tmp == null){
 				Intent i = new Intent(this, LocationService.class);
@@ -702,12 +650,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
 				startService(i);
 				
-				Log.w("TEST", "Location nach Location-Intent: " + loc);
 			} else{
 				loc = tmp.getLocation();
 			}
 			
-			Log.w("TEST", "Location die übertragen wird: " + loc);
 			return loc;
 		}
 }

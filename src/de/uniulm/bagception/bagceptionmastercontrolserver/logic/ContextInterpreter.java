@@ -4,11 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,7 +28,6 @@ import de.uniulm.bagception.mcs.services.MasterControlServer;
 public class ContextInterpreter implements Receiver{
 
 	private final MasterControlServer mcs;
-//	private List<ContextSuggestion> suggestions;
 	private HashSet<ContextSuggestion> suggestions;
 	private List<Item> itemList;
 	private Set<CachedContextInfo> cache = new HashSet<CachedContextInfo>();
@@ -41,6 +38,7 @@ public class ContextInterpreter implements Receiver{
 	private List<Item> suggestedItems;
 	private List<Item> suggestedContextItems;
 	private Intent weatherIntent;
+	private Location loc;
 
 	
 	private JSONParser parser = new JSONParser();
@@ -53,6 +51,7 @@ public class ContextInterpreter implements Receiver{
 		resultReceiver = new MyResultReceiver(new Handler());
 		resultReceiver.setReceiver(this);
 		db=mcs.getDB();
+		
 	}
 
 	/**
@@ -64,8 +63,7 @@ public class ContextInterpreter implements Receiver{
 	public void updateList(List<Item> itemsIn) throws DatabaseException {
 		synchronized (lock) {
 
-			Location loc = mcs.getLocation();
-			
+			loc = mcs.getLocation();
 			if(loc == null) return;
 				
 			itemList = itemsIn;
@@ -81,13 +79,14 @@ public class ContextInterpreter implements Receiver{
 				}
 			}
 			
-			if (forecast == null)
+			if (forecast == null) {
 			
 				weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
 				weatherIntent.putExtra("receiverTag", resultReceiver);
 				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
 				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
 				mcs.startService(weatherIntent);
+			}
 				
 			if (itemList == null)
 				return;
@@ -467,7 +466,7 @@ public class ContextInterpreter implements Receiver{
 		}
 
 	}
-
+	
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		
@@ -488,14 +487,6 @@ public class ContextInterpreter implements Receiver{
 					Float.parseFloat(object.get("rain").toString())
 				);
 				
-//				log("------- GET WEATHER FORECAST------");
-//				log(" city: " + forecast.getCity());
-//				log(" temp: " + forecast.getTemp());
-//				log(" wind: " + forecast.getWind()); 
-//				log(" clouds: " + forecast.getClouds());
-//				log(" tempMin: " + forecast.getTemp_min());
-//				log(" tempMax: " + forecast.getTemp_max()); 
-//				log(" rain: " + forecast.getRain());
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}
