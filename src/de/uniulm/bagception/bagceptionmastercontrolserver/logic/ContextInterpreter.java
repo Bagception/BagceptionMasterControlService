@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion.CONTEXT;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -38,7 +41,6 @@ public class ContextInterpreter implements Receiver{
 	private List<Item> suggestedItems;
 	private List<Item> suggestedContextItems;
 	private Intent weatherIntent;
-	private Location loc;
 
 	
 	private JSONParser parser = new JSONParser();
@@ -63,10 +65,20 @@ public class ContextInterpreter implements Receiver{
 	public void updateList(List<Item> itemsIn) throws DatabaseException {
 		synchronized (lock) {
 
-			loc = mcs.getLocation();
-			if(loc == null) return;
-				
-			itemList = itemsIn;
+			//TODO
+			//liste = alle items der activity holen
+			//liste2 = liste ohne die items, die kein kontext haben
+			//listt3 = liste2 ohne die items, die den kontext nicht erfüllen
+			//liste = liste ohne liste3
+			
+			//kurz:
+			//lösche alle items aus activity liste, die den kontext nicht erfüllen
+			
+			//if (isRemove
+			
+			if (itemsIn!=null){
+				itemList = itemsIn;
+			}
 			
 			List<Long> item_ids = db.getContextItems();
 			
@@ -79,14 +91,6 @@ public class ContextInterpreter implements Receiver{
 				}
 			}
 			
-			if (forecast == null) {
-			
-				weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
-				weatherIntent.putExtra("receiverTag", resultReceiver);
-				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
-				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
-				mcs.startService(weatherIntent);
-			}
 				
 			if (itemList == null)
 				return;
@@ -101,13 +105,6 @@ public class ContextInterpreter implements Receiver{
 				if (i.getTimestamp() < System.currentTimeMillis()
 						- (4 * 1000 * 60 * 60)) {
 
-					
-					Intent intent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
-					intent.putExtra("receiverTag", resultReceiver);
-					intent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
-					intent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
-					mcs.startService(intent);
-					
 					onContextDataRecv(forecast);
 					
 				} else {
@@ -376,6 +373,7 @@ public class ContextInterpreter implements Receiver{
 			}
 
 		}
+		mcs.setStatusChanged();
 	}
 
 	/**
@@ -403,7 +401,6 @@ public class ContextInterpreter implements Receiver{
 		synchronized (lock) {
 			cache.clear();
 			cache = getContexts(forecast);
-			
 			if (itemList != null) {
 				updateList(itemList);
 			}
@@ -441,6 +438,44 @@ public class ContextInterpreter implements Receiver{
 		}
 	}
 
+	
+	public  void requestWeather(){
+		synchronized(lock){
+			
+			Location loc = null;
+			try {
+				loc = mcs.getActivitySystem().getCurrentActivity().getLocation();
+			} catch (DatabaseException e) {
+				e.printStackTrace();
+			}
+			
+			if (loc == null){
+//				Handler h = new Handler();
+//				h.postDelayed(new Runnable() {
+//					
+//					@Override
+//					public void run() {
+//						//todo request	 
+//						/* Intent i = new Intent(this, LocationService.class);
+//						i.putExtra("receiverTag", resultReceiver);
+//						i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
+//						startService(i);
+//						*/
+//					}
+//				}, 5000);
+				return;
+			}
+			LOGGER.C(this,"request weather for: "+loc.getName());
+			weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
+			weatherIntent.putExtra("receiverTag", resultReceiver);
+			weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
+			weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
+			mcs.startService(weatherIntent);
+				
+		}
+		
+	}
+	
 	public class CachedContextInfo {
 		
 		private final CONTEXT context;
@@ -486,7 +521,11 @@ public class ContextInterpreter implements Receiver{
 					Float.parseFloat(object.get("temp_max").toString()),
 					Float.parseFloat(object.get("rain").toString())
 				);
-				
+				try {
+					updateList(null);
+				} catch (DatabaseException e) {
+					e.printStackTrace();
+				}
 			} catch (ParseException e) {
 				e.printStackTrace();
 			}

@@ -1,53 +1,53 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-
+import android.os.Handler;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
-import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
+import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
+import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
 import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
+import de.uniulm.bagception.mcs.services.MasterControlServer;
+import de.uniulm.bagception.services.attributes.OurLocation;
+import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 
 
 public class ActivitySystem {
 
 	private Activity currentActivity;
-	private final DatabaseHelper db;
 	private boolean manuallyDetermActivity=false;
+	private final MasterControlServer mcs;
 	
-	public ActivitySystem(DatabaseHelper db) throws DatabaseException {
-		this.db = db;
+		
+	
+	public ActivitySystem(MasterControlServer mcs) throws DatabaseException {
 		currentActivity = Activity.NO_ACTIVITY;
+		this.mcs = mcs;
 	}
+	
+	
 	
 	
 	public void setCurrentActivity(Activity activity) throws DatabaseException{
 		this.currentActivity = activity;
-		LOGGER.C(this, "activity changed: "+activity.getName());
-//		String d="activty changed: "+activity.getName()+"\n"+" items: ";
-//		Item last=null;
-//		for(Item i:activity.getItemsForActivity()){
-//			d+=i.getName()+"("+i.hashCode()+")";
-//			if (last!=null){
-//				d+=last.equals(i);
-//			}
-//			d+=", ";
-//		}
-//		LOGGER.C(this, d);
-//		location = activity.getLocation();
+		LOGGER.C(this, "activity changed: "+currentActivity.getName());
+		mcs.getContextInterpreter().requestWeather();
+		try {
+			mcs.getContextInterpreter().updateList(null);
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+		
 
 	}
 	
@@ -69,7 +69,7 @@ public class ActivitySystem {
 		
 		List<Activity> activities = new ArrayList<Activity>();
 		try {
-			activities = db.getActivities();
+			activities = mcs.getDB().getActivities();
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
@@ -97,13 +97,13 @@ public class ActivitySystem {
 		List<Item> ac_items = currentActivity.getItemsForActivity();
 		Location loc = currentActivity.getLocation();
 		
-		List<Long> item_ids = db.getIndependentItems();
+		List<Long> item_ids = mcs.getDB().getIndependentItems();
 		List<Item> items = new ArrayList<Item>();
 		
 		if(item_ids != null){
 			
 			for(int j = 0; j < item_ids.size(); j++){
-				Item item = db.getItem(item_ids.get(j));
+				Item item = mcs.getDB().getItem(item_ids.get(j));
 				items.add(item);
 			}
 			
@@ -128,7 +128,7 @@ public class ActivitySystem {
 				continue;
 			}
 			
-			List<Activity> as = db.getActivitesByItem(i.getId());
+			List<Activity> as = mcs.getDB().getActivitesByItem(i.getId());
 
 			if (as!=null){
 				wl.put(as);

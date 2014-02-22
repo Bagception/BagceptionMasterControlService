@@ -2,7 +2,9 @@ package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.json.simple.JSONObject;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -28,7 +30,6 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ContextInterpret
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ItemIndexSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.logic.ServiceSystem;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
-import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.service_status_fragment.ServiceInfo;
@@ -52,7 +53,6 @@ import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver
 import de.uniulm.bagception.protocol.bundle.constants.StatusCode;
 import de.uniulm.bagception.services.ServiceNames;
 import de.uniulm.bagception.services.attributes.OurLocation;
-import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 public class MasterControlServer extends ObservableService implements Runnable,
 		MessengerHelperCallback, CaseOpenServiceBroadcastReactor, Receiver {
@@ -84,17 +84,21 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 	private ItemIndexSystem itemIndexSystem;
 	private ActivitySystem activitySystem;
+	public ActivitySystem getActivitySystem(){
+		return activitySystem;
+	}
 	private ServiceSystem serviceSystem;
 	
 	private ContextInterpreter contextInterpreter;
-	
+	public ContextInterpreter getContextInterpreter(){
+		return contextInterpreter;
+	}
 	private int batteryStatus = 0;
 
 	public DatabaseHelper getDB(){
 		return dbHelper;
 	}
 	
-	private ActivityPriorityList lastActivityList;
 
 	@Override
 	public void onCreate() {
@@ -131,7 +135,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		itemIndexSystem = new ItemIndexSystem(dbHelper);
 		try {
-			activitySystem = new ActivitySystem(dbHelper);
+			activitySystem = new ActivitySystem(this);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
@@ -186,7 +190,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		// then check if all are started
 		delayHandler.postDelayed(new Runnable() {
-
+ 
 			@Override
 			public void run() {
 				// check if all services are running
@@ -513,7 +517,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 
-						lastActivityList = activityPriorityList;
+						//lastActivityList = activityPriorityList;
 						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
 						
 						setStatusChanged();
@@ -548,7 +552,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 	};
 
-	private void setStatusChanged() throws DatabaseException {
+	public void setStatusChanged() throws DatabaseException {
 
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
@@ -603,31 +607,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		public void onActivityStart(Activity a, AdministrationCommand<Activity> cmd) {
 			try {
 				
-				Intent weatherIntent;
-				weatherIntent = new Intent(getBaseContext(), WeatherForecastService.class);
-				weatherIntent.putExtra("receiverTag", resultReceiver);
-				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
-				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LONGITUDE, loc.getLng());
-				startService(weatherIntent);
-				
 				activitySystem.setCurrentActivity(a);
 				activitySystem.setManuallyDetermActivity(true);
-				if(a.getLocation() != null){
-					loc = a.getLocation();
-					Intent i = new Intent(getApplicationContext(), WeatherForecastService.class);
-					i.putExtra("receiverTag", resultReceiver);
-					i.putExtra(WeatherForecast.LATITUDE, loc.getLat());
-					i.putExtra(WeatherForecast.LONGITUDE, loc.getLng());
-					startService(i);
-				}
-				
+								
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
 				try {
 					setStatusChanged();
 				} catch (DatabaseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -648,18 +636,5 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			}
 		}
 		
-		public Location getLocation(){
-			
-			if(tmp == null){
-				Intent i = new Intent(this, LocationService.class);
-				i.putExtra("receiverTag", resultReceiver);
-				i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.GETLOCATION);
-				startService(i);
-				
-			} else{
-				loc = tmp.getLocation();
-			}
-			
-			return loc;
-		}
+		
 }
