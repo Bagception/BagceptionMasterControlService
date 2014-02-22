@@ -50,7 +50,7 @@ public class ContextInterpreter implements Receiver{
 		this.mcs = mcs;
 		
 		resultReceiver = new MyResultReceiver(new Handler());
-		resultReceiver.setReceiver(mcs);
+		resultReceiver.setReceiver(this);
 		db=mcs.getDB();
 	}
 
@@ -88,10 +88,13 @@ public class ContextInterpreter implements Receiver{
 				}
 			}
 			
-			Log.w("TEST", "Überprüfe Wetter (Server/ContextInterpreter): " + forecast);
-			Log.w("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
+			Log.d("TEST", "Überprüfe Wetter (Server/ContextInterpreter): " + forecast);
+			Log.d("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
+			Log.d("TEST", "Forecast: " + forecast);
 			
 			if (forecast == null)
+				Log.w("TEST", "Überprüfe Wetterkoordinaten (Server/ContextInterpreter): " + loc);
+			
 				weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
 				weatherIntent.putExtra("receiverTag", resultReceiver);
 				weatherIntent.putExtra(de.uniulm.bagception.services.attributes.WeatherForecast.LATITUDE, loc.getLat());
@@ -101,11 +104,16 @@ public class ContextInterpreter implements Receiver{
 			if (itemList == null)
 				return;
 			
-			if(cache == null){
+			Log.w("TEST", "Überprüfung des Caches: " + cache.size());
+			if(cache.size() == 0 && forecast != null){
 				Log.w("TEST", "Wettercache gleich null (Server/ContextInterpreter)");
 				onContextDataRecv(forecast);
-			}
+			} 
 
+			Log.w("TEST", "Überspringe den Cache");
+			
+			suggestions = new ArrayList<ContextSuggestion>();
+			
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
 						- (4 * 1000 * 60 * 60)) {
@@ -179,6 +187,10 @@ public class ContextInterpreter implements Receiver{
 								}
 							}
 							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							
+							Log.w("TEST", "Suggestion: " + suggestion);
+							Log.w("TEST", "Suggestions: " + suggestions);
+							
 							suggestions.add(suggestion);
 							break;
 							
@@ -204,6 +216,10 @@ public class ContextInterpreter implements Receiver{
 								}
 							}
 							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							
+							Log.w("TEST", "SuggestionItem: " + suggestion);
+							Log.w("TEST", "SuggestionItemS: " + suggestions);
+							
 							suggestions.add(suggestion);
 							break;
 							
@@ -254,6 +270,10 @@ public class ContextInterpreter implements Receiver{
 								}
 							}
 							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+							
+							Log.w("TEST", "Suggestion: " + suggestion);
+							Log.w("TEST", "Suggestions: " + suggestions);
+							
 							suggestions.add(suggestion);
 							break;
 							
@@ -346,6 +366,9 @@ public class ContextInterpreter implements Receiver{
 							break;
 						
 						}
+						
+						
+						Log.w("TEST", "FOR-Schleife, suggestions, ContextInterpreter:371: " + suggestions);
 					}
 				}
 			}
@@ -382,6 +405,9 @@ public class ContextInterpreter implements Receiver{
 		synchronized (lock) {
 
 			Log.w("TEST", "getContexts (Server/ContextInterpreter)");
+			Log.w("TEST", "Object in getContexts: " + object);
+			Log.w("TEST", "Forecast in getContexts: " + forecast);
+			
 			
 			HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
 			float weather = Float.parseFloat(object.get("rain").toString());

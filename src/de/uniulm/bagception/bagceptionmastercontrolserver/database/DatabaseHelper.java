@@ -3,6 +3,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.database;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -775,7 +776,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 						if(imageString != null){
 							item.setImageString(imageString);
 						}
-						
 						items.add(item);
 				} while(c.moveToNext());
 				c.close();
@@ -2027,11 +2027,24 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		 
 	     // Close the SQLiteOpenHelper so it will commit the created empty
 	     // database to internal storage.
+    	 
 		 LOGGER.C(this,"try to copy: "+from+" -> "+to);
 	     close();
 	     File fromFile = new File(from);
 	     File toFile = new File(to);
+	     if (!toFile.exists()){
+	    	 File dir = new File("/data/data/de.uniulm.bagception.bagceptionmastercontrolserver/databases/");
+	    	 dir.mkdirs();
+	    	 LOGGER.C(this,"create new database file");
+	    	 FileWriter fw = new FileWriter(toFile);
+	    	 fw.write("");
+	    	 fw.close();
+	     }else{
+	    	 LOGGER.C(this,"database exists.. override");
+	     }
+	     
 	     if (fromFile.exists()) {
+
 	         Utility.copyFile(new FileInputStream(fromFile), new FileOutputStream(toFile));
 	         // Access the copied database so SQLiteHelper will cache it and mark
 	         // it as created.
