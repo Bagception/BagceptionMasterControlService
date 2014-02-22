@@ -573,6 +573,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				toSendObj);
 		btHelper.sendMessageBundle(toSendBun);
 	}
+	@SuppressWarnings("unchecked")
+	public void sendMessageToRemote(String message) {
+		JSONObject obj = new JSONObject();
+		obj.put("msg", message);
+		sendToRemote(BUNDLE_MESSAGE.STRING_MESSAGE,obj);
+	}
 
 	public static void DEBUG() throws DatabaseException {
 		debuginstance.setStatusChanged();
