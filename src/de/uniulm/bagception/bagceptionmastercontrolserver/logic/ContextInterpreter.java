@@ -136,10 +136,10 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
-									
-									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-									suggestions.add(suggestion);
 								}
+								
+								suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
 							
 							break;
@@ -164,11 +164,10 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
-									
-									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-									suggestions.add(suggestion);
-									
 								}
+								
+								suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
 							
 							
@@ -194,10 +193,10 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
-									
-									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-									suggestions.add(suggestion);
 								}
+								
+								suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
 							
 							break;
@@ -221,10 +220,10 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
-									
-									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-									suggestions.add(suggestion);
 								}
+								
+								suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
 							
 							break;
@@ -248,11 +247,10 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
-									
-									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-									suggestions.add(suggestion);
-									
 								}
+								
+								suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
 							
 							break;
@@ -276,10 +274,10 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
-									
-									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-									suggestions.add(suggestion);
 								}
+								
+								suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
 							
 							

@@ -1334,27 +1334,30 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 
 		SQLiteDatabase db = this.getWritableDatabase();
 		
-		ContentValues values = new ContentValues();
 		long activity_id = toEdit.getId();
+		Log.w("DEBUG", "toEdit ID: " + activity_id);
 		
-		if(toEdit.getName() != after.getName()) {
-			values.put(NAME, after.getName());
-		}
+		ContentValues values = new ContentValues();
+		values.put(NAME, after.getName());
 		
-		if(toEdit.getLocation() != after.getLocation() && after.getLocation() != null) {
+		if(after.getLocation() != null) {
 			values.put(LOCATION_ID, after.getLocation().getId());
 		}
 		
-//		for(int i = 0; i < toEdit.getItemsForActivity().size(); i++){
-//			deleteActivityItem(toEdit.getItemsForActivity().get(i).getId());
-//		}
+		long id = db.update(TABLE_ACTIVITY, values, _ID + " = ?" , new String[] {String.valueOf(activity_id)});
+		Log.w("DEBUG", "after ID: " + id);
 		
-		long id = db.update(TABLE_ACTIVITY, values, _ID + " = " + activity_id, null);
+		
+		for(int l = 0; l < toEdit.getItemsForActivity().size(); l++){
+			deleteActivityItem(toEdit.getItemsForActivity().get(l).getId());
+		}
 		
 		if(after.getItemsForActivity() != null){
+			
 			List<Item> iA = after.getItemsForActivity();
-			updateActivityItems(activity_id, iA);
-//			addActivityItems(id, iA, null);
+			Log.w("DEBUG", "ItemsForActivity: " + iA);
+//			updateActivityItems(activity_id, iA);
+			addActivityItems(activity_id, iA, null);
 			
 		}
 	}
@@ -1467,7 +1470,8 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					
 					
 					// Get item_ids which belong to the activity
-					String itemIdQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
+//					String itemIdQuery = "SELECT " + ITEM_ID + " FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
+					String itemIdQuery = "SELECT * FROM " + TABLE_ACTIVITYITEM + " WHERE " + ACTIVITY_ID + " = " + id;
 					Cursor iC = db.rawQuery(itemIdQuery, null);
 					
 					if(iC.moveToFirst() && iC.getCount() > 0){
