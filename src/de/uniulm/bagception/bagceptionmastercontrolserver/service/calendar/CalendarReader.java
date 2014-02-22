@@ -110,10 +110,10 @@ public class CalendarReader {
 //				if(!cursor.getString(3).isEmpty()) location = cursor.getString(3);
 				if(!cursor.getString(4).isEmpty()) startDate = Long.parseLong(cursor.getString(4));
 				if(!cursor.getString(5).isEmpty()) endDate = Long.parseLong(cursor.getString(5));
-				
+				int calendarId = 1;
 				for(Activity a : activityList){
 					if(a.getName().equals(description)){
-						CalendarEvent event = new CalendarEvent(name, calendarName, description, location, startDate, endDate);
+						CalendarEvent event = new CalendarEvent(name, calendarId, calendarName, description, location, startDate, endDate);
 						calendarEvents.add(event);
 						number++;
 					}
