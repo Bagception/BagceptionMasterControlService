@@ -85,18 +85,6 @@ public class ActivitySystem {
 	 */
 	public Activity getCurrentActivity() throws DatabaseException {
 		
-		//TODO 
-		// Add independent items
-//		currentActivity.getItemsForActivity().addAll(INDEPENDENTITEMS);
-//		
-//		
-//		currentActivity.getItemsForActivity().
-		
-		long id = currentActivity.getId();
-		String name = currentActivity.getName();
-		List<Item> ac_items = currentActivity.getItemsForActivity();
-		Location loc = currentActivity.getLocation();
-		
 		return currentActivity;
 	}
 	
