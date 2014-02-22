@@ -43,6 +43,7 @@ import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.CalendarEvent;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContainerStateUpdate;
+import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
 import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
@@ -519,6 +520,19 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 						//lastActivityList = activityPriorityList;
 						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+						StringBuilder sb = new StringBuilder();
+						sb.append("Context:\n");
+						List<ContextSuggestion> ssss=contextInterpreter.getContextSuggetions();
+						for(ContextSuggestion sss:ssss){
+							sb.append("item to replace: ("+sss.getReason().name()+")"+sss.getItemToReplace()+"\n ");
+							for(Item iii:sss.getReplaceSuggestions()){
+								sb.append(" "+iii.getName());
+							}
+							sb.append("\n");
+						}
+						
+						
+						LOGGER.C(this, sb.toString());
 						
 						setStatusChanged();
 					} else {
