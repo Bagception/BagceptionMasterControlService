@@ -1294,6 +1294,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void addActivity(Activity activity) throws DatabaseException {
 
+		Log.w("TEST", "Activity bei Datenbank speichern: " + activity);
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		long loc_id = -1;
@@ -1442,6 +1443,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		// looping through all rows and adding them to list
 		if(c.moveToFirst() && c.getCount() > 0) {
 			do {
+					items = new ArrayList<Item>();
 					long id = c.getLong(c.getColumnIndex(_ID));
 					String name = c.getString(c.getColumnIndex(NAME));
 					long loc_id = c.getLong(c.getColumnIndex(LOCATION_ID));
@@ -1457,7 +1459,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					Cursor iC = db.rawQuery(itemIdQuery, null);
 					
 					if(iC.moveToFirst() && iC.getCount() > 0){
-						
 						do {
 							long item_id = iC.getLong(iC.getColumnIndex(ITEM_ID));
 
@@ -1491,7 +1492,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 					indC.close();
 						
 					Activity activity = new Activity(id, name, items, location);
-					Log.w("TEST", "ActivityLocation bei Datenbank abfrage (Server/DatabaseHelper): " + location);
 					activities.add(activity);
 			} while(c.moveToNext());
 			c.close();
@@ -1596,6 +1596,9 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	public void addActivityItems(long activity_id, List<Item> items, List<Category> categoriesForActivity) throws DatabaseException {
 
+		
+		Log.w("TEST", "Folgende Items werden gespeichert: " + items);
+		
 		Item item = null;
 		Category category = null;
 		int itemsize = 0;
@@ -1658,6 +1661,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 				c.moveToNext();
 			}while(c.moveToNext());
 			c.close();
+			Log.w("TEST", "Items der Activity: " + items);
 			return items;
 		} else {	
 			c.close();
