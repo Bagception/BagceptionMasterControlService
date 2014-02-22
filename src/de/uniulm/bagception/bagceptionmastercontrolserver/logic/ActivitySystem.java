@@ -97,20 +97,6 @@ public class ActivitySystem {
 		List<Item> ac_items = currentActivity.getItemsForActivity();
 		Location loc = currentActivity.getLocation();
 		
-		List<Long> item_ids = mcs.getDB().getIndependentItems();
-		List<Item> items = new ArrayList<Item>();
-		
-		if(item_ids != null){
-			
-			for(int j = 0; j < item_ids.size(); j++){
-				Item item = mcs.getDB().getItem(item_ids.get(j));
-				items.add(item);
-			}
-			
-			ac_items.addAll(items);
-			currentActivity = new Activity(id, name, ac_items, loc);
-		}
-		
 		return currentActivity;
 	}
 	
