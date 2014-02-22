@@ -118,6 +118,16 @@ public class ServiceSystem implements Receiver{
 		mcs.startService(i);
 	}
 	
+	public void calendarRemoveRequest(CalendarEvent event) {
+		log("remove event");
+		Intent i = new Intent(mcs, CalendarService.class);
+		i.putExtra("receiverTag", mResultreceiver);
+		i.putExtra("payload", event.toJSONObject().toString());
+		i.putExtra(Calendar.REQUEST_TYPE, Calendar.REMOVE_EVENT);
+		mcs.startService(i);
+	}
+
+	
 	private void log(String s){
 		Log.d("MCS", s);
 	}
@@ -201,8 +211,9 @@ public class ServiceSystem implements Receiver{
 				ArrayList<String> calendarNames = new ArrayList<String>();
 				if(resultData.containsKey(Calendar.CALENDAR_NAMES)){
 					calendarNames = resultData.getStringArrayList("calendarNames");
+					int eventId = 1;
 					for(String st : calendarNames){
-						CalendarEvent name = new CalendarEvent(st, "", "", "", -1, -1);
+						CalendarEvent name = new CalendarEvent(st, eventId, "", "", "", -1, -1);
 						mcs.sendToRemote(BUNDLE_MESSAGE.CALENDAR_NAME_REPLY, name);
 						log("################ sending calendar name reply. " + name.getCalendarName());
 					}
@@ -228,8 +239,14 @@ public class ServiceSystem implements Receiver{
 				}
 
 			}
+			
+			if(resultData.getString(Calendar.RESPONSE_TYPE).equals(Calendar.REMOVE_EVENT)){
+							mcs.sendToRemote(BUNDLE_MESSAGE.CALENDAR_REMOVE_EVENT_REPLY, null);
+
+			}
 		}
 	}
+
 
 
 	

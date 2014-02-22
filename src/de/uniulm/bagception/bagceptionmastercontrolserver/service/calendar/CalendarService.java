@@ -65,10 +65,40 @@ public class CalendarService extends IntentService {
 				log("sending calendar names...");
 			}
 			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.ADD_EVENT)){
-				log("request wird bearbeitet...");
 //				Bundle b = new Bundle();
 				String s = intent.getStringExtra("payload");
-				log(s);
+				JSONParser parser = new JSONParser();
+				JSONObject obj;
+				CalendarEvent event = null;
+				try {
+					obj = (JSONObject) parser.parse(s);
+					event = CalendarEvent.fromJSON(obj);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				} catch (org.json.simple.parser.ParseException e) {
+					e.printStackTrace();
+				}
+//				log("name: " + event.getName());
+//				log("description: " + event.getDescription());
+//				log("calendar: " + event.getCalendarName());
+//				log("start: " + getDate(event.getStartDate()));
+//				log("end: " + getDate(event.getEndDate()));
+				TimeZone tz = TimeZone.getDefault();
+				intent.putExtra(Events.EVENT_TIMEZONE, "Germany");
+				ContentResolver cr = getContentResolver();
+				ContentValues values = new ContentValues();
+				values.put(Events.DTSTART, event.getStartDate());
+				values.put(Events.DTEND, event.getEndDate());
+				values.put(Events.TITLE, event.getName());
+				values.put(Events.DESCRIPTION, event.getDescription());
+				values.put(Events.CALENDAR_ID, 1);
+				values.put(Events.EVENT_TIMEZONE, tz.getID());
+				Uri uri = cr.insert(Events.CONTENT_URI, values);
+			}
+			
+			if(intent.getStringExtra(Calendar.REQUEST_TYPE).equals(Calendar.REMOVE_EVENT)){
+				log("remove event");
+				String s = intent.getStringExtra("payload");
 				JSONParser parser = new JSONParser();
 				JSONObject obj;
 				CalendarEvent event = null;
@@ -83,20 +113,22 @@ public class CalendarService extends IntentService {
 				log("name: " + event.getName());
 				log("description: " + event.getDescription());
 				log("calendar: " + event.getCalendarName());
-				log("start: " + getDate(event.getStartDate()));
-				log("end: " + getDate(event.getEndDate()));
-				TimeZone tz = TimeZone.getDefault();
-				intent.putExtra(Events.EVENT_TIMEZONE, "Germany");
+				log("location: " + event.getLocation());
 				ContentResolver cr = getContentResolver();
-				ContentValues values = new ContentValues();
-				values.put(Events.DTSTART, event.getStartDate());
-				values.put(Events.DTEND, event.getEndDate());
-				values.put(Events.TITLE, event.getName());
-				values.put(Events.DESCRIPTION, event.getDescription());
-				values.put(Events.CALENDAR_ID, 1);
-				values.put(Events.EVENT_TIMEZONE, tz.getID());
-				Uri uri = cr.insert(Events.CONTENT_URI, values);
+				cr.delete(Uri.parse("content://com.android.calendar/events"), 
+									"title=? and calendar_id=? and description=? and eventLocation=? ",
+									new String[]{event.getName(),
+									event.getCalendarName(), 
+									event.getDescription(), 
+									event.getLocation()});
+				log("event removed");
+				
+				Bundle b = new Bundle();
+				b.putString(Calendar.RESPONSE_TYPE, Calendar.REMOVE_EVENT);
+				resultReceiver.send(0, b);
 			}
+			
+			
 		}
 		
 	}
