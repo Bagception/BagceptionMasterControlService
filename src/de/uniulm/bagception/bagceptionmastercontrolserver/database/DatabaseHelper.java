@@ -683,7 +683,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 			} while(c.moveToNext());
 		}
 		
-		
+		Log.w("DEBUG", "Suggestions von Datenbank: " + items);
 		return items;
 	}
 	

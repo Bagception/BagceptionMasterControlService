@@ -501,7 +501,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							// item taken out
 							LOGGER.C(this, "Item out: " + i.getName());
 						}
-						
+						sendToRemote(BUNDLE_MESSAGE.ITEM_FOUND, null);
 						List<Item> items = itemIndexSystem.getCurrentItems();
 						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
