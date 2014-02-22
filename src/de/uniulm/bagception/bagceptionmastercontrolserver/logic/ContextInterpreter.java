@@ -64,37 +64,24 @@ public class ContextInterpreter implements Receiver{
 	public void updateList(List<Item> itemsIn) throws DatabaseException {
 		synchronized (lock) {
 
-			Log.w("TEST", "updateList gestartet (Server/ContextInterpreter)");
-			
 			Location loc = mcs.getLocation();
-			Log.w("TEST", "Location der Aktivität (Server/ContextInterpreter): " + loc);
 			
 			if(loc == null) return;
 				
 			itemList = itemsIn;
 			
-			Log.w("TEST", "List<Item> itemsIn (Server/ContextInterpreter): " + itemsIn);
-			
 			List<Long> item_ids = db.getContextItems();
-			Log.w("TEST", "ContextItems (Server/ContextInterpreter): " + item_ids);			
 			
 			List<Item> contextItems = new ArrayList<Item>();
 			
 			if(item_ids != null){
 				for(long l:item_ids){
-					Log.w("TEST", "ContextItemId in Item umwandeln (Server/ContextInterpreter)");
 					Item item = db.getItem(l);
 					contextItems.add(item);
-					Log.w("TEST", "ContextItems (Server/ContextInterpreter): " + contextItems);
 				}
 			}
 			
-			Log.d("TEST", "Überprüfe Wetter (Server/ContextInterpreter): " + forecast);
-			Log.d("TEST", "Items in Bag (Server/ContextInterpreter): " + itemList);
-			Log.d("TEST", "Forecast: " + forecast);
-			
 			if (forecast == null)
-				Log.w("TEST", "Überprüfe Wetterkoordinaten (Server/ContextInterpreter): " + loc);
 			
 				weatherIntent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
 				weatherIntent.putExtra("receiverTag", resultReceiver);
@@ -105,21 +92,16 @@ public class ContextInterpreter implements Receiver{
 			if (itemList == null)
 				return;
 			
-			Log.w("TEST", "Überprüfung des Caches: " + cache.size());
 			if(cache.size() == 0 && forecast != null){
-				Log.w("TEST", "Wettercache gleich null (Server/ContextInterpreter)");
 				onContextDataRecv(forecast);
 			} 
 
-			Log.w("TEST", "Überspringe den Cache");
-			
 			suggestions = new HashSet<ContextSuggestion>();
 			
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
 						- (4 * 1000 * 60 * 60)) {
 
-					Log.w("TEST", "Cache veraltet (Server/ContextInterpreter)");
 					
 					Intent intent = new Intent(mcs.getBaseContext(), WeatherForecastService.class);
 					intent.putExtra("receiverTag", resultReceiver);
@@ -135,10 +117,7 @@ public class ContextInterpreter implements Receiver{
 					for(Item item:itemList){
 						
 						ItemAttribute iA = item.getAttribute();
-						Log.w("CONTEXT", "ItemAttribute (Server/ContextInterpreter): " + iA);
 						if(iA == null) return;
-						
-						Log.w("CONTEXT", "Context von: " + i.getContext());
 						
 						switch (i.getContext()) {
 						
@@ -170,21 +149,17 @@ public class ContextInterpreter implements Receiver{
 							break;
 							
 						case COLD:
-							Log.w("CONTEXT", "Context COLD erkannt");
-							Log.w("CONTEXT", "Attribute des Items: " + iA); 
+
 							suggestedItems = new ArrayList<Item>();
 							if(iA.getTemperature().equals("cold")){
-								Log.w("CONTEXT", "Attribut von Item " + item.getName() + " ist COLD");
 								return;
 							} else if(iA.getTemperature().equals("warm")){
 								
-								Log.w("CONTEXT", "Attribut von Item " + item.getName() + " ist WARM");
 								if(item.getCategory() != null){
 									long cat_id = item.getCategory().getId();
 									
 									// List with items with the same category_id
 									List<Item> sug_items = db.getItems(cat_id);
-									Log.w("CONTEXT", "Vorschläge: " + sug_items);
 									
 									for(Item si:sug_items){
 										if(si.getAttribute() != null){
@@ -197,8 +172,6 @@ public class ContextInterpreter implements Receiver{
 									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
 									suggestions.add(suggestion);
 									
-									Log.w("CONTEXT", "Suggestion: " + suggestion);
-									Log.w("CONTEXT", "Suggestions: " + suggestions);
 								}
 							}
 							
@@ -283,8 +256,6 @@ public class ContextInterpreter implements Receiver{
 									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
 									suggestions.add(suggestion);
 									
-									Log.w("TEST", "Suggestion: " + suggestion);
-									Log.w("TEST", "Suggestions: " + suggestions);
 								}
 							}
 							
@@ -322,10 +293,16 @@ public class ContextInterpreter implements Receiver{
 						}
 					}
 					
+					
+					
+					
 					suggestedContextItems = new ArrayList<Item>();
+					Log.w("CONTEXT", "ContextItems: " + contextItems);
+					
 					for(Item ci:contextItems){
 						
 						ItemAttribute cia = ci.getAttribute();
+						
 						if(cia == null) return;
 						
 						switch(i.getContext()){
@@ -334,7 +311,7 @@ public class ContextInterpreter implements Receiver{
 							if(cia.getLightness().equals("ligth")){
 								suggestedContextItems.add(ci);
 								
-								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
 							
@@ -342,9 +319,9 @@ public class ContextInterpreter implements Receiver{
 						case COLD:
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getTemperature().equals("cold")){
+
 								suggestedContextItems.add(ci);
-								
-								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
 							
@@ -354,7 +331,7 @@ public class ContextInterpreter implements Receiver{
 							if(cia.getLightness().equals("dark")){
 								suggestedContextItems.add(ci);
 								
-								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
 							
@@ -364,7 +341,7 @@ public class ContextInterpreter implements Receiver{
 							if(cia.getWeather().equals("rainy")){
 								suggestedContextItems.add(ci);
 								
-								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
 							
@@ -374,7 +351,7 @@ public class ContextInterpreter implements Receiver{
 							if(cia.getWeather().equals("sunny")){
 								suggestedContextItems.add(ci);
 								
-								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
 							
@@ -384,7 +361,7 @@ public class ContextInterpreter implements Receiver{
 							if(cia.getTemperature().equals("warm")){
 								suggestedContextItems.add(ci);
 								
-								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
 							
@@ -395,6 +372,8 @@ public class ContextInterpreter implements Receiver{
 						}
 					}
 				}
+				
+				Log.w("CONTEXT", "Suggestions: " + suggestions);
 			}
 
 		}
@@ -417,8 +396,6 @@ public class ContextInterpreter implements Receiver{
 				suggItems = new ArrayList<ContextSuggestion>();
 			}
 			
-			Log.w("DEBUG", "HashSet in Liste umgewandelt (Server/ContextInterpreter): " + suggItems);
-			
 			return suggItems;
 		}
 	}
@@ -427,7 +404,6 @@ public class ContextInterpreter implements Receiver{
 		synchronized (lock) {
 			cache.clear();
 			cache = getContexts(forecast);
-			Log.w("TEST", "Wettervorhersage (Server/ContextInterpreter): " + forecast);
 			
 			if (itemList != null) {
 				updateList(itemList);
@@ -438,11 +414,6 @@ public class ContextInterpreter implements Receiver{
 	private HashSet<CachedContextInfo> getContexts(WeatherForecast forecast) {
 		synchronized (lock) {
 
-			Log.w("TEST", "getContexts (Server/ContextInterpreter)");
-			Log.w("TEST", "Object in getContexts: " + object);
-			Log.w("TEST", "Forecast in getContexts: " + forecast);
-			
-			
 			HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
 			float weather = Float.parseFloat(object.get("rain").toString());
 			float temp = Float.parseFloat(object.get("temp").toString());
@@ -500,15 +471,10 @@ public class ContextInterpreter implements Receiver{
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		
-		
-		Log.w("TEST", "onReceiveResult (Server/ContextInterpreter)");
-
 		if(resultData.getString(de.uniulm.bagception.services.attributes.WeatherForecast.RESPONSE_TYPE)
 				.equals(de.uniulm.bagception.services.attributes.WeatherForecast.WEATHERFORECAST)){
 
 			String s = resultData.getString("payload");
-			
-			Log.w("TEST", "p (Server/ContextInterpreter): " + s);
 			
 			try {
 				object = (JSONObject) parser.parse(s);
@@ -521,8 +487,6 @@ public class ContextInterpreter implements Receiver{
 					Float.parseFloat(object.get("temp_max").toString()),
 					Float.parseFloat(object.get("rain").toString())
 				);
-				
-				Log.w("TEST", "Wetter nach Abruf (Server/ContextInterpreter): " + forecast);
 				
 //				log("------- GET WEATHER FORECAST------");
 //				log(" city: " + forecast.getCity());
