@@ -30,7 +30,8 @@ import de.uniulm.bagception.mcs.services.MasterControlServer;
 public class ContextInterpreter implements Receiver{
 
 	private final MasterControlServer mcs;
-	private List<ContextSuggestion> suggestions;
+//	private List<ContextSuggestion> suggestions;
+	private HashSet<ContextSuggestion> suggestions;
 	private List<Item> itemList;
 	private Set<CachedContextInfo> cache = new HashSet<CachedContextInfo>();
 	private WeatherForecast forecast;
@@ -112,7 +113,7 @@ public class ContextInterpreter implements Receiver{
 
 			Log.w("TEST", "Überspringe den Cache");
 			
-			suggestions = new ArrayList<ContextSuggestion>();
+			suggestions = new HashSet<ContextSuggestion>();
 			
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
@@ -131,12 +132,13 @@ public class ContextInterpreter implements Receiver{
 				} else {
 					ContextSuggestion suggestion;
 					
-					Log.w("TEST", "Cache nicht veraltet, überprüfe Items (Server/ContextInterpreter): " + itemList);
 					for(Item item:itemList){
 						
 						ItemAttribute iA = item.getAttribute();
-						Log.w("TEST", "ItemAttribute (Server/ContextInterpreter): " + iA);
+						Log.w("CONTEXT", "ItemAttribute (Server/ContextInterpreter): " + iA);
 						if(iA == null) return;
+						
+						Log.w("CONTEXT", "Context von: " + i.getContext());
 						
 						switch (i.getContext()) {
 						
@@ -159,23 +161,30 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
+									
+									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+									suggestions.add(suggestion);
 								}
 							}
-							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 							
 						case COLD:
+							Log.w("CONTEXT", "Context COLD erkannt");
+							Log.w("CONTEXT", "Attribute des Items: " + iA); 
 							suggestedItems = new ArrayList<Item>();
 							if(iA.getTemperature().equals("cold")){
+								Log.w("CONTEXT", "Attribut von Item " + item.getName() + " ist COLD");
 								return;
 							} else if(iA.getTemperature().equals("warm")){
 								
+								Log.w("CONTEXT", "Attribut von Item " + item.getName() + " ist WARM");
 								if(item.getCategory() != null){
 									long cat_id = item.getCategory().getId();
 									
 									// List with items with the same category_id
 									List<Item> sug_items = db.getItems(cat_id);
+									Log.w("CONTEXT", "Vorschläge: " + sug_items);
 									
 									for(Item si:sug_items){
 										if(si.getAttribute() != null){
@@ -184,10 +193,17 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
+									
+									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+									suggestions.add(suggestion);
+									
+									Log.w("CONTEXT", "Suggestion: " + suggestion);
+									Log.w("CONTEXT", "Suggestions: " + suggestions);
 								}
 							}
-							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
+							
+							
 							break;
 							
 						case DARK:
@@ -209,10 +225,12 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
+									
+									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+									suggestions.add(suggestion);
 								}
 							}
-							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 							
 						case RAIN:
@@ -234,10 +252,12 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
+									
+									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+									suggestions.add(suggestion);
 								}
 							}
-							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 							
 						case SUNNY:
@@ -259,14 +279,15 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
+									
+									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+									suggestions.add(suggestion);
+									
+									Log.w("TEST", "Suggestion: " + suggestion);
+									Log.w("TEST", "Suggestions: " + suggestions);
 								}
 							}
-							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
 							
-							Log.w("TEST", "Suggestion: " + suggestion);
-							Log.w("TEST", "Suggestions: " + suggestions);
-							
-							suggestions.add(suggestion);
 							break;
 							
 						case WARM:
@@ -288,18 +309,17 @@ public class ContextInterpreter implements Receiver{
 											}
 										}
 									}
+									
+									suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
+									suggestions.add(suggestion);
 								}
 							}
-							suggestion = new ContextSuggestion(item, suggestedItems, i.getContext());
 							
-							suggestions.add(suggestion);
+							
 							break;
 						default:
 							break;
 						}
-						
-						Log.w("DEBUG", "Suggestions: " + suggestions);
-						
 					}
 					
 					suggestedContextItems = new ArrayList<Item>();
@@ -313,57 +333,66 @@ public class ContextInterpreter implements Receiver{
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getLightness().equals("ligth")){
 								suggestedContextItems.add(ci);
+								
+								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
-							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 						case COLD:
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getTemperature().equals("cold")){
 								suggestedContextItems.add(ci);
+								
+								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
-							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 						case DARK:
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getLightness().equals("dark")){
 								suggestedContextItems.add(ci);
+								
+								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
-							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 						case RAIN:
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getWeather().equals("rainy")){
 								suggestedContextItems.add(ci);
+								
+								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
-							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 						case SUNNY:
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getWeather().equals("sunny")){
 								suggestedContextItems.add(ci);
+								
+								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
-							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 						case WARM:
 							if(suggestedContextItems.contains(ci)) return;
 							if(cia.getTemperature().equals("warm")){
 								suggestedContextItems.add(ci);
+								
+								suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
+								suggestions.add(suggestion);
 							}
-							suggestion = new ContextSuggestion(null, suggestedItems, i.getContext());
-							suggestions.add(suggestion);
+							
 							break;
 						default:
 							break;
 						
 						}
-						
-						
-						Log.w("TEST", "FOR-Schleife, suggestions, ContextInterpreter:371: " + suggestions);
 					}
 				}
 			}
@@ -379,8 +408,18 @@ public class ContextInterpreter implements Receiver{
 	 */
 	public synchronized List<ContextSuggestion> getContextSuggetions() {
 		synchronized (lock) {
-			Log.w("TEST", "getContextSuggestions (Server/ContextInterpreter): " + suggestions);
-			return suggestions;
+			
+			List<ContextSuggestion> suggItems; 
+			
+			if(suggestions != null){
+				suggItems = new ArrayList<ContextSuggestion>(suggestions);
+			} else{
+				suggItems = new ArrayList<ContextSuggestion>();
+			}
+			
+			Log.w("DEBUG", "HashSet in Liste umgewandelt (Server/ContextInterpreter): " + suggItems);
+			
+			return suggItems;
 		}
 	}
 
