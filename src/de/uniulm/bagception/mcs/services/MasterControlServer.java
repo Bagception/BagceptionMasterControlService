@@ -1,7 +1,9 @@
 package de.uniulm.bagception.mcs.services;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.simple.JSONObject;
 
@@ -519,7 +521,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 
 						//lastActivityList = activityPriorityList;
-						contextInterpreter.updateList(itemIndexSystem.getCurrentItems());
+						ContainerStateUpdate u = new ContainerStateUpdate(
+								activitySystem.getCurrentActivity(), 
+								itemIndexSystem.getCurrentItems(), 
+								null, 
+								0);
+						Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
+						toCheck.addAll(u.getMissingItems());
+						
+						contextInterpreter.updateList(new ArrayList<Item>(toCheck));
 						StringBuilder sb = new StringBuilder();
 						sb.append("Context:\n");
 						List<ContextSuggestion> ssss=contextInterpreter.getContextSuggetions();
@@ -566,6 +576,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 	};
 
+	public void setStatusChanged(ContainerStateUpdate s){
+		Bundle toSend = BundleMessage.getInstance().createBundle(
+				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
+				s.toString());
+		btHelper.sendMessageBundle(toSend);
+		LOGGER.C(this, "status update send");
+	}
+	
+	
 	public void setStatusChanged() throws DatabaseException {
 
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
@@ -574,11 +593,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 				contextInterpreter.getContextSuggetions(),
 				batteryStatus);
 				
-		Bundle toSend = BundleMessage.getInstance().createBundle(
-				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
-				statusUpdate.toString());
-		btHelper.sendMessageBundle(toSend);
-		LOGGER.C(this, "status update send");
+		setStatusChanged(statusUpdate);
 		
 	}
 
