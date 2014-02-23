@@ -317,6 +317,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	@Override
 	public void editItem(Item oldItem,Item item) throws DatabaseException {
 		
+		Log.w("DEBUG", "editItem - Kategorie: " + item.getCategory());
 		SQLiteDatabase db = this.getWritableDatabase();
 		
 		long id = oldItem.getId();
@@ -1831,7 +1832,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		values.put(LON, location.getLng());
 		values.put(LAT, location.getLat());
 		values.put(RADIUS, location.getRadius());
-		values.put(MAC, location.getRadius());
+		values.put(MAC, location.getMac());
 		
 		db.insert(TABLE_LOCATION, null, values);
 	}
