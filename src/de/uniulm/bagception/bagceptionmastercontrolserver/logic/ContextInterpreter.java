@@ -65,17 +65,6 @@ public class ContextInterpreter implements Receiver{
 	public void updateList(List<Item> itemsIn) throws DatabaseException {
 		synchronized (lock) {
 
-			//TODO
-			//liste = alle items der activity holen
-			//liste2 = liste ohne die items, die kein kontext haben
-			//listt3 = liste2 ohne die items, die den kontext nicht erfüllen
-			//liste = liste ohne liste3
-			
-			//kurz:
-			//lösche alle items aus activity liste, die den kontext nicht erfüllen
-			
-			//if (isRemove
-			
 			if (itemsIn!=null){
 				itemList = itemsIn;
 			}
@@ -369,7 +358,46 @@ public class ContextInterpreter implements Receiver{
 				
 				Log.w("CONTEXT", "Suggestions: " + suggestions);
 			}
-
+			
+			
+			//TODO
+			//liste = alle items der activity holen = DONE
+			//liste2 = liste ohne die items, die kein kontext haben = DONE
+			//listt3 = liste2 ohne die items, die den kontext nicht erfüllen
+			//liste = liste ohne liste3
+			
+			//kurz:
+			//lösche alle items aus activity liste, die den kontext nicht erfüllen
+			
+			//if (isRemove
+			
+//			if(mcs.getActivitySystem().getCurrentActivity() == null) return;
+//			List<Long> activity_items = db.getActivityItems(mcs.getActivitySystem().getCurrentActivity().getId());
+//			int size = activity_items.size();
+//			// activity_items contains all items which belong to the activity
+//			
+//			for(int j = 0; j < size; j++){
+//				ItemAttribute iA = db.getItemAttribute(activity_items.get(j));
+//				if(iA == null){
+//					activity_items.remove(iA.getItemId());
+//				}
+//			}
+//			// activity_items contains just the items which belong to the activity and have a context
+//			
+//			
+//			if(suggestions == null) return;
+//			
+//			List<ContextSuggestion> removeAfterReplace = new ArrayList<ContextSuggestion>(suggestions);
+//			size = removeAfterReplace.size();
+//			
+//			for(int j = 0; j < size; j++){
+//				if(removeAfterReplace.get(j) == null) return;
+//				if(removeAfterReplace.get(j).getItemToReplace() == null) return;
+//				
+//				activity_items.remove((removeAfterReplace.get(j).getItemToReplace().getId()));
+//			}
+			// activity_items contains just the items which belong to the activity and have the right context
+			
 		}
 		mcs.setStatusChanged();
 	}

@@ -266,9 +266,9 @@ public class LocationService extends Service{
 		try {
 			WifiManager mainWifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			if(mainWifi.isWifiEnabled()){
+				// get all known locations from db
 				knownLocations = dbHelper.getLocations();
 				if(knownLocations == null) return;
-				// get all known locations from db
 				IntentFilter i = new IntentFilter();
 				i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
 				
@@ -299,7 +299,6 @@ public class LocationService extends Service{
 				
 			}
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -340,7 +339,6 @@ public class LocationService extends Service{
 			IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 			registerReceiver(mReceiver, filter); // Don't forget to unregister
 		} catch (DatabaseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
