@@ -309,7 +309,7 @@ public class ContextInterpreter implements Receiver{
 						
 						switch(i.getContext()){
 						case BRIGHT:
-							if(suggestedContextItems.contains(ci)) continue;;
+							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getLightness().equals("ligth")){
 								suggestedContextItems.add(ci);
 								
@@ -319,7 +319,7 @@ public class ContextInterpreter implements Receiver{
 							
 							break;
 						case COLD:
-							if(suggestedContextItems.contains(ci)) continue;;
+							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getTemperature().equals("cold")){
 
 								suggestedContextItems.add(ci);
@@ -329,7 +329,7 @@ public class ContextInterpreter implements Receiver{
 							
 							break;
 						case DARK:
-							if(suggestedContextItems.contains(ci)) continue;;
+							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getLightness().equals("dark")){
 								suggestedContextItems.add(ci);
 								
@@ -339,7 +339,7 @@ public class ContextInterpreter implements Receiver{
 							
 							break;
 						case RAIN:
-							if(suggestedContextItems.contains(ci)) continue;;
+							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getWeather().equals("rainy")){
 								suggestedContextItems.add(ci);
 								
@@ -349,7 +349,7 @@ public class ContextInterpreter implements Receiver{
 							
 							break;
 						case SUNNY:
-							if(suggestedContextItems.contains(ci)) continue;;
+							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getWeather().equals("sunny")){
 								suggestedContextItems.add(ci);
 								
@@ -359,7 +359,7 @@ public class ContextInterpreter implements Receiver{
 							
 							break;
 						case WARM:
-							if(suggestedContextItems.contains(ci)) continue;;
+							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getTemperature().equals("warm")){
 								suggestedContextItems.add(ci);
 								
@@ -376,7 +376,7 @@ public class ContextInterpreter implements Receiver{
 				}
 			}
 			
-			Log.w("CONTEXT", "Suggestions: " + suggestions);
+			Log.w("DEBUGCONTEXT", "Suggestions: " + suggestions);
 		}
 		if (!preventRecursion){
 			mcs.setStatusChanged();
