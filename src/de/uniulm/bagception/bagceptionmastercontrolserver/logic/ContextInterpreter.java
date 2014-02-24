@@ -299,7 +299,7 @@ public class ContextInterpreter implements Receiver{
 					
 					
 					suggestedContextItems = new ArrayList<Item>();
-//					Log.w("CONTEXT", "ContextItems: " + contextItems);
+					Log.w("DEBUGCONTEXT", "ContextItems: " + contextItems);
 					
 					for(Item ci:contextItems){
 						
