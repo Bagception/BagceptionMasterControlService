@@ -422,9 +422,9 @@ public class ContextInterpreter implements Receiver{
 			} else{
 				ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "Uhrzeit"));
 			}
-			//DEBUG:
-			ret.clear();
-			ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "hell"));
+//			//DEBUG:
+//			ret.clear();
+//			ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "hell"));
 			String c="";
 			for (CachedContextInfo cc:ret){
 				c+=cc.getContext().name();
