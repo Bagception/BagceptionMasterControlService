@@ -525,52 +525,89 @@ public class ContextInterpreter implements Receiver{
 	}
 	
 	
-//	public void removeFromListWhereContextIsNotValid(){
-//		//TODO
-//		//liste = alle items der activity holen = DONE
-//		//liste2 = liste ohne die items, die kein kontext haben = DONE
-//		//listt3 = liste2 ohne die items, die den kontext nicht erfüllen
-//		//liste = liste ohne liste3
-//		
-//		//kurz:
-//		//lösche alle items aus activity liste, die den kontext nicht erfüllen
-//		
-//		//if (isRemove
-//		
-//		if(mcs.getActivitySystem().getCurrentActivity() == null) return;
-//		List<Item> activity_items = mcs.getActivitySystem().getCurrentActivity().getItemsForActivity();
-//		
-//		int size = activity_items.size();
-//		// activity_items contains all items which belong to the activity
-//		for(int i=size-1;i>=0;i--){
-//			ItemAttribute iA = db.getItemAttribute(i);
-//			if(iA != null){
-//				activity_items.remove(iA.getItemId());
-//			}
-//
-//		}
-//
-//		
-//		// activity_items contains just the items which belong to the activity and have a context
-//		
-//		
-//		if(suggestions == null) return;
-//		
-//		List<ContextSuggestion> removeAfterReplace = new ArrayList<ContextSuggestion>(suggestions);
-//		size = removeAfterReplace.size();
-//		
-//		for(int j=size-1;j>=0;j--){
-//			if(removeAfterReplace.get(j) == null) return;
-//			if(removeAfterReplace.get(j).getItemToReplace() == null) return;
-//			
-//			activity_items.remove((removeAfterReplace.get(j).getItemToReplace().getId()));
-//			LOGGER.C(this,"activity items: "+activity_items);
-//
-//		}
-//		// activity_items contains just the items which belong to the activity and have the right context
-//	
-//		return;
-//	}
-//	
+	public List<Item> removeFromListWhereContextIsNotValid(List<Item> items) throws DatabaseException{
+		
+		if(mcs.getActivitySystem().getCurrentActivity() == null) return null;
+		List<Item> activity_items = new ArrayList<Item>();
+		
+		int size = items.size();
+		
+		for(int i = 0; i < size; i++){
+			
+			Item item = items.get(i);
+			ItemAttribute attributes = items.get(i).getAttribute();
+			
+			if(attributes != null){
+			
+				for (CachedContextInfo ci : cache) {
+					if (ci.getTimestamp() < System.currentTimeMillis()
+							- (4 * 1000 * 60 * 60)) {
+	
+						onContextDataRecv(forecast);
+						
+					} else {
+						
+						switch(ci.getContext()){
+						
+						case BRIGHT:
+							if(attributes.getLightness().equals("light")){
+								activity_items.add(item);
+							}
+							
+							break;
+						case COLD:
+							break;
+						case DARK:
+							break;
+						case RAIN:
+							break;
+						case SUNNY:
+							break;
+						case WARM:
+							break;
+						default:
+							break;
+						
+						}
+					}
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		// activity_items contains all items which belong to the activity
+		for(int i=size-1;i>=0;i--){
+			ItemAttribute iA = db.getItemAttribute(i);
+			if(iA != null){
+				activity_items.remove(iA.getItemId());
+			}
+
+		}
+
+		
+		// activity_items contains just the items which belong to the activity and have a context
+		
+		
+		if(suggestions == null) return null;
+		
+		List<ContextSuggestion> removeAfterReplace = new ArrayList<ContextSuggestion>(suggestions);
+		size = removeAfterReplace.size();
+		
+		for(int j=size-1;j>=0;j--){
+			if(removeAfterReplace.get(j) == null) return null;
+			if(removeAfterReplace.get(j).getItemToReplace() == null) return null;
+			
+			activity_items.remove((removeAfterReplace.get(j).getItemToReplace().getId()));
+			LOGGER.C(this,"activity items: "+activity_items);
+
+		}
+		// activity_items contains just the items which belong to the activity and have the right context
+	
+		return activity_items;
+	}
+	
 
 }
