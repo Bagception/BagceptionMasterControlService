@@ -1,6 +1,7 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -404,6 +405,8 @@ public class ContextInterpreter implements Receiver{
 			float temp = Float.parseFloat(object.get("temp").toString());
 			long time = System.currentTimeMillis();
 			long sunset = 64800000; // 18:00 pm = 64 800 000 Milliseconds
+			Calendar calendar = Calendar.getInstance();
+			long seconds = calendar.getTimeInMillis();
 			
 			if(weather > 50){
 			ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
@@ -529,54 +532,5 @@ public class ContextInterpreter implements Receiver{
 			}
 		}
 	}
-	
-	
-//	public void removeFromListWhereContextIsNotValid(){
-//		//TODO
-//		//liste = alle items der activity holen = DONE
-//		//liste2 = liste ohne die items, die kein kontext haben = DONE
-//		//listt3 = liste2 ohne die items, die den kontext nicht erfüllen
-//		//liste = liste ohne liste3
-//		
-//		//kurz:
-//		//lösche alle items aus activity liste, die den kontext nicht erfüllen
-//		
-//		//if (isRemove
-//		
-//		if(mcs.getActivitySystem().getCurrentActivity() == null) return;
-//		List<Item> activity_items = mcs.getActivitySystem().getCurrentActivity().getItemsForActivity();
-//		
-//		int size = activity_items.size();
-//		// activity_items contains all items which belong to the activity
-//		for(int i=size-1;i>=0;i--){
-//			ItemAttribute iA = db.getItemAttribute(i);
-//			if(iA != null){
-//				activity_items.remove(iA.getItemId());
-//			}
-//
-//		}
-//
-//		
-//		// activity_items contains just the items which belong to the activity and have a context
-//		
-//		
-//		if(suggestions == null) return;
-//		
-//		List<ContextSuggestion> removeAfterReplace = new ArrayList<ContextSuggestion>(suggestions);
-//		size = removeAfterReplace.size();
-//		
-//		for(int j=size-1;j>=0;j--){
-//			if(removeAfterReplace.get(j) == null) return;
-//			if(removeAfterReplace.get(j).getItemToReplace() == null) return;
-//			
-//			activity_items.remove((removeAfterReplace.get(j).getItemToReplace().getId()));
-//			LOGGER.C(this,"activity items: "+activity_items);
-//
-//		}
-//		// activity_items contains just the items which belong to the activity and have the right context
-//	
-//		return;
-//	}
-//	
 
 }
