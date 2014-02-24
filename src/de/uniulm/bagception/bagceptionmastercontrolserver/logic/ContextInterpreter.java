@@ -93,7 +93,7 @@ public class ContextInterpreter implements Receiver{
 			
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
-						- (4 * 1000 * 60 * 60)) {
+						- (1 * 1000 * 60 * 60)) {
 
 					onContextDataRecv(forecast);
 					
@@ -362,7 +362,7 @@ public class ContextInterpreter implements Receiver{
 			
 			
 		}
-		mcs.setStatusChanged();
+		//mcs.setStatusChanged();
 	}
 
 	/**
@@ -422,10 +422,16 @@ public class ContextInterpreter implements Receiver{
 			} else{
 				ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "Uhrzeit"));
 			}
-			//DEBUG:
-			ret.clear();
-			ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "hell"));
+//			//DEBUG:
+//			ret.clear();
+//			ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "hell"));
+			String c="";
+			for (CachedContextInfo cc:ret){
+				c+=cc.getContext().name();
+				c+="\n";
+			}
 			
+			mcs.sendMessageToRemote("Aktiver Kontext: "+c);
 			return ret;
 		}
 	}

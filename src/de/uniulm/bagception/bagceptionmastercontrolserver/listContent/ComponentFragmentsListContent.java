@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.app.Fragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.DebugFragment;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ImportExportFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.LogFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
 
@@ -32,7 +33,8 @@ public class ComponentFragmentsListContent {
 		// ###### Add Items Here ######### \\
 		addItem(new FragmentListItem("1", "Services",ServiceStatusFragment.class));
 		addItem(new FragmentListItem("2", "Logger",LogFragment.class));
-		addItem(new FragmentListItem("3", "Debug",DebugFragment.class));
+		addItem(new FragmentListItem("3", "Import/Export",ImportExportFragment.class));
+		addItem(new FragmentListItem("4", "Debug",DebugFragment.class));
 		
 		
 	}

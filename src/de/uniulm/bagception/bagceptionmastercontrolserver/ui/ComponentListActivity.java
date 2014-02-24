@@ -102,4 +102,10 @@ public class ComponentListActivity extends FragmentActivity implements
 			BootLoader.start(this);
 		}
 	}
+	
+	@Override
+	protected void onActivityResult(int arg0, int arg1, Intent arg2) {
+		super.onActivityResult(arg0, arg1, arg2);
+		
+	}
 }

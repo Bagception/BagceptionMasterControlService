@@ -576,7 +576,15 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 	};
 
-	public void setStatusChanged(ContainerStateUpdate s){
+	public synchronized void setStatusChanged(ContainerStateUpdate s){
+		Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
+		toCheck.addAll(s.getMissingItems());
+		try {
+			contextInterpreter.updateList(new ArrayList<Item>(toCheck));
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+
 		Bundle toSend = BundleMessage.getInstance().createBundle(
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
 				s.toString());
