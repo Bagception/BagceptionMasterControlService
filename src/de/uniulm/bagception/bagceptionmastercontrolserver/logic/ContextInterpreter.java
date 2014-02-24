@@ -406,7 +406,8 @@ public class ContextInterpreter implements Receiver{
 			long time = System.currentTimeMillis();
 			long sunset = 64800000; // 18:00 pm = 64 800 000 Milliseconds
 			Calendar calendar = Calendar.getInstance();
-			long seconds = calendar.getTimeInMillis();
+			int hours = calendar.get(Calendar.HOUR) + 12;
+			Log.w("DEBUG", "Uhrzeit: " + hours);
 			
 			if(weather > 50){
 			ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
@@ -420,7 +421,7 @@ public class ContextInterpreter implements Receiver{
 				ret.add(new CachedContextInfo(CONTEXT.COLD, object.get("temp").toString()));
 			}
 			
-			if(time > sunset){
+			if(hours > sunset){
 				ret.add(new CachedContextInfo(CONTEXT.DARK, "Uhrzeit"));
 			} else{
 				ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "Uhrzeit"));
