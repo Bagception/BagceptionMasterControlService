@@ -12,7 +12,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_database_test">DatabaseTest</string>
     <string name="title_activity_fickenfucken">FICKENFUCKEN</string>
-    <string name="app_name">File dialog</string>
     <string name="location">Location</string>
     <string name="cant_read_folder">folder can\'t be read!</string>
     <string name="nnew">New</string>
