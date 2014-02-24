@@ -43,6 +43,10 @@
                 android:value=".ui.ComponentListActivity" />
         </activity>
 
+        
+        <activity android:label="@string/app_name" android:name="com.lamerman.FileDialog">
+        </activity>
+        
         <service
             android:name="de.uniulm.bagception.mcs.services.MasterControlServer"
             android:exported="true" >

@@ -86,7 +86,14 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	private static final String IMAGE_HASH = "imgHash";
 	
 	private final String DB_FILEPATH;
-	private final String DB_BACKUP_PATH;
+	public static final String DB_BACKUP_PATH;
+	//public static final String DB_BACKUP_NAME = "sqlite.db";
+	
+	static{
+		File sdCard = Environment.getExternalStorageDirectory();
+		File file = new File (sdCard.getAbsolutePath() + "/bagception/db/");
+		DB_BACKUP_PATH = file.getAbsolutePath();
+	}
 	
 	// Table create statements
 	private static final String CREATE_TABLE_ITEM = 
@@ -182,9 +189,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 		//ContextWrapper cw =new ContextWrapper(context.getApplicationContext());
 		//DB_FILEPATH = cw.getFilesDir().getAbsolutePath()+ "/Database/"+DATABASE_NAME;
 		DB_FILEPATH = "/data/data/de.uniulm.bagception.bagceptionmastercontrolserver/databases/"+DATABASE_NAME;
-		File sdCard = Environment.getExternalStorageDirectory();
-		File file = new File (sdCard.getAbsolutePath() + "/bagception/db/sqlite.db");
-		DB_BACKUP_PATH = file.getAbsolutePath();
+		
 		
 	}
 	
@@ -2008,46 +2013,51 @@ public class DatabaseHelper extends SQLiteOpenHelper implements DatabaseInterfac
 	
 	
 
-	public void exportDatabase(){
+	public boolean exportDatabase(String path){
 		
 		
-		File sdCard = Environment.getExternalStorageDirectory();
-		File dir = new File (sdCard.getAbsolutePath() + "/bagception/db/");
-		dir.mkdirs();
-		File file = new File(dir, "sqlite.db");
-		
+//		File sdCard = Environment.getExternalStorageDirectory();
+//		File dir = new File (sdCard.getAbsolutePath() + "/bagception/db/");
+//		dir.mkdirs();
+//		File file = new File(dir, "sqlite.db");
+		File file = new File(path);
 		try {
 			if(copyDatabase(DB_FILEPATH,file.getAbsolutePath())){
 				LOGGER.C(this, "Database exported");
 			}else{
 				LOGGER.C(this, "Database not exported");
+				return false;
 			}
 		} catch (IOException e) {
 			LOGGER.C(this, "error: "+e.getMessage());
 			e.printStackTrace();
+			return false;
 		}	
 
-		
+		return true;
 	}
 
-	public  void importDatabase(){
+	public  boolean importDatabase(String path){
 		
-		File file = new File(DB_BACKUP_PATH);
+		File file = new File(path);
 		if (file.exists()){
 			LOGGER.C(this, "Database to import found");
 			try {
-				if(copyDatabase(DB_BACKUP_PATH,DB_FILEPATH)){
+				if(copyDatabase(path,DB_FILEPATH)){
 					LOGGER.C(this, "Database imported");
 				}else{
 					LOGGER.C(this, "Database not imported");
+					return false;
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
+				return false;
 			}	
 		}else{
 			LOGGER.C(this, "no Database to import: "+file.getAbsolutePath());
+			return false;
 		}
-		
+		return true;
 	}
 	
 	 /**
