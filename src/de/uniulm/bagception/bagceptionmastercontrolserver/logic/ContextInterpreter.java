@@ -427,8 +427,8 @@ public class ContextInterpreter implements Receiver{
 //			ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "hell"));
 			String c="";
 			for (CachedContextInfo cc:ret){
+				c+="\n ";
 				c+=cc.getContext().name();
-				c+="\n";
 			}
 			
 			mcs.sendMessageToRemote("Aktiver Kontext: "+c);
