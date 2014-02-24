@@ -42,11 +42,7 @@ public class ActivitySystem {
 		this.currentActivity = activity;
 		LOGGER.C(this, "activity changed: "+currentActivity.getName());
 		mcs.getContextInterpreter().requestWeather();
-		try {
-			mcs.getContextInterpreter().updateList(null);
-		} catch (DatabaseException e) {
-			e.printStackTrace();
-		}
+		mcs.getContextInterpreter().updateList(null);
 		
 
 	}

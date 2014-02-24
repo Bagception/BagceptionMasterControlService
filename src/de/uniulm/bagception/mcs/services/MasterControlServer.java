@@ -18,6 +18,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 import de.philipphock.android.lib.logging.LOG;
 import de.philipphock.android.lib.services.ServiceUtil;
@@ -526,23 +527,23 @@ public class MasterControlServer extends ObservableService implements Runnable,
 								itemIndexSystem.getCurrentItems(), 
 								null, 
 								0);
-						Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
-						toCheck.addAll(u.getMissingItems());
-						
-						contextInterpreter.updateList(new ArrayList<Item>(toCheck));
-						StringBuilder sb = new StringBuilder();
-						sb.append("Context:\n");
-						List<ContextSuggestion> ssss=contextInterpreter.getContextSuggetions();
-						for(ContextSuggestion sss:ssss){
-							sb.append("item to replace: ("+sss.getReason().name()+")"+sss.getItemToReplace()+"\n ");
-							for(Item iii:sss.getReplaceSuggestions()){
-								sb.append(" "+iii.getName());
-							}
-							sb.append("\n");
-						}
-						
-						
-						LOGGER.C(this, sb.toString());
+//						Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
+//						toCheck.addAll(u.getMissingItems());
+//						
+//						contextInterpreter.updateList(new ArrayList<Item>(toCheck));
+//						StringBuilder sb = new StringBuilder();
+//						sb.append("Context:\n");
+//						List<ContextSuggestion> ssss=contextInterpreter.getContextSuggetions();
+//						for(ContextSuggestion sss:ssss){
+//							sb.append("item to replace: ("+sss.getReason().name()+")"+sss.getItemToReplace()+"\n ");
+//							for(Item iii:sss.getReplaceSuggestions()){
+//								sb.append(" "+iii.getName());
+//							}
+//							sb.append("\n");
+//						}
+//						
+//						
+//						LOGGER.C(this, sb.toString());
 						
 						setStatusChanged();
 					} else {
@@ -576,18 +577,28 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 	};
 
-	public synchronized void setStatusChanged(ContainerStateUpdate s){
+	private synchronized void setStatusChanged(ContainerStateUpdate s){
 		Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
 		toCheck.addAll(s.getMissingItems());
+		if (s.getActivity() != null){
+			if (s.getActivity().getItemsForActivity() != null){
+				toCheck.addAll(s.getActivity().getItemsForActivity());
+			}
+		}
+		
 		try {
-			contextInterpreter.updateList(new ArrayList<Item>(toCheck));
+			contextInterpreter.updateList(new ArrayList<Item>(toCheck),true);
 		} catch (DatabaseException e) {
 			e.printStackTrace();
 		}
 
+		
+		s = new ContainerStateUpdate(s.getActivity(), s.getItemList(), contextInterpreter.getContextSuggetions(), s.getBatteryState());
 		Bundle toSend = BundleMessage.getInstance().createBundle(
 				BundleMessage.BUNDLE_MESSAGE.CONTAINER_STATUS_UPDATE,
 				s.toString());
+		
+		
 		btHelper.sendMessageBundle(toSend);
 		LOGGER.C(this, "status update send");
 	}
@@ -598,7 +609,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		ContainerStateUpdate statusUpdate = new ContainerStateUpdate(
 				activitySystem.getCurrentActivity(),
 				itemIndexSystem.getCurrentItems(),
-				contextInterpreter.getContextSuggetions(),
+				null,
 				batteryStatus);
 				
 		setStatusChanged(statusUpdate);
