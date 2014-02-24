@@ -2,6 +2,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -437,10 +438,9 @@ public class ContextInterpreter implements Receiver{
 			} else{
 				ret.add(new CachedContextInfo(CONTEXT.COLD, object.get("temp").toString()));
 			}
-			
-			if(hours > sunset){
+			if (isDark(16, 0)){
 				ret.add(new CachedContextInfo(CONTEXT.DARK, "Uhrzeit"));
-			} else{
+			}else{
 				ret.add(new CachedContextInfo(CONTEXT.BRIGHT, "Uhrzeit"));
 			}
 //			//DEBUG:
@@ -546,6 +546,16 @@ public class ContextInterpreter implements Receiver{
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static boolean isDark(int hourOfSunset,int minuteOfSunset){
+		Date now = Calendar.getInstance().getTime();
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY,hourOfSunset);
+		c.set(Calendar.MINUTE,minuteOfSunset);
+		c.set(Calendar.SECOND,0);
+		Date late = c.getTime();
+		return (now.after(late));
 	}
 
 }
