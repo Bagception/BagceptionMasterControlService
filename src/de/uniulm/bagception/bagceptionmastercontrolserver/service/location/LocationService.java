@@ -391,7 +391,7 @@ public class LocationService extends Service{
 	}
 	
 	private void log(String s){
-		Log.d("LocationService", s);
+//		Log.d("LocationService", s);
 	}
 	
 	private Location isMACKnown(String mac, List<Location> knownLocations){

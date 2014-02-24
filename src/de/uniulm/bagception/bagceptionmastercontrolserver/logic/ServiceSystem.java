@@ -51,6 +51,7 @@ public class ServiceSystem implements Receiver{
 	
 	// RESOLVE ADDRESS TO COORDS
 	public void resolveAddressRequest(String address){
+		log("intent started");
 		Intent i = new Intent(mcs,LocationService.class);
 		i.putExtra("receiverTag", mResultreceiver);
 		i.putExtra(OurLocation.REQUEST_TYPE, OurLocation.RESOLVEADDRESS);
@@ -129,7 +130,7 @@ public class ServiceSystem implements Receiver{
 
 	
 	private void log(String s){
-		Log.d("MCS", s);
+//		Log.d("MCS", s);
 	}
 
 	
