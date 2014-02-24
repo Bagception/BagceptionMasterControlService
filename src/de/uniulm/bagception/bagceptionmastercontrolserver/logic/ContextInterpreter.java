@@ -1,6 +1,7 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -404,6 +405,8 @@ public class ContextInterpreter implements Receiver{
 			float temp = Float.parseFloat(object.get("temp").toString());
 			long time = System.currentTimeMillis();
 			long sunset = 64800000; // 18:00 pm = 64 800 000 Milliseconds
+			Calendar calendar = Calendar.getInstance();
+			long seconds = calendar.getTimeInMillis();
 			
 			if(weather > 50){
 			ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
