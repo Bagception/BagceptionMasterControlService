@@ -93,7 +93,7 @@ public class ContextInterpreter implements Receiver{
 			
 			for (CachedContextInfo i : cache) {
 				if (i.getTimestamp() < System.currentTimeMillis()
-						- (4 * 1000 * 60 * 60)) {
+						- (1 * 1000 * 60 * 60)) {
 
 					onContextDataRecv(forecast);
 					
@@ -362,7 +362,7 @@ public class ContextInterpreter implements Receiver{
 			
 			
 		}
-		mcs.setStatusChanged();
+		//mcs.setStatusChanged();
 	}
 
 	/**
