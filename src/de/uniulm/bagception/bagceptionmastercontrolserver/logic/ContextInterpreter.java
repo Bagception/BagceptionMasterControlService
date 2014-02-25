@@ -19,7 +19,6 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseExcep
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
-import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion.CONTEXT;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
@@ -59,6 +58,11 @@ public class ContextInterpreter implements Receiver{
 		
 	}
 
+	public void clearItemList(){
+		
+		itemList.clear();
+	}
+	
 	public void updateList(List<Item> itemsIn){
 		try {
 			updateList(itemsIn, false);
@@ -421,14 +425,9 @@ public class ContextInterpreter implements Receiver{
 			HashSet<CachedContextInfo> ret = new HashSet<CachedContextInfo>();
 			float weather = Float.parseFloat(object.get("rain").toString());
 			float temp = Float.parseFloat(object.get("temp").toString());
-			long time = System.currentTimeMillis();
-			long sunset = 64800000; // 18:00 pm = 64 800 000 Milliseconds
-			Calendar calendar = Calendar.getInstance();
-			int hours = calendar.get(Calendar.HOUR) + 12;
-			Log.w("DEBUG", "Uhrzeit: " + hours);
 			
 			if(weather > 50){
-			ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
+				ret.add(new CachedContextInfo(CONTEXT.RAIN, object.get("rain").toString()));
 			} else {
 				ret.add(new CachedContextInfo(CONTEXT.SUNNY, object.get("rain").toString()));
 			} 
@@ -438,6 +437,7 @@ public class ContextInterpreter implements Receiver{
 			} else{
 				ret.add(new CachedContextInfo(CONTEXT.COLD, object.get("temp").toString()));
 			}
+			
 			if (isDark(16, 0)){
 				ret.add(new CachedContextInfo(CONTEXT.DARK, "Uhrzeit"));
 			}else{
