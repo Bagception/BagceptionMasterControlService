@@ -307,15 +307,14 @@ public class ContextInterpreter implements Receiver{
 					Log.w("DEBUGCONTEXT", "ContextItems: " + contextItems);
 					
 					for(Item ci:contextItems){
-						
 						ItemAttribute cia = ci.getAttribute();
 						
 						if(cia == null) continue;
-						
 						switch(i.getContext()){
 						case BRIGHT:
 							if(suggestedContextItems.contains(ci)) continue;
-							if(cia.getLightness().equals("ligth")){
+							if(cia.getLightness().equals("light")){
+								Log.d("BRIGHT"," light");
 								suggestedContextItems.add(ci);
 								
 								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
