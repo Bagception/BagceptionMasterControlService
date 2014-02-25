@@ -160,7 +160,7 @@ public class ContextInterpreter implements Receiver{
 									
 									// List with items with the same category_id
 									List<Item> sug_items = db.getItems(cat_id);
-									Log.w("CCC", "Contextitems: " + sug_items);
+									Log.w("CCC", "Alternative Items: " + sug_items);
 									
 									for(Item si:sug_items){
 										if(si.getAttribute() != null){
@@ -312,8 +312,8 @@ public class ContextInterpreter implements Receiver{
 						case BRIGHT:
 							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getLightness().equals("ligth")){
-								suggestedContextItems.add(ci);
 								
+								suggestedContextItems.add(ci);
 								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
 								suggestions.add(suggestion);
 							}
