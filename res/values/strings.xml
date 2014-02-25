@@ -14,11 +14,11 @@
     <string name="title_activity_fickenfucken">FICKENFUCKEN</string>
     <string name="location">Location</string>
     <string name="cant_read_folder">folder can\'t be read!</string>
-    <string name="nnew">New</string>
-    <string name="select">Select</string>
-    <string name="file_name">File name:</string>
-    <string name="cancel">Cancel</string>
-    <string name="create">Save</string>
+    <string name="nnew">Neu</string>
+    <string name="select">Auswählen</string>
+    <string name="file_name">Dateiname:</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="create">Speichern</string>
     <string name="no_data">No Data</string>
     <color name="gray">#ffff0000</color>
     <string name="err">Error</string>
