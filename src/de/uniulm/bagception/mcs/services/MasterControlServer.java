@@ -522,11 +522,11 @@ public class MasterControlServer extends ObservableService implements Runnable,
 							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 
 						//lastActivityList = activityPriorityList;
-						ContainerStateUpdate u = new ContainerStateUpdate(
-								activitySystem.getCurrentActivity(), 
-								itemIndexSystem.getCurrentItems(), 
-								null, 
-								0);
+//						ContainerStateUpdate u = new ContainerStateUpdate(
+//								activitySystem.getCurrentActivity(), 
+//								itemIndexSystem.getCurrentItems(), 
+//								null, 
+//								0);
 //						Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
 //						toCheck.addAll(u.getMissingItems());
 //						
