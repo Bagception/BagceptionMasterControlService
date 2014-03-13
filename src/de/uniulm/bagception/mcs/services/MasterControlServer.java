@@ -87,6 +87,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 	private volatile boolean isScanning = false;
 
 	private ItemIndexSystem itemIndexSystem;
+	public ItemIndexSystem getItemIndexSystem(){
+		return itemIndexSystem;
+	}
+	
 	private ActivitySystem activitySystem;
 	public ActivitySystem getActivitySystem(){
 		return activitySystem;
@@ -494,58 +498,10 @@ public class MasterControlServer extends ObservableService implements Runnable,
 					}
 					
 					if (i != null) {
-						// tag exists in database
-						LOGGER.C(this, "TAG found: " + i.getName()+", hash: "+i.getImageHash());
-						if (itemIndexSystem.itemScanned(i,id)) {
-							// item put in
-							LOGGER.C(this, "Item in: " + i.getName());
-						} else {
-							// item taken out
-							LOGGER.C(this, "Item out: " + i.getName());
-						}
-						sendToRemote(BUNDLE_MESSAGE.ITEM_FOUND, null);
-						List<Item> items = itemIndexSystem.getCurrentItems();
-						ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 						
-						Activity first = null;
-						
-						if(activityPriorityList != null && activityPriorityList.getActivities().size() > 0){
-							first = activityPriorityList.getActivities().get(0);
-						}
-						
-						if (first!=null){
-							if (!activitySystem.isManuallyDetermActivity())
-								activitySystem.setCurrentActivity(first);
-								tmp = first;
-						}
-							
-							sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
 
-						//lastActivityList = activityPriorityList;
-//						ContainerStateUpdate u = new ContainerStateUpdate(
-//								activitySystem.getCurrentActivity(), 
-//								itemIndexSystem.getCurrentItems(), 
-//								null, 
-//								0);
-//						Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());
-//						toCheck.addAll(u.getMissingItems());
-//						
-//						contextInterpreter.updateList(new ArrayList<Item>(toCheck));
-//						StringBuilder sb = new StringBuilder();
-//						sb.append("Context:\n");
-//						List<ContextSuggestion> ssss=contextInterpreter.getContextSuggetions();
-//						for(ContextSuggestion sss:ssss){
-//							sb.append("item to replace: ("+sss.getReason().name()+")"+sss.getItemToReplace()+"\n ");
-//							for(Item iii:sss.getReplaceSuggestions()){
-//								sb.append(" "+iii.getName());
-//							}
-//							sb.append("\n");
-//						}
-//						
-//						
-//						LOGGER.C(this, sb.toString());
+						itemScanned(i,id);
 						
-						setStatusChanged();
 					} else {
 						// tag not found in db
 						ArrayList<String> ids = new ArrayList<String>();
@@ -576,6 +532,38 @@ public class MasterControlServer extends ObservableService implements Runnable,
 
 		}
 	};
+	
+	
+	public void itemScanned(Item i,String id) throws DatabaseException{
+		// tag exists in database
+		LOGGER.C(this, "TAG found: " + i.getName()+", hash: "+i.getImageHash());
+		if (itemIndexSystem.itemScanned(i,id)) {
+			// item put in
+			LOGGER.C(this, "Item in: " + i.getName());
+		} else {
+			// item taken out
+			LOGGER.C(this, "Item out: " + i.getName());
+		}
+		sendToRemote(BUNDLE_MESSAGE.ITEM_FOUND, null);
+		List<Item> items = itemIndexSystem.getCurrentItems();
+		ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
+		
+		Activity first = null;
+		
+		if(activityPriorityList != null && activityPriorityList.getActivities().size() > 0){
+			first = activityPriorityList.getActivities().get(0);
+		}
+		
+		if (first!=null){
+			if (!activitySystem.isManuallyDetermActivity())
+				activitySystem.setCurrentActivity(first);
+				tmp = first;
+		}
+		
+		sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);
+		setStatusChanged();
+
+	}
 
 	private synchronized void setStatusChanged(ContainerStateUpdate s){
 		Set<Item> toCheck = new HashSet<Item>(itemIndexSystem.getCurrentItems());

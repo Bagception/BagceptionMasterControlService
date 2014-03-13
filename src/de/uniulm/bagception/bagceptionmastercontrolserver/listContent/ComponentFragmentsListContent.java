@@ -10,6 +10,7 @@ import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.DebugFrag
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ImportExportFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.LogFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.ServiceStatusFragment;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.WizardOfOzFragment;
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -35,6 +36,7 @@ public class ComponentFragmentsListContent {
 		addItem(new FragmentListItem("2", "Logger",LogFragment.class));
 		addItem(new FragmentListItem("3", "Import/Export",ImportExportFragment.class));
 		addItem(new FragmentListItem("4", "Debug",DebugFragment.class));
+		addItem(new FragmentListItem("5", "Studie",WizardOfOzFragment.class));
 		
 		
 	}
