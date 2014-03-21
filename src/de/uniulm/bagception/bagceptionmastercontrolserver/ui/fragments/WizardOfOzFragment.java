@@ -29,6 +29,10 @@ public class WizardOfOzFragment extends Fragment {
 	private final HashSet<Long> swimmingItemIds;
 	private final HashSet<Long> footballItemIds;
 	
+	private final String weatherDataSwimming = ""; //TODO weatherData for swimming here
+	private final String weatherDataFootball = ""; //TODO weatherData for football here
+	public static String weatherData=""; 
+	
 	private View view;
 	
 	private HashSet<Long> currentSet;
@@ -73,6 +77,7 @@ public class WizardOfOzFragment extends Fragment {
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								currentSet = footballItemIds;
+								weatherData = weatherDataFootball; 
 								initArray();
 							}
 						})
@@ -83,6 +88,7 @@ public class WizardOfOzFragment extends Fragment {
 							public void onClick(DialogInterface dialog,
 									int which) {
 								currentSet = swimmingItemIds;
+								weatherData = weatherDataSwimming;
 								initArray();
 							}
 						});
