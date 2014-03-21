@@ -1,5 +1,8 @@
 package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 import android.content.Context;
@@ -17,14 +20,48 @@ public class ItemListArrayAdapter extends ArrayAdapter<Item> {
 
 	
 	private List<Item> itemsIn;
+
+	
 	public ItemListArrayAdapter(Context context) {
 		super(context, R.layout.item_elem);
+
+		 	
 	}
 	
 	public void setItemsIn(List<Item> itemsIn){
 		this.itemsIn = itemsIn;
+		notifyDataSetInvalidated();
 	}
 	
+
+	public void addAll(List<Item> items,final HashSet<Long> itemsToPrefer) {
+		Collections.sort(items,new Comparator<Item>() {
+
+			@Override
+			public int compare(Item lhs, Item rhs) {
+				long id0 = lhs.getId();
+				long id1 = rhs.getId();
+				
+				if (itemsToPrefer.contains(id0) && !itemsToPrefer.contains(id1)){
+					return -1;
+				}
+				if (!itemsToPrefer.contains(id0) && !itemsToPrefer.contains(id1)){
+					return 0;
+				}
+				if (itemsToPrefer.contains(id0) && itemsToPrefer.contains(id1)){
+					return 0;
+				}
+				if (!itemsToPrefer.contains(id0) && itemsToPrefer.contains(id1)){
+					return 1;
+				}
+					
+				
+				return 0;
+			}
+
+		});
+		super.addAll(items);
+	}
 	
 	
 	@Override
