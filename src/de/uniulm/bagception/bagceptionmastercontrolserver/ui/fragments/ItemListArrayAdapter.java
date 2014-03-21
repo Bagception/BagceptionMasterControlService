@@ -25,6 +25,8 @@ public class ItemListArrayAdapter extends ArrayAdapter<Item> {
 		this.itemsIn = itemsIn;
 	}
 	
+	
+	
 	@Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
@@ -43,10 +45,13 @@ public class ItemListArrayAdapter extends ArrayAdapter<Item> {
             if (imageView != null){
             	imageView.setImageBitmap(item.getImage());
             }
+      
+            
             if (itemsIn.contains(item)){
-            	itemView.setBackgroundColor(Color.rgb(182,255,182));
+            	view.setBackgroundColor(Color.argb(50,182,255,182));
+            	
             }else{
-            	itemView.setBackgroundColor(Color.rgb(255, 182, 182));
+            	view.setBackgroundColor(Color.argb(50,255, 182, 182));
             }
          }
 
