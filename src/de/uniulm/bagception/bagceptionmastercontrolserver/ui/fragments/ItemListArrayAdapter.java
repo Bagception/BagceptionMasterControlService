@@ -8,7 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 
 public class ItemListArrayAdapter extends ArrayAdapter<Item> {
@@ -16,7 +18,7 @@ public class ItemListArrayAdapter extends ArrayAdapter<Item> {
 	
 	private List<Item> itemsIn;
 	public ItemListArrayAdapter(Context context) {
-		super(context, android.R.layout.simple_list_item_1);
+		super(context, R.layout.item_elem);
 	}
 	
 	public void setItemsIn(List<Item> itemsIn){
@@ -28,20 +30,23 @@ public class ItemListArrayAdapter extends ArrayAdapter<Item> {
         View view = convertView;
         if (view == null) {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(android.R.layout.simple_list_item_1, null);
+            view = inflater.inflate(R.layout.item_elem, null);
         }
 
         Item item = getItem(position);
         if (item!= null) {
-            TextView itemView = (TextView) view.findViewById(android.R.id.text1);
-            
+            TextView itemView = (TextView) view.findViewById(R.id.name);
+            ImageView imageView = (ImageView) view.findViewById(R.id.icon);
             if (itemView != null) {
                 itemView.setText(item.getName());
             }
+            if (imageView != null){
+            	imageView.setImageBitmap(item.getImage());
+            }
             if (itemsIn.contains(item)){
-            	itemView.setBackgroundColor(Color.GREEN);
+            	itemView.setBackgroundColor(Color.rgb(182,255,182));
             }else{
-            	itemView.setBackgroundColor(Color.RED);
+            	itemView.setBackgroundColor(Color.rgb(255, 182, 182));
             }
          }
 
