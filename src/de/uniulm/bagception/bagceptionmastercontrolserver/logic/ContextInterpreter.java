@@ -18,6 +18,7 @@ import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseHelper;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.WizardOfOzFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ContextSuggestion.CONTEXT;
@@ -458,7 +459,13 @@ public class ContextInterpreter implements Receiver{
 
 	
 	public  void requestWeather(){
+
 		synchronized(lock){
+			if (WizardOfOzFragment.weatherData != null){
+				//studie aktiv:
+				object = WizardOfOzFragment.weatherData;
+				return;
+			}
 			
 			Location loc = null;
 			try {
@@ -548,6 +555,10 @@ public class ContextInterpreter implements Receiver{
 	}
 	
 	public static boolean isDark(int hourOfSunset,int minuteOfSunset){
+		if (WizardOfOzFragment.isDark != null){
+			
+			return WizardOfOzFragment.isDark;
+		}
 		Date now = Calendar.getInstance().getTime();
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.HOUR_OF_DAY,hourOfSunset);

@@ -3,6 +3,8 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 import java.util.HashSet;
 import java.util.List;
 
+import org.json.simple.JSONObject;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -29,9 +31,13 @@ public class WizardOfOzFragment extends Fragment {
 	private final HashSet<Long> swimmingItemIds;
 	private final HashSet<Long> footballItemIds;
 	
-	private final String weatherDataSwimming = ""; //TODO weatherData for swimming here
-	private final String weatherDataFootball = ""; //TODO weatherData for football here
-	public static String weatherData=""; 
+	private final JSONObject weatherDataSwimming = new JSONObject(); //TODO weatherData for swimming here
+	{
+		//weatherDataFootball
+	}
+	private final JSONObject weatherDataFootball = new JSONObject(); //TODO weatherData for football here
+	public static JSONObject weatherData=null; 
+	public static Boolean isDark=null;
 	
 	private View view;
 	
@@ -78,6 +84,7 @@ public class WizardOfOzFragment extends Fragment {
 							public void onClick(DialogInterface dialog, int id) {
 								currentSet = footballItemIds;
 								weatherData = weatherDataFootball; 
+								isDark = true;
 								initArray();
 							}
 						})
@@ -89,6 +96,7 @@ public class WizardOfOzFragment extends Fragment {
 									int which) {
 								currentSet = swimmingItemIds;
 								weatherData = weatherDataSwimming;
+								isDark = false;
 								initArray();
 							}
 						});
