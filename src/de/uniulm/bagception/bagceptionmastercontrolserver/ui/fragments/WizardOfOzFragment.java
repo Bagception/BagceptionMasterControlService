@@ -46,14 +46,24 @@ public class WizardOfOzFragment extends Fragment {
 	{
 		//XXX item IDs 
 		swimmingItemIds = new HashSet<Long>();
-		swimmingItemIds.add(15l);
-		swimmingItemIds.add(13l);
-		swimmingItemIds.add(10l);
+		swimmingItemIds.add(3l);
+		
+		
+		
 		
 		footballItemIds = new HashSet<Long>();
-		footballItemIds.add(14l);
-		footballItemIds.add(8l);
+		footballItemIds.add(4l);
 		footballItemIds.add(5l);
+		footballItemIds.add(6l);
+		footballItemIds.add(10l);
+		footballItemIds.add(12l);
+		footballItemIds.add(13l);
+		footballItemIds.add(19l);
+		footballItemIds.add(15l);
+		footballItemIds.add(24l);
+		
+		
+		
 	}
 	
 	private MasterControlServer mcs;
