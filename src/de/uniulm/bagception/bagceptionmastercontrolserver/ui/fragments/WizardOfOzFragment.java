@@ -2,6 +2,7 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.json.simple.JSONObject;
 
@@ -150,7 +151,12 @@ public class WizardOfOzFragment extends Fragment {
 		Toast.makeText(getActivity(), i.getId()+"",Toast.LENGTH_SHORT).show();
 		
 		try {
-			
+			if (i.getIds().size() < 1){
+				
+				UUID uid = UUID.randomUUID();
+				i.getIds().add(uid.toString());
+				mcs.getDB().editItem(i, i);
+			}
 			mcs.itemScanned(i,i.getIds().get(0));		
 			mcs.getItemIndexSystem().caseClosed();
 		} catch (DatabaseException e) {
