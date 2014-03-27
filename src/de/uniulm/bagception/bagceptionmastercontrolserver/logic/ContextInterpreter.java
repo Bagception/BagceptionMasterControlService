@@ -464,6 +464,7 @@ public class ContextInterpreter implements Receiver{
 			if (WizardOfOzFragment.weatherData != null){
 				//studie aktiv:
 				forecast = WizardOfOzFragment.weatherData;
+				object = forecast.toJSONObject();
 				return;
 			}
 			
