@@ -463,7 +463,7 @@ public class ContextInterpreter implements Receiver{
 		synchronized(lock){
 			if (WizardOfOzFragment.weatherData != null){
 				//studie aktiv:
-				object = WizardOfOzFragment.weatherData;
+				forecast = WizardOfOzFragment.weatherData;
 				return;
 			}
 			
