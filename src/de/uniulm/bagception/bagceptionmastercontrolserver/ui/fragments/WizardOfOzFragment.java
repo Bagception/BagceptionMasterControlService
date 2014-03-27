@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -186,7 +187,7 @@ public class WizardOfOzFragment extends Fragment {
 		updateUI();
 	}
 	
-	private void onListItemClick( View v, int position, long id) {
+	private synchronized void onListItemClick( View v, int position, long id) {
 		
 		Item i = adapter.getItem(position);
 		Toast.makeText(getActivity(), i.getId()+"",Toast.LENGTH_SHORT).show();
