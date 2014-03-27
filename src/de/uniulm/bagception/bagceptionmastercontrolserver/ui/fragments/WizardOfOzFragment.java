@@ -37,7 +37,7 @@ public class WizardOfOzFragment extends Fragment {
 	{
 		//weatherDataFootball
 	}
-	private final WeatherForecast weatherDataFootball = new WeatherForecast("Ulm",5,1,1,5,5,1);
+	private final WeatherForecast weatherDataFootball = new WeatherForecast("Ulm",5,1,1,5,5,80);
 	public static WeatherForecast weatherData=null; 
 	public static Boolean isDark=null;
 	

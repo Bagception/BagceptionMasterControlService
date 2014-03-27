@@ -59,6 +59,12 @@ public class ContextInterpreter implements Receiver{
 		
 	}
 
+	public void updateWeather(){
+		cache.clear();
+		requestWeather();
+		
+	}
+	
 	public void clearItemList(){
 		
 		itemList.clear();
@@ -465,6 +471,7 @@ public class ContextInterpreter implements Receiver{
 				//studie aktiv:
 				forecast = WizardOfOzFragment.weatherData;
 				object = forecast.toJSONObject();
+				updateList(null);
 				return;
 			}
 			
