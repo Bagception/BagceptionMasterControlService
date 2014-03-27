@@ -9,6 +9,7 @@ import android.os.Handler;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
+import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.WizardOfOzFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
@@ -39,11 +40,19 @@ public class ActivitySystem {
 	
 	
 	public void setCurrentActivity(Activity activity) throws DatabaseException{
+		
+		
+		
 		this.currentActivity = activity;
 		LOGGER.C(this, "activity changed: "+currentActivity.getName());
 		mcs.getContextInterpreter().requestWeather();
 		mcs.getContextInterpreter().updateList(null);
-		
+		if (WizardOfOzFragment.correctActivitySelected()){
+			//richtige activity
+			setManuallyDetermActivity(true);
+		}else{
+			return;
+		}
 
 	}
 	

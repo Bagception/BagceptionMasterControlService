@@ -546,6 +546,11 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		}
 		sendToRemote(BUNDLE_MESSAGE.ITEM_FOUND, null);
 		List<Item> items = itemIndexSystem.getCurrentItems();
+		
+		if (activitySystem.isManuallyDetermActivity()){
+			setStatusChanged();
+			return;
+		}
 		ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 		
 		Activity first = null;
@@ -655,11 +660,11 @@ public class MasterControlServer extends ObservableService implements Runnable,
 			} catch (DatabaseException e) {
 				e.printStackTrace();
 			}
-				try {
-					setStatusChanged();
-				} catch (DatabaseException e) {
-					e.printStackTrace();
-				}
+			try {
+				setStatusChanged();
+			} catch (DatabaseException e) {
+				e.printStackTrace();
+			}
 		}
 	};
 		

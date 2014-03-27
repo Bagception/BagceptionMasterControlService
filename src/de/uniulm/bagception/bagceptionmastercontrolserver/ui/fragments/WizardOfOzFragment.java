@@ -32,7 +32,9 @@ import de.uniulm.bagception.mcs.services.MasterControlServer;
 public class WizardOfOzFragment extends Fragment {
 	private final HashSet<Long> swimmingItemIds;
 	private final HashSet<Long> footballItemIds;
-	
+	public static int activityActive = 0;
+	public static final int ACTIVITY_FOOTBALL= 1;
+	public static final int ACTIVITY_SWIMMING = 2;
 	private final WeatherForecast weatherDataSwimming = new WeatherForecast("Ulm",32,1,1,32,32,0); 
 	{
 		//weatherDataFootball
@@ -43,11 +45,33 @@ public class WizardOfOzFragment extends Fragment {
 	
 	private View view;
 	
+	public static boolean correctActivitySelected(){
+		if (MasterControlServer.debuginstance == null) return false;
+		try {
+			if (activityActive == ACTIVITY_FOOTBALL && MasterControlServer.debuginstance.getActivitySystem().getCurrentActivity().getName().equals("Fußball")){
+				return true;
+			}
+			if (activityActive == ACTIVITY_SWIMMING && MasterControlServer.debuginstance.getActivitySystem().getCurrentActivity().getName().equals("Schwimmen")){
+				return true;
+			}
+		} catch (DatabaseException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
 	private HashSet<Long> currentSet;
 	{
 		//XXX item IDs 
 		swimmingItemIds = new HashSet<Long>();
 		swimmingItemIds.add(3l);
+		swimmingItemIds.add(10l);
+		swimmingItemIds.add(13l);
+		swimmingItemIds.add(29l);
+		swimmingItemIds.add(35l);
+		swimmingItemIds.add(36l);
+		swimmingItemIds.add(37l);
+		swimmingItemIds.add(41l);
 		
 		
 		
@@ -97,6 +121,9 @@ public class WizardOfOzFragment extends Fragment {
 								currentSet = footballItemIds;
 								weatherData = weatherDataFootball; 
 								isDark = true;
+								
+								activityActive = ACTIVITY_FOOTBALL;
+								
 								initArray();
 							}
 						})
@@ -109,6 +136,9 @@ public class WizardOfOzFragment extends Fragment {
 								currentSet = swimmingItemIds;
 								weatherData = weatherDataSwimming;
 								isDark = false;
+								
+								activityActive = ACTIVITY_SWIMMING;
+								
 								initArray();
 							}
 						});
