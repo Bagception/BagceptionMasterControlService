@@ -20,6 +20,7 @@ import android.widget.Toast;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
+import de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
 
 /**
@@ -32,12 +33,12 @@ public class WizardOfOzFragment extends Fragment {
 	private final HashSet<Long> swimmingItemIds;
 	private final HashSet<Long> footballItemIds;
 	
-	private final JSONObject weatherDataSwimming = new JSONObject(); //TODO weatherData for swimming here
+	private final WeatherForecast weatherDataSwimming = new WeatherForecast("Ulm",32,1,1,32,32,0); 
 	{
 		//weatherDataFootball
 	}
-	private final JSONObject weatherDataFootball = new JSONObject(); //TODO weatherData for football here
-	public static JSONObject weatherData=null; 
+	private final WeatherForecast weatherDataFootball = new WeatherForecast("Ulm",5,1,1,5,5,1);
+	public static WeatherForecast weatherData=null; 
 	public static Boolean isDark=null;
 	
 	private View view;
