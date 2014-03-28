@@ -81,12 +81,16 @@ public class WizardOfOzFragment extends Fragment {
 		footballItemIds.add(4l);
 		footballItemIds.add(5l);
 		footballItemIds.add(6l);
-		footballItemIds.add(10l);
-		footballItemIds.add(12l);
-		footballItemIds.add(13l);
+		footballItemIds.add(8l);
+		//footballItemIds.add(10l);
+		//footballItemIds.add(12l);
+		//footballItemIds.add(13l);
+		footballItemIds.add(14l);
 		footballItemIds.add(19l);
 		footballItemIds.add(15l);
 		footballItemIds.add(24l);
+		footballItemIds.add(28l);
+		footballItemIds.add(30l);
 		
 		
 		
