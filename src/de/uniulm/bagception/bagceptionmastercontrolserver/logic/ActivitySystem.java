@@ -3,23 +3,15 @@ package de.uniulm.bagception.bagceptionmastercontrolserver.logic;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
-import de.uniulm.bagception.bagceptionmastercontrolserver.service.location.LocationService;
-import de.uniulm.bagception.bagceptionmastercontrolserver.service.weatherforecast.WeatherForecastService;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.fragments.WizardOfOzFragment;
 import de.uniulm.bagception.bagceptionmastercontrolserver.ui.log_fragment.LOGGER;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Activity;
 import de.uniulm.bagception.bundlemessageprotocol.entities.ActivityPriorityList;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Location;
-import de.uniulm.bagception.intentservicecommunication.MyResultReceiver;
-import de.uniulm.bagception.intentservicecommunication.MyResultReceiver.Receiver;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
-import de.uniulm.bagception.services.attributes.OurLocation;
-import de.uniulm.bagception.services.attributes.WeatherForecast;
 
 
 
@@ -46,13 +38,9 @@ public class ActivitySystem {
 		this.currentActivity = activity;
 		LOGGER.C(this, "activity changed: "+currentActivity.getName());
 		mcs.getContextInterpreter().requestWeather();
+		
 		mcs.getContextInterpreter().updateList(null);
-		if (WizardOfOzFragment.correctActivitySelected()){
-			//richtige activity
-			setManuallyDetermActivity(true);
-		}else{
-			return;
-		}
+		
 
 	}
 	

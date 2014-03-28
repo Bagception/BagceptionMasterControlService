@@ -547,10 +547,12 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		sendToRemote(BUNDLE_MESSAGE.ITEM_FOUND, null);
 		List<Item> items = itemIndexSystem.getCurrentItems();
 		
-		if (activitySystem.isManuallyDetermActivity()){
-			setStatusChanged();
-			return;
-		}
+//		if (activitySystem.isManuallyDetermActivity()){
+//			setStatusChanged();
+//			Log.d("ACT"," not in recognition");
+//			//return;
+//		}
+		Log.d("ACT","in recognition");
 		ActivityPriorityList activityPriorityList = activitySystem.activityRecognition(items);
 		
 		Activity first = null;
@@ -562,7 +564,7 @@ public class MasterControlServer extends ObservableService implements Runnable,
 		if (first!=null){
 			if (!activitySystem.isManuallyDetermActivity())
 				activitySystem.setCurrentActivity(first);
-				tmp = first;
+			tmp = first;
 		}
 		
 		sendToRemote(BUNDLE_MESSAGE.ACTIVITY_PRIORITY_LIST, activityPriorityList);

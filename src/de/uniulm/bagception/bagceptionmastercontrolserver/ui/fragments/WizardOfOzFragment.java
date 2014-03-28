@@ -20,8 +20,12 @@ import android.widget.GridView;
 import android.widget.Toast;
 import de.uniulm.bagception.bagceptionmastercontrolserver.R;
 import de.uniulm.bagception.bagceptionmastercontrolserver.database.DatabaseException;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage;
+import de.uniulm.bagception.bundlemessageprotocol.BundleMessage.BUNDLE_MESSAGE;
 import de.uniulm.bagception.bundlemessageprotocol.entities.Item;
 import de.uniulm.bagception.bundlemessageprotocol.entities.WeatherForecast;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.ActivityCommand;
+import de.uniulm.bagception.bundlemessageprotocol.entities.administration.AdministrationCommand;
 import de.uniulm.bagception.mcs.services.MasterControlServer;
 
 /**
@@ -126,10 +130,17 @@ public class WizardOfOzFragment extends Fragment {
 								currentSet = footballItemIds;
 								weatherData = weatherDataFootball; 
 								isDark = true;
+//								Bundle b;
 								
 								activityActive = ACTIVITY_FOOTBALL;
 								
 								initArray();
+//								try {
+//									b = BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND,ActivityCommand.start(mcs.getDB().getActivity("Fußball")));
+//									mcs.onBundleMessage(b);
+//								} catch (DatabaseException e) {
+//									e.printStackTrace();
+//								}
 							}
 						})
 				.setNegativeButton("schwimmen",
@@ -141,10 +152,17 @@ public class WizardOfOzFragment extends Fragment {
 								currentSet = swimmingItemIds;
 								weatherData = weatherDataSwimming;
 								isDark = false;
+//								Bundle b;
 								
 								activityActive = ACTIVITY_SWIMMING;
 								
 								initArray();
+//								try {
+//									b = BundleMessage.getInstance().createBundle(BUNDLE_MESSAGE.ADMINISTRATION_COMMAND,ActivityCommand.start(mcs.getDB().getActivity("Schwimmen")));
+//									mcs.onBundleMessage(b);
+//								} catch (DatabaseException e) {
+//									e.printStackTrace();
+//								}
 							}
 						});
 		
