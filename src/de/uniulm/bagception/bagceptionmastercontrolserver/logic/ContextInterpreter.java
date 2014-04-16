@@ -311,9 +311,16 @@ public class ContextInterpreter implements Receiver{
 					
 					suggestedContextItems = new ArrayList<Item>();
 					Log.w("DEBUGCONTEXT", "ContextItems: " + contextItems);
+					ItemAttribute cia;
 					
 					for(Item ci:contextItems){
-						ItemAttribute cia = ci.getAttribute();
+						Log.w("TEST", "ci: " + ci);
+						
+						if(ci != null){
+							cia = ci.getAttribute();
+						} else{
+							cia = null;
+						}
 						
 						if(cia == null) continue;
 						switch(i.getContext()){
@@ -469,6 +476,7 @@ public class ContextInterpreter implements Receiver{
 			if (WizardOfOzFragment.weatherData != null){
 				//studie aktiv:
 				forecast = WizardOfOzFragment.weatherData;
+				Log.w("TEST", "forecast: " + forecast);
 				object = forecast.toJSONObject();
 				updateList(null);
 				return;

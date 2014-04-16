@@ -37,6 +37,8 @@ public class ActivitySystem {
 		
 		this.currentActivity = activity;
 		LOGGER.C(this, "activity changed: "+currentActivity.getName());
+		Log.w("TEST", "mcs: " + mcs);
+		Log.w("TEST", "mcs.getContextInterpreter: " + mcs.getContextInterpreter());
 		mcs.getContextInterpreter().requestWeather();
 		
 		mcs.getContextInterpreter().updateList(null);
