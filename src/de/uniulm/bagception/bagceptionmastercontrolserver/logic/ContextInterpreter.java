@@ -107,8 +107,7 @@ public class ContextInterpreter implements Receiver{
 			suggestions = new HashSet<ContextSuggestion>();
 			
 			for (CachedContextInfo i : cache) {
-				if (i.getTimestamp() < System.currentTimeMillis()
-						- (1 * 1000 * 60 * 60)) {
+				if (i.getTimestamp() < System.currentTimeMillis() - (1 * 1000 * 60 * 60)) {
 
 					onContextDataRecv(forecast);
 					
@@ -314,7 +313,7 @@ public class ContextInterpreter implements Receiver{
 						case BRIGHT:
 							if(suggestedContextItems.contains(ci)) continue;
 							if(cia.getLightness().equals("light")){
-								Log.d("BRIGHT"," light");
+//								Log.d("BRIGHT"," light");
 								
 								suggestedContextItems.add(ci);
 								suggestion = new ContextSuggestion(null, suggestedContextItems, i.getContext());
@@ -554,6 +553,7 @@ public class ContextInterpreter implements Receiver{
 		c.set(Calendar.MINUTE,minuteOfSunset);
 		c.set(Calendar.SECOND,0);
 		Date late = c.getTime();
+		Log.w("TEST", "Now: " + now);
 		return (now.after(late));
 	}
 
